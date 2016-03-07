@@ -1,5 +1,5 @@
 === Plugin Name ===
-Contributors: nathanbarry
+Contributors: nathanbarry, growdev
 Donate link: http://convertkit.com/
 Tags: convertkit, email, marketing, membermouse
 Requires at least: 3.0.1
@@ -18,7 +18,7 @@ This plugin integrates ConvertKit with Member Mouse.
 
 == Installation ==
 
-1. Upload `cpmvertlot-membermouse` to the `/wp-content/plugins/` directory
+1. Upload `convertkit-membermouse` to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Visit the settings page by clicking on the link under the plugin's name
 4. Enter your ConvertKit API key, which you can find [here](https://app.convertkit.com/account/edit), and save the settings
@@ -43,3 +43,5 @@ Yes, for it to work you must first have an account on ConvertKit.com
 
 
 == Upgrade notice ==
+
+None.

@@ -38,6 +38,9 @@ Yes, for it to work you must first have an account on ConvertKit.com
 
 == Changelog ==
 
+= 1.0.1=
+* Fixed PHP short tag causing a T_STRING error.
+
 = 1.0 =
 * Initial release
 

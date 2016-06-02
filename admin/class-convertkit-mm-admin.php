@@ -287,11 +287,11 @@ class ConvertKit_MM_Admin {
 			          name="<?php echo $this->plugin_name; ?>-options[<?php echo $option_name ?>]"><?php
 			if ( empty( $tag ) ) {
 				?>
-				<option value=""><?php echo __( 'Select a tag', 'convertkit-mm' ); ?></option><?
+				<option value=""><?php echo __( 'Select a tag', 'convertkit-mm' ); ?></option><?php
 			}
 			foreach ( $args['tags'] as $value => $text ) {
 				?>
-				<option value="<?php echo $value; ?>" <?php selected( $tag, $value ); ?>><?php echo $text; ?></option><?
+				<option value="<?php echo $value; ?>" <?php selected( $tag, $value ); ?>><?php echo $text; ?></option><?php
 			}
 			?></select><?php
 		}
@@ -308,11 +308,14 @@ class ConvertKit_MM_Admin {
 
 		global $wpdb;
 
-		$sql = "SELECT id, name, status FROM " . MM_TABLE_MEMBERSHIP_LEVELS;
+		$levels = array();
+		if ( defined( 'MM_TABLE_MEMBERSHIP_LEVELS' ) ) {
+			$sql = "SELECT id, name, status FROM " . MM_TABLE_MEMBERSHIP_LEVELS;
+		} else {
+			return $levels;
+		}
 
 		$result = $wpdb->get_results( $sql, OBJECT );
-
-		$levels = array();
 
 		foreach ( $result as $_level ){
 			$levels[ $_level->id ] = $_level->name;

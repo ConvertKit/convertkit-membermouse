@@ -149,6 +149,7 @@ class ConvertKit_MM {
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_menu' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
 		$this->loader->add_action( 'mm_member_add', $plugin_admin, 'add_member' );
+		$this->loader->add_action( 'mm_bundles_add', $plugin_admin, 'add_bundle', 10, 2 );
 
 	}
 

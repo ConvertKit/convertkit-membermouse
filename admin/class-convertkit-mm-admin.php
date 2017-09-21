@@ -128,6 +128,16 @@ class ConvertKit_MM_Admin {
 			);
 
 		} else {
+
+
+			add_settings_field(
+				'convertkit-membership-levels',
+				apply_filters( $this->plugin_name . '-display-convertkit-mapping', __( 'Membership Levels', 'convertkit-mm' ) ),
+				function(){return false;},
+				$this->plugin_name,
+				$this->plugin_name . '-ck-mapping'
+			);
+
 			foreach( $levels as $key => $name ) {
 
 				add_settings_field(
@@ -145,6 +155,47 @@ class ConvertKit_MM_Admin {
 
 		}
 
+		// Get all MemberMouse bundles
+		$bundles = $this->get_mm_bundles();
+
+		// No MM mappings created yet
+		if ( empty ( $bundles ) ){
+
+			add_settings_field(
+				'convertkit-empty-mapping',
+				apply_filters( $this->plugin_name . '-display-convertkit-mapping', __( 'Mapping', 'convertkit-mm' ) ),
+				array( $this, 'display_options_empty_mapping' ),
+				$this->plugin_name,
+				$this->plugin_name . '-ck-mapping'
+			);
+
+		} else {
+
+			add_settings_field(
+				'convertkit-bundles',
+				apply_filters( $this->plugin_name . '-display-convertkit-mapping', __( 'Bundles', 'convertkit-mm' ) ),
+				function(){return false;},
+				$this->plugin_name,
+				$this->plugin_name . '-ck-mapping'
+			);
+
+
+			foreach( $bundles as $key => $name ) {
+				//add_settings_field($id, $title, $callback, $page, $section = 'default', $args = array()) {
+				add_settings_field(
+					'convertkit-mapping-bundle-' . $key,
+					apply_filters( $this->plugin_name . '-display-convertkit-mapping-bundle-' . $key , $name ),
+					array( $this, 'display_options_convertkit_mapping' ),
+					$this->plugin_name,
+					$this->plugin_name . '-ck-mapping',
+					array( 'key' => 'bundle-' . $key,
+					       'name' => $name,
+					       'tags' => $tags,
+					)
+				);
+			}
+
+		}
 	}
 
 
@@ -234,7 +285,6 @@ class ConvertKit_MM_Admin {
 		return $links;
 	}
 
-
 	/**
 	 * Creates a settings input for the API key.
 	 *
@@ -247,7 +297,6 @@ class ConvertKit_MM_Admin {
 		?><input type="text" id="<?php echo $this->plugin_name; ?>-options[api-key]" name="<?php echo $this->plugin_name; ?>-options[api-key]" value="<?php echo esc_attr( $api_key ); ?>" /><br/>
 		<p class="description"><a href="https://app.convertkit.com/account/edit" target="_blank"><?php echo __( 'Get your ConvertKit API Key', 'convertkit-mm' ); ?></a></p><?php
 	}
-
 
 	/**
 	 * Empty mapping callback
@@ -263,7 +312,6 @@ class ConvertKit_MM_Admin {
 			<?php echo sprintf( __( 'You can add one <a href="%s">here</a>.', 'converkit-mm'), get_admin_url( null, '/admin.php?page=mmro-membershiplevels' ) ); ?></p>
 		<?php
 	}
-
 
 	/**
 	 * Display mapping for the specified key.
@@ -285,10 +333,10 @@ class ConvertKit_MM_Admin {
 
 			?><select id="<?php echo $this->plugin_name; ?>-options[<?php echo $option_name ?>]"
 			          name="<?php echo $this->plugin_name; ?>-options[<?php echo $option_name ?>]"><?php
-			if ( empty( $tag ) ) {
 				?>
-				<option value=""><?php echo __( 'Select a tag', 'convertkit-mm' ); ?></option><?php
-			}
+				<option value=""><?php echo __( 'None', 'convertkit-mm' ); ?></option>
+			<?php
+
 			foreach ( $args['tags'] as $value => $text ) {
 				?>
 				<option value="<?php echo $value; ?>" <?php selected( $tag, $value ); ?>><?php echo $text; ?></option><?php
@@ -325,6 +373,28 @@ class ConvertKit_MM_Admin {
 
 	}
 
+	/**
+	 *
+	 */
+	public function get_mm_bundles(){
+
+		global $wpdb;
+
+		$levels = array();
+		if ( defined( 'MM_TABLE_BUNDLES' ) ) {
+			$sql = "SELECT id, name, status FROM " . MM_TABLE_BUNDLES;
+		} else {
+			return $levels;
+		}
+
+		$result = $wpdb->get_results( $sql, OBJECT );
+
+		foreach ( $result as $_level ){
+			$levels[ $_level->id ] = $_level->name;
+		}
+
+		return $levels;
+	}
 
 	/**
 	 * A member was added to MemberMouse
@@ -339,6 +409,8 @@ class ConvertKit_MM_Admin {
 	 */
 	public function add_member( $member_data ) {
 
+		$this->log( "In add_member" );
+		$this->log( "member data:\n" . print_r( $member_data, true ) );
 		if( isset( $member_data['membership_level'] ) ){
 
 			$user_email = $member_data['email'];
@@ -353,6 +425,24 @@ class ConvertKit_MM_Admin {
 
 	}
 
+	public function add_bundle( $member_data, $bundle_data ) {
+
+		$this->log( "In add_bundle" );
+		$this->log( "member data:\n" . print_r( $member_data, true ) );
+		$this->log( "bundle data:\n" . print_r( $bundle_data, true ) );
+		if( isset( $member_data['bundle_id'] ) ) {
+
+			$user_email = $member_data['email'];
+			$user_name = urlencode( $member_data['first_name'] . ' ' . $member_data['last_name'] );
+			$mapping = 'convertkit-mapping-bundle-' . $member_data['bundle_id'];
+			$tag_id = $this->get_option( $mapping );
+
+			if (! empty( $tag_id ) ){
+				$this->api->add_tag_to_user( $user_email, $user_name, $tag_id );
+			}
+		}
+
+	}
 
 	/**
 	 * Get the setting option requested.
@@ -371,6 +461,22 @@ class ConvertKit_MM_Admin {
 		}
 
 		return $option;
+	}
+
+	/**
+	 * Output data to log file
+	 *
+	 * @param string $message String to add to log.
+	 */
+	public function log( $message ) {
+
+		$dir = dirname( __FILE__ );
+		$handle = fopen( trailingslashit( $dir ) . 'log.txt', 'a' );
+		if ( $handle ) {
+			$time   = date_i18n( 'm-d-Y @ H:i:s -' );
+			fwrite( $handle, $time . ' ' . $message . "\n" );
+			fclose( $handle );
+		}
 	}
 
 }

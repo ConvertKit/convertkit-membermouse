@@ -149,9 +149,10 @@ class ConvertKit_MM {
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_menu' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
 		$this->loader->add_action( 'mm_member_add', $plugin_admin, 'add_member' );
+		$this->loader->add_action( 'mm_member_status_change', $plugin_admin, 'status_change_member' );
+		$this->loader->add_action( 'mm_member_delete', $plugin_admin, 'delete_member' );
 
 	}
-
 
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.

@@ -30,6 +30,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+define( 'CONVERTKIT_MM_PATH', plugin_dir_path( __FILE__ ) );
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-convertkit-mm-activator.php
@@ -50,6 +51,11 @@ function deactivate_convertkit_mm() {
 
 register_activation_hook( __FILE__, 'activate_convertkit_mm' );
 register_deactivation_hook( __FILE__, 'deactivate_convertkit_mm' );
+
+/**
+ * Helper functions
+ */
+require plugin_dir_path( __FILE__ ) . 'includes/convertkit-mm-functions.php';
 
 /**
  * The core plugin class

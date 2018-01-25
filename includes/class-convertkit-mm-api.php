@@ -163,8 +163,8 @@ class ConvertKit_MM_API {
 
 		), $request_args );
 
-		$this->log( "Request url: " . $request_url );
-		$this->log( "Request args: " . print_r( $request_args, true ) );
+		convertkit_mm_log( 'api' , 'Request url: ' . $request_url );
+		convertkit_mm_log( 'api' , 'Request args: ' . print_r( $request_args, true ) );
 
 		// Do the request
 		$response = wp_remote_request( $request_url, $request_args );
@@ -177,7 +177,7 @@ class ConvertKit_MM_API {
 			$response_data = json_decode( $response_body, true );
 
 			if( is_null( $response_data ) ) {
-				$this->log( "Response data not null. " . print_r( $response,true));
+				convertkit_mm_log( 'api' , 'Response data not null. ' . print_r( $response,true));
 				return new WP_Error( 'parse_failed', __('Could not parse response from ConvertKit', 'convertkit-mm' ) );
 			} else if( isset( $response_data['error']) && isset($response_data['message'] ) ) {
 				return new WP_Error( $response_data['error'], $response_data['message'] );
@@ -188,26 +188,5 @@ class ConvertKit_MM_API {
 		}
 
 	}
-
-
-	/**
-	 * Log API calls and updates.
-	 *
-	 * @since 1.0.0
-	 * @param string $message Message to put in the log.
-	 */
-	public function log( $message ) {
-
-		if ( defined( 'CK_DEBUG') ) {
-
-			$log     = fopen( plugin_dir_path( __FILE__ ) . '/log.txt', 'a+' );
-			$message = '[' . date( 'd-m-Y H:i:s' ) . '] ' . $message . PHP_EOL;
-			fwrite( $log, $message );
-			fclose( $log );
-
-		}
-
-	}
-
 
 }

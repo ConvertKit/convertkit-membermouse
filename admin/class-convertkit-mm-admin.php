@@ -93,7 +93,6 @@ class ConvertKit_MM_Admin {
 			$this->plugin_name
 		);
 
-		// add_settings_field( $id, $title, $callback, $menu_slug, $section, $args );
 		add_settings_field(
 			'api-key',
 			apply_filters( $this->plugin_name . '-display-api-key', __( 'API Key', 'convertkit-mm' ) ),
@@ -101,8 +100,13 @@ class ConvertKit_MM_Admin {
 			$this->plugin_name,
 			$this->plugin_name . '-display-options'
 		);
-
-		// add_settings_section( $id, $title, $callback, $menu_slug );
+		add_settings_field(
+			'debug',
+			apply_filters( $this->plugin_name . '-display-debug', __( 'Debug', 'convertkit-mm' ) ),
+			array( $this, 'display_options_debug' ),
+			$this->plugin_name,
+			$this->plugin_name . '-display-options'
+		);
 		add_settings_section(
 			$this->plugin_name . '-ck-mapping',
 			apply_filters( $this->plugin_name . '-display-mapping-title', __( 'Assign Tags', 'convertkit-mm' ) ),
@@ -129,7 +133,7 @@ class ConvertKit_MM_Admin {
 
 		} else {
 			foreach( $levels as $key => $name ) {
-
+				//($id, $title, $callback, $page, $section = 'default', $args = array()) {
 				add_settings_field(
 					'convertkit-mapping-' . $key,
 					apply_filters( $this->plugin_name . '-display-convertkit-mapping-' . $key , $name ),
@@ -141,6 +145,7 @@ class ConvertKit_MM_Admin {
 					       'tags' => $tags,
 					)
 				);
+
 			}
 
 		}
@@ -216,7 +221,8 @@ class ConvertKit_MM_Admin {
 	 * @return 		mixed 						The settings section
 	 */
 	public function display_mapping_section( $params ) {
-		echo '<p>' . __( 'Below is a list of the defined MemberMmouse Membership Levels. Assign a membership level to a ConvertKit tag that will be assigned to members of that level.','convertkit-mm') .'</p>';
+		echo '<p>' . __( 'Below is a list of the defined MemberMouse Membership Levels. Assign a membership level to a ConvertKit tag that will be assigned to members of that level.','convertkit-mm') .'</p>';
+		echo '<table class="form-table"><tbody><tr><th scope="row">Membership</th><td><strong>Apply tag on add</strong></td><td><strong>Apply tag on cancel</strong></td></tr></tbody></table>';
 	}
 
 
@@ -248,6 +254,19 @@ class ConvertKit_MM_Admin {
 		<p class="description"><a href="https://app.convertkit.com/account/edit" target="_blank"><?php echo __( 'Get your ConvertKit API Key', 'convertkit-mm' ); ?></a></p><?php
 	}
 
+		/**
+	 * Creates a settings input for the Debug option.
+	 *
+	 * @since 		1.0.0
+	 * @return 		mixed 			The settings field
+	 */
+	public function display_options_debug() {
+		$debug = $this->get_option( 'debug' );
+
+		?><input type="checkbox" id="<?php echo $this->plugin_name; ?>-options[debug]" name="<?php echo $this->plugin_name; ?>-options[debug]" <?php if( 'on' === $debug) { echo "checked"; }?> /> <?php echo __( 'Add data to a debug log.', 'convertkit-mm'); ?><?php
+	}
+
+
 
 	/**
 	 * Empty mapping callback
@@ -275,6 +294,7 @@ class ConvertKit_MM_Admin {
 
 		$option_name = 'convertkit-mapping-' . $args['key'];
 		$tag         = $this->get_option( $option_name );
+		$tag_cancel  = $this->get_option( $option_name . '-cancel' );
 		$api_key     = $this->get_option( 'api-key' );
 
 		if ( empty( $api_key ) ) {
@@ -285,15 +305,30 @@ class ConvertKit_MM_Admin {
 
 			?><select id="<?php echo $this->plugin_name; ?>-options[<?php echo $option_name ?>]"
 			          name="<?php echo $this->plugin_name; ?>-options[<?php echo $option_name ?>]"><?php
-			if ( empty( $tag ) ) {
-				?>
-				<option value=""><?php echo __( 'Select a tag', 'convertkit-mm' ); ?></option><?php
-			}
-			foreach ( $args['tags'] as $value => $text ) {
-				?>
-				<option value="<?php echo $value; ?>" <?php selected( $tag, $value ); ?>><?php echo $text; ?></option><?php
-			}
-			?></select><?php
+				if ( empty( $tag ) ) {
+					?>
+					<option value=""><?php echo __( 'Select a tag', 'convertkit-mm' ); ?></option><?php
+				}
+				foreach ( $args['tags'] as $value => $text ) {
+					?>
+					<option value="<?php echo $value; ?>" <?php selected( $tag, $value ); ?>><?php echo $text; ?></option><?php
+				}
+			?></select>
+			</td>
+			<td>
+
+			<select id="<?php echo $this->plugin_name; ?>-options[<?php echo $option_name ?>-cancel]"
+			        name="<?php echo $this->plugin_name; ?>-options[<?php echo $option_name ?>-cancel]"><?php
+				if ( empty( $tag_cancel ) ) {
+					?>
+					<option value=""><?php echo __( 'Select a tag', 'convertkit-mm' ); ?></option><?php
+				}
+				foreach ( $args['tags'] as $value => $text ) {
+					?>
+					<option value="<?php echo $value; ?>" <?php selected( $tag_cancel, $value ); ?>><?php echo $text; ?></option><?php
+				}
+				?></select>
+			<?php
 		}
 
 	}
@@ -348,11 +383,51 @@ class ConvertKit_MM_Admin {
 
 			if (! empty( $tag_id ) ){
 				$this->api->add_tag_to_user( $user_email, $user_name, $tag_id );
+				convertkit_mm_log( 'tag', 'Add tag ' . $tag_id . ' to user ' . $user_email . ' (' . $user_name . ')' );
 			}
 		}
 
 	}
 
+	/**
+	 * @param $member_data
+	 */
+	public function status_change_member( $member_data ) {
+
+		if( isset( $member_data['membership_level'] ) ) {
+			if ( isset( $member_data['status_name'] ) && 'Canceled' == $member_data['status_name'] ) {
+
+				$user_email = $member_data['email'];
+				$user_name = urlencode( $member_data['first_name'] . ' ' . $member_data['last_name'] );
+				$mapping = 'convertkit-mapping-' . $member_data['membership_level'] . '-cancel';
+				$tag_id = $this->get_option( $mapping );
+
+				if (! empty( $tag_id ) ){
+					$this->api->add_tag_to_user( $user_email, $user_name, $tag_id );
+					convertkit_mm_log( 'tag', 'Delete tag ' . $tag_id . ' to user ' . $user_email . ' (' . $user_name . ')' );
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param $member_data
+     */
+	public function delete_member( $member_data ) {
+
+		if( isset( $member_data['membership_level'] ) ){
+
+			$user_email = $member_data['email'];
+			$user_name = urlencode( $member_data['first_name'] . ' ' . $member_data['last_name'] );
+			$mapping = 'convertkit-mapping-' . $member_data['membership_level'] . '-cancel';
+			$tag_id = $this->get_option( $mapping );
+
+			if (! empty( $tag_id ) ){
+				$this->api->add_tag_to_user( $user_email, $user_name, $tag_id );
+				convertkit_mm_log( 'tag', 'Delete tag ' . $tag_id . ' to user ' . $user_email . ' (' . $user_name . ')' );
+			}
+		}
+	}
 
 	/**
 	 * Get the setting option requested.
@@ -372,5 +447,6 @@ class ConvertKit_MM_Admin {
 
 		return $option;
 	}
+
 
 }

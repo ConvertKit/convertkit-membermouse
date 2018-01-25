@@ -3,8 +3,8 @@ Contributors: nathanbarry, growdev
 Donate link: http://convertkit.com/
 Tags: convertkit, email, marketing, membermouse
 Requires at least: 3.0.1
-Tested up to: 4.4.2
-Stable tag: 1.0.0
+Tested up to: 4.9.2
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,6 +37,10 @@ This plugin integrates ConvertKit with Member Mouse.
 Yes, for it to work you must first have an account on ConvertKit.com
 
 == Changelog ==
+
+= 1.0.2  2018-01-25 =
+* Added tag to be applied when a membership cancels or a member is deleted.
+* Added debug log setting
 
 = 1.0.1=
 * Fixed PHP short tag causing a T_STRING error.

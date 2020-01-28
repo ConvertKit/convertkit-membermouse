@@ -114,17 +114,16 @@ class ConvertKit_MM_API {
 	/**
 	 *
 	 * @param string $user_email
-	 * @param string $user_name
+	 * @param string $first_name
 	 * @param int $tag_id
 	 */
-	public function add_tag_to_user( $user_email, $user_name, $tag_id ){
-
+	public function add_tag_to_user( $user_email, $first_name, $tag_id ){
 		$args = array(
-			'name' => $user_name,
-			'email' => $user_email,
+			'first_name' => $first_name,
+			'email'      => $user_email,
 		);
-		$response = $this->do_api_call( 'tags/' . $tag_id . '/subscribe', $args, 'POST' );
 
+		$this->do_api_call( 'tags/' . $tag_id . '/subscribe', $args, 'POST' );
 	}
 
 

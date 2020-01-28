@@ -377,12 +377,12 @@ class ConvertKit_MM_Admin {
 		if( isset( $member_data['membership_level'] ) ){
 
 			$user_email = $member_data['email'];
-			$user_name = urlencode( $member_data['first_name'] . ' ' . $member_data['last_name'] );
+			$first_name = urlencode( $member_data['first_name'] );
 			$mapping = 'convertkit-mapping-' . $member_data['membership_level'];
 			$tag_id = $this->get_option( $mapping );
 
 			if (! empty( $tag_id ) ){
-				$this->api->add_tag_to_user( $user_email, $user_name, $tag_id );
+				$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
 				convertkit_mm_log( 'tag', 'Add tag ' . $tag_id . ' to user ' . $user_email . ' (' . $user_name . ')' );
 			}
 		}
@@ -398,12 +398,12 @@ class ConvertKit_MM_Admin {
 			if ( isset( $member_data['status_name'] ) && 'Canceled' == $member_data['status_name'] ) {
 
 				$user_email = $member_data['email'];
-				$user_name = urlencode( $member_data['first_name'] . ' ' . $member_data['last_name'] );
+				$first_name = urlencode( $member_data['first_name'] );
 				$mapping = 'convertkit-mapping-' . $member_data['membership_level'] . '-cancel';
 				$tag_id = $this->get_option( $mapping );
 
 				if (! empty( $tag_id ) ){
-					$this->api->add_tag_to_user( $user_email, $user_name, $tag_id );
+					$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
 					convertkit_mm_log( 'tag', 'Delete tag ' . $tag_id . ' to user ' . $user_email . ' (' . $user_name . ')' );
 				}
 			}
@@ -418,12 +418,12 @@ class ConvertKit_MM_Admin {
 		if( isset( $member_data['membership_level'] ) ){
 
 			$user_email = $member_data['email'];
-			$user_name = urlencode( $member_data['first_name'] . ' ' . $member_data['last_name'] );
+			$first_name = urlencode( $member_data['first_name'] );
 			$mapping = 'convertkit-mapping-' . $member_data['membership_level'] . '-cancel';
 			$tag_id = $this->get_option( $mapping );
 
 			if (! empty( $tag_id ) ){
-				$this->api->add_tag_to_user( $user_email, $user_name, $tag_id );
+				$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
 				convertkit_mm_log( 'tag', 'Delete tag ' . $tag_id . ' to user ' . $user_email . ' (' . $user_name . ')' );
 			}
 		}

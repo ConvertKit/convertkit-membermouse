@@ -16,9 +16,9 @@
  * Plugin Name:       ConvertKit MemberMouse Integration
  * Plugin URI:        http://www.convertkit.com
  * Description:       This plugin integrates ConvertKit with MemberMouse.
- * Version:           1.0.2
- * Author:            Daniel Espinoza
- * Author URI:        https://growdevelopment.com
+ * Version:           1.1.2
+ * Author:            ConvertKit
+ * Author URI:        https://convertkit.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       convertkit-mm

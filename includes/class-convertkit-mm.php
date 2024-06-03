@@ -69,7 +69,7 @@ class ConvertKit_MM {
 	public function __construct() {
 
 		$this->plugin_name = 'convertkit-mm';
-		$this->version = '1.1.2';
+		$this->version = '1.1.3';
 
 		$this->load_dependencies();
 		$this->set_locale();

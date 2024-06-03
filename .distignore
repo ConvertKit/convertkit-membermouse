@@ -23,7 +23,6 @@ composer.lock
 convertkit-membermouse.zip
 DEPLOYMENT.md
 DEVELOPMENT.md
-LICENSE
 log.txt
 phpcs.xml
 phpcs.tests.xml

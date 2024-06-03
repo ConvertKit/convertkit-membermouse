@@ -1,3 +1,11 @@
 .DS_Store
-includes/log.txt
-log*
+.env
+.env.testing
+codeception.yml
+composer.lock
+log
+log.txt
+phpstan.neon
+tests/_output
+vendor
+*.zip

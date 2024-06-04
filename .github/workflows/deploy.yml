@@ -19,6 +19,13 @@ jobs:
       - name: Checkout Plugin
         uses: actions/checkout@v4
 
+      # Installs required packages that must be included in the Plugin
+      # as specified in composer.json's "require" section.
+      # "require-dev" is ignored by design, as these are only needed for
+      # testing
+      - name: Run Composer
+        run: composer install --no-dev
+
       # Deploy to wordpress.org, if expected files exist.
       - name: WordPress Plugin Deploy
         id: deploy

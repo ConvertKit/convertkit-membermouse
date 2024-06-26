@@ -17,9 +17,16 @@ class ActivateDeactivatePluginCest
 	public function testPluginActivationDeactivation(AcceptanceTester $I)
 	{
 		$I->activateConvertKitPlugin($I);
-		$I->activateThirdPartyPlugin($I, 'membermouse');
+		$I->activateThirdPartyPlugin($I, 'membermouse-platform');
+
+		// Go to the Plugin's Settings > General Screen.
+		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
+
+		// Check that no PHP warnings or notices were output.
+		$I->checkNoWarningsAndNoticesOnScreen($I);
+
 		$I->deactivateConvertKitPlugin($I);
-		$I->deactivateThirdPartyPlugin($I, 'membermouse');
+		$I->deactivateThirdPartyPlugin($I, 'membermouse-platform');
 	}
 
 	/**
@@ -30,9 +37,16 @@ class ActivateDeactivatePluginCest
 	 *
 	 * @param   AcceptanceTester $I  Tester.
 	 */
-	public function testPluginActivationDeactivationWithoutWPForms(AcceptanceTester $I)
+	public function testPluginActivationDeactivationWithoutMemberMouse(AcceptanceTester $I)
 	{
 		$I->activateConvertKitPlugin($I);
+
+		// Go to the Plugin's Settings > General Screen.
+		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
+
+		// Check that no PHP warnings or notices were output.
+		$I->checkNoWarningsAndNoticesOnScreen($I);
+
 		$I->deactivateConvertKitPlugin($I);
 	}
 }

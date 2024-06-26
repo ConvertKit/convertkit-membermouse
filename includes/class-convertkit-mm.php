@@ -69,7 +69,7 @@ class ConvertKit_MM {
 	public function __construct() {
 
 		$this->plugin_name = 'convertkit-mm';
-		$this->version = '1.1.3';
+		$this->version     = '1.1.3';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -99,19 +99,18 @@ class ConvertKit_MM {
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-convertkit-mm-loader.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-convertkit-mm-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-convertkit-mm-i18n.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-convertkit-mm-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-convertkit-mm-admin.php';
-
+		require_once plugin_dir_path( __DIR__ ) . 'admin/class-convertkit-mm-admin.php';
 
 		$this->loader = new ConvertKit_MM_Loader();
 
@@ -145,7 +144,7 @@ class ConvertKit_MM {
 
 		$plugin_admin = new ConvertKit_MM_Admin( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_filter( 'plugin_action_links_convertkit-membermouse/convertkit-membermouse.php' , $plugin_admin, 'settings_link' );
+		$this->loader->add_filter( 'plugin_action_links_convertkit-membermouse/convertkit-membermouse.php', $plugin_admin, 'settings_link' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_menu' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
 		$this->loader->add_action( 'mm_member_add', $plugin_admin, 'add_member' );

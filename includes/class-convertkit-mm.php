@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The file that defines the core plugin class
  *
@@ -69,7 +68,7 @@ class ConvertKit_MM {
 	public function __construct() {
 
 		$this->plugin_name = 'convertkit-mm';
-		$this->version = '1.1.3';
+		$this->version     = '1.1.3';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -83,7 +82,7 @@ class ConvertKit_MM {
 	 * Include the following files that make up the plugin:
 	 *
 	 * - ConvertKit_MM_Loader. Orchestrates the hooks of the plugin.
-	 * - ConvertKit_MM_i18n. Defines internationalization functionality.
+	 * - ConvertKit_MM_I18n. Defines internationalization functionality.
 	 * - ConvertKit_MM_Admin. Defines all hooks for the admin area.
 	 * - ConvertKit_MM_Public. Defines all hooks for the public side of the site.
 	 *
@@ -99,19 +98,18 @@ class ConvertKit_MM {
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-convertkit-mm-loader.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-convertkit-mm-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-convertkit-mm-i18n.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-convertkit-mm-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-convertkit-mm-admin.php';
-
+		require_once plugin_dir_path( __DIR__ ) . 'admin/class-convertkit-mm-admin.php';
 
 		$this->loader = new ConvertKit_MM_Loader();
 
@@ -120,7 +118,7 @@ class ConvertKit_MM {
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the ConvertKit_MM_i18n class in order to set the domain and to register the hook
+	 * Uses the ConvertKit_MM_I18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
@@ -128,7 +126,7 @@ class ConvertKit_MM {
 	 */
 	private function set_locale() {
 
-		$plugin_i18n = new ConvertKit_MM_i18n();
+		$plugin_i18n = new ConvertKit_MM_I18n();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
 
@@ -145,7 +143,7 @@ class ConvertKit_MM {
 
 		$plugin_admin = new ConvertKit_MM_Admin( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_filter( 'plugin_action_links_convertkit-membermouse/convertkit-membermouse.php' , $plugin_admin, 'settings_link' );
+		$this->loader->add_filter( 'plugin_action_links_convertkit-membermouse/convertkit-membermouse.php', $plugin_admin, 'settings_link' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_menu' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
 		$this->loader->add_action( 'mm_member_add', $plugin_admin, 'add_member' );

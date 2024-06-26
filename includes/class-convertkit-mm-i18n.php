@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Define the internationalization functionality
  *
@@ -24,7 +23,7 @@
  * @subpackage ConvertKit_MM/includes
  * @author     Daniel Espinoza <daniel@growdevelopment.com>
  */
-class ConvertKit_MM_i18n {
+class ConvertKit_MM_I18n {
 
 
 	/**

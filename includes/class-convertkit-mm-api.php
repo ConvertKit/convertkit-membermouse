@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ConvertKit API specific functionality
  *
@@ -21,27 +20,57 @@
  */
 class ConvertKit_MM_API {
 
-	/** @var  string $api_version */
+	/**
+	 * API version
+	 *
+	 * @since   1.0.0
+	 *
+	 * @var     string
+	 */
 	protected $api_version = 'v3';
 
-	/** @var  string $api_url */
+	/**
+	 * API URL
+	 *
+	 * @since   1.0.0
+	 *
+	 * @var     string
+	 */
 	protected $api_url = 'https://api.convertkit.com';
 
-	/** @var  string $api_key The customer's ConvertKit API key */
+	/**
+	 * API Key
+	 *
+	 * @since   1.0.0
+	 *
+	 * @var     string
+	 */
 	protected $api_key;
 
-	/** @var   */
+	/**
+	 * ConvertKit Forms
+	 *
+	 * @since   1.0.0
+	 *
+	 * @var     array
+	 */
 	protected $forms;
 
-	/** @var  array $tags Tags in the customer's account */
+	/**
+	 * ConvertKit Tags
+	 *
+	 * @since   1.0.0
+	 *
+	 * @var     array
+	 */
 	protected $tags;
-
 
 	/**
 	 * Initialize the class.
 	 *
 	 * @since    1.0.0
-	 * @param    string $api_key
+	 *
+	 * @param    string $api_key    API Key.
 	 */
 	public function __construct( $api_key ) {
 
@@ -51,6 +80,8 @@ class ConvertKit_MM_API {
 
 	/**
 	 * Get an array of forms and IDs from the API
+	 *
+	 * @since   1.0.0
 	 *
 	 * @return mixed
 	 */
@@ -83,6 +114,8 @@ class ConvertKit_MM_API {
 	/**
 	 * Get an array of tags and IDs from the API
 	 *
+	 * @since   1.0.0
+	 *
 	 * @return mixed
 	 */
 	public function get_tags() {
@@ -110,31 +143,35 @@ class ConvertKit_MM_API {
 
 	}
 
-
 	/**
+	 * Add a tag to the subscriber.
 	 *
-	 * @param string $user_email
-	 * @param string $first_name
-	 * @param int    $tag_id
+	 * @since   1.0.0
+	 *
+	 * @param string $user_email    Email Address.
+	 * @param string $first_name    First name.
+	 * @param int    $tag_id        ConvertKit Tag ID.
 	 */
 	public function add_tag_to_user( $user_email, $first_name, $tag_id ) {
+
 		$args = array(
 			'first_name' => $first_name,
 			'email'      => $user_email,
 		);
 
 		$this->do_api_call( 'tags/' . $tag_id . '/subscribe', $args, 'POST' );
-	}
 
+	}
 
 	/**
 	 * Make a remote call to ConvertKit's API.
 	 *
-	 * @param $path
-	 * @param array  $query_args
-	 * @param string $method
-	 * @param null   $body
-	 * @param array  $request_args
+	 * @since   1.0.0
+	 * @param   string $path           API endpoint.
+	 * @param   array  $query_args     Query arguments.
+	 * @param   string $method         Request method.
+	 * @param   null   $body           Body.
+	 * @param   array  $request_args   Request arguments.
 	 *
 	 * @return array|mixed|object|WP_Error
 	 */
@@ -142,16 +179,16 @@ class ConvertKit_MM_API {
 
 		$api_key = $this->api_key;
 
-		if ( '' == $api_key ) {
+		if ( '' === $api_key ) {
 			return array();
 		}
 
-		// Setup the URL endpoint
+		// Setup the URL endpoint.
 		$request_url           = $this->api_url . '/' . $this->api_version . '/' . $path;
 		$query_args['api_key'] = $api_key;
 		$request_url           = add_query_arg( $query_args, $request_url );
 
-		// Setup the request args
+		// Setup the request args.
 		$request_args = array_merge(
 			array(
 				'body'    => $body,
@@ -166,12 +203,12 @@ class ConvertKit_MM_API {
 		);
 
 		convertkit_mm_log( 'api', 'Request url: ' . $request_url );
-		convertkit_mm_log( 'api', 'Request args: ' . print_r( $request_args, true ) );
+		convertkit_mm_log( 'api', 'Request args: ' . print_r( $request_args, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 
-		// Do the request
+		// Do the request.
 		$response = wp_remote_request( $request_url, $request_args );
 
-		// Handle the response
+		// Handle the response.
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		} else {
@@ -179,7 +216,7 @@ class ConvertKit_MM_API {
 			$response_data = json_decode( $response_body, true );
 
 			if ( is_null( $response_data ) ) {
-				convertkit_mm_log( 'api', 'Response data not null. ' . print_r( $response, true ) );
+				convertkit_mm_log( 'api', 'Response data not null. ' . print_r( $response, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 				return new WP_Error( 'parse_failed', __( 'Could not parse response from ConvertKit', 'convertkit-mm' ) );
 			} elseif ( isset( $response_data['error'] ) && isset( $response_data['message'] ) ) {
 				return new WP_Error( $response_data['error'], $response_data['message'] );

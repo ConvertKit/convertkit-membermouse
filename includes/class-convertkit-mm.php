@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The file that defines the core plugin class
  *
@@ -83,7 +82,7 @@ class ConvertKit_MM {
 	 * Include the following files that make up the plugin:
 	 *
 	 * - ConvertKit_MM_Loader. Orchestrates the hooks of the plugin.
-	 * - ConvertKit_MM_i18n. Defines internationalization functionality.
+	 * - ConvertKit_MM_I18n. Defines internationalization functionality.
 	 * - ConvertKit_MM_Admin. Defines all hooks for the admin area.
 	 * - ConvertKit_MM_Public. Defines all hooks for the public side of the site.
 	 *
@@ -119,7 +118,7 @@ class ConvertKit_MM {
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the ConvertKit_MM_i18n class in order to set the domain and to register the hook
+	 * Uses the ConvertKit_MM_I18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
@@ -127,7 +126,7 @@ class ConvertKit_MM {
 	 */
 	private function set_locale() {
 
-		$plugin_i18n = new ConvertKit_MM_i18n();
+		$plugin_i18n = new ConvertKit_MM_I18n();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
 

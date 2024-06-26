@@ -94,6 +94,12 @@ jobs:
         working-directory: ${{ env.ROOT_DIR }}
         run: wp-cli plugin install ${{ env.INSTALL_PLUGINS }}
 
+      # These should be stored as a separated list of URLs in the repository Settings > Secrets > Repository Secret > CONVERTKIT_PAID_PLUGIN_URLS.
+      # We cannot include the URLs in this file, as they're not Plugins we are permitted to distribute.
+      - name: Install and Activate Paid Third Party WordPress Plugins
+        working-directory: ${{ env.ROOT_DIR }}
+        run: wp-cli plugin install ${{ secrets.CONVERTKIT_PAID_PLUGIN_URLS }} --activate
+
       # Install PHP version to run tests against.
       - name: Install PHP
         uses: shivammathur/setup-php@v2
@@ -110,6 +116,11 @@ jobs:
       - name: Build PHP Autoloader
         working-directory: ${{ env.PLUGIN_DIR }}
         run: composer dump-autoload
+
+      # Run Coding Standards on Tests.
+      - name: Run Coding Standards on Tests
+        working-directory: ${{ env.PLUGIN_DIR }}
+        run: php vendor/bin/phpcs -q --standard=phpcs.tests.xml --report=checkstyle ./tests | cs2pr
 
       # Run WordPress Coding Standards on Plugin.
       - name: Run WordPress Coding Standards

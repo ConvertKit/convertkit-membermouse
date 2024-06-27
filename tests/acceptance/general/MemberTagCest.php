@@ -59,8 +59,9 @@ class MemberTagCest
 		// Accept popup once user created.
 		// We have to wait as there's no specific event MemberMouse fires to tell
 		// us it completed adding the member.
-		$I->wait(5);
+		$I->wait(3);
 		$I->acceptPopup();
+		$I->wait(3);
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);

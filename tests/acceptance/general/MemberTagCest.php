@@ -53,10 +53,17 @@ class MemberTagCest
 		$I->fillField('#mm-new-last-name', 'Last');
 		$I->fillField('#mm-new-email', $emailAddress);
 		$I->fillField('#mm-new-password', '12345678');
-		$I->click('Create Member');
+		$I->click('Create Member', '.mm-dialog-button-container');
+		$I->waitForElementNotVisible('#mm-new-member-form-container');
 
 		// Accept popup once user created.
+		// We have to wait as there's no specific event MemberMouse fires to tell
+		// us it completed adding the member.
+		$I->wait(5);
 		$I->acceptPopup();
+
+		// Check subscriber exists.
+		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
 
 		// Check that the subscriber has been assigned to the tag.
 		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);

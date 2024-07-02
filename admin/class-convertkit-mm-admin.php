@@ -147,11 +147,11 @@ class ConvertKit_MM_Admin {
 		}
 
 		// Output product to tag mappings.
-		if ( empty( $levels ) ) {
+		if ( empty( $products ) ) {
 			add_settings_field(
 				'convertkit-empty-mapping',
-				apply_filters( $this->plugin_name . '_display_convertkit_mapping', esc_html__( 'Mapping', 'convertkit-mm' ) ),
-				array( $this, 'display_options_empty_mapping' ),
+				apply_filters( $this->plugin_name . '_display_convertkit_mapping_product', esc_html__( 'Mapping', 'convertkit-mm' ) ),
+				array( $this, 'display_options_empty_mapping_products' ),
 				$this->plugin_name,
 				$this->plugin_name . '-ck-mapping'
 			);
@@ -374,6 +374,29 @@ class ConvertKit_MM_Admin {
 				</select>
 			<?php
 		}
+
+	}
+
+
+	/**
+	 * Outputs a notice in the Mapping section when no MemberMouse products have been added
+	 *
+	 * @since       1.2.0
+	 */
+	public function display_options_empty_mapping_products() {
+
+		?>
+		<p>
+			<?php echo esc_html__( 'No MM Products have been added yet.', 'convertkit-mm' ); ?><br/>
+			<?php
+			printf(
+				/* translators: Link to MemberMouse Membership Levels */
+				esc_html__( 'You can add one <a href="%s">here</a>.', 'convertkit-mm' ),
+				esc_url( get_admin_url( null, '/admin.php?page=product_settings' ) )
+			);
+			?>
+		</p>
+		<?php
 
 	}
 

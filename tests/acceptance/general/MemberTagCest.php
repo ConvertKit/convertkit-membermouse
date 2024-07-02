@@ -88,7 +88,7 @@ class MemberTagCest
 		$I->setupConvertKitPlugin(
 			$I,
 			[
-				'convertkit-mapping-'.$levelID => $_ENV['CONVERTKIT_API_TAG_ID'],
+				'convertkit-mapping-' . $levelID => $_ENV['CONVERTKIT_API_TAG_ID'],
 			]
 		);
 
@@ -148,7 +148,64 @@ class MemberTagCest
 	 */
 	public function testMemberTaggedWhenMembershipLevelCancelled(AcceptanceTester $I)
 	{
-		
+		// Setup Plugin to tag users added to the Free Membership level to the
+		// ConvertKit Tag ID, and assign them a different tag when their membership
+		// is cancelled.
+		$I->setupConvertKitPlugin(
+			$I,
+			[
+				'convertkit-mapping-1'        => $_ENV['CONVERTKIT_API_TAG_ID'],
+				'convertkit-mapping-1-cancel' => $_ENV['CONVERTKIT_API_TAG_CANCEL_ID'],
+
+			]
+		);
+
+		// Generate email address for test.
+		$emailAddress = $I->generateEmailAddress();
+
+		// Navigate to MemberMouse > Manage Members.
+		$I->amOnAdminPage('admin.php?page=manage_members');
+
+		// Create Member.
+		$I->click('Create Member');
+		$I->waitForElementVisible('#mm-new-member-form-container');
+		$I->fillField('#mm-new-first-name', 'First');
+		$I->fillField('#mm-new-last-name', 'Last');
+		$I->fillField('#mm-new-email', $emailAddress);
+		$I->fillField('#mm-new-password', '12345678');
+		$I->click('Create Member', '.mm-dialog-button-container');
+		$I->waitForElementNotVisible('#mm-new-member-form-container');
+
+		// Accept popup once user created.
+		// We have to wait as there's no specific event MemberMouse fires to tell
+		// us it completed adding the member.
+		$I->wait(3);
+		$I->acceptPopup();
+		$I->wait(3);
+
+		// Check subscriber exists.
+		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
+
+		// Check that the subscriber has been assigned to the tag.
+		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);
+
+		// Cancel the user's membership level.
+		$I->amOnAdminPage('admin.php?page=manage_members');
+		$I->click($emailAddress);
+		$I->click('Access Rights');
+		$I->click('Cancel Membership');
+
+		// Accept popups
+		// We have to wait as there's no specific event MemberMouse fires to tell
+		// us it completed changing the membership level.
+		$I->wait(3);
+		$I->acceptPopup();
+		$I->wait(3);
+		$I->acceptPopup();
+		$I->wait(3);
+
+		// Check that the subscriber has been assigned to the cancelled tag.
+		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_CANCEL_ID']);
 	}
 
 	/**
@@ -161,7 +218,63 @@ class MemberTagCest
 	 */
 	public function testMemberTaggedWhenDeleted(AcceptanceTester $I)
 	{
-		
+		// Setup Plugin to tag users added to the Free Membership level to the
+		// ConvertKit Tag ID, and assign them a different tag when their membership
+		// is cancelled through account deletion.
+		$I->setupConvertKitPlugin(
+			$I,
+			[
+				'convertkit-mapping-1'        => $_ENV['CONVERTKIT_API_TAG_ID'],
+				'convertkit-mapping-1-cancel' => $_ENV['CONVERTKIT_API_TAG_CANCEL_ID'],
+
+			]
+		);
+
+		// Generate email address for test.
+		$emailAddress = $I->generateEmailAddress();
+
+		// Navigate to MemberMouse > Manage Members.
+		$I->amOnAdminPage('admin.php?page=manage_members');
+
+		// Create Member.
+		$I->click('Create Member');
+		$I->waitForElementVisible('#mm-new-member-form-container');
+		$I->fillField('#mm-new-first-name', 'First');
+		$I->fillField('#mm-new-last-name', 'Last');
+		$I->fillField('#mm-new-email', $emailAddress);
+		$I->fillField('#mm-new-password', '12345678');
+		$I->click('Create Member', '.mm-dialog-button-container');
+		$I->waitForElementNotVisible('#mm-new-member-form-container');
+
+		// Accept popup once user created.
+		// We have to wait as there's no specific event MemberMouse fires to tell
+		// us it completed adding the member.
+		$I->wait(3);
+		$I->acceptPopup();
+		$I->wait(3);
+
+		// Check subscriber exists.
+		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
+
+		// Check that the subscriber has been assigned to the tag.
+		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);
+
+		// Cancel the user's membership level.
+		$I->amOnAdminPage('admin.php?page=manage_members');
+		$I->click($emailAddress);
+		$I->click('Delete Member');
+
+		// Accept popups
+		// We have to wait as there's no specific event MemberMouse fires to tell
+		// us it completed changing the membership level.
+		$I->wait(3);
+		$I->acceptPopup();
+		$I->wait(3);
+		$I->acceptPopup();
+		$I->wait(3);
+
+		// Check that the subscriber has been assigned to the cancelled tag.
+		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_CANCEL_ID']);
 	}
 
 	/**

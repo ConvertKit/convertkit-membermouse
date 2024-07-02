@@ -15,22 +15,22 @@ class MemberMouse extends \Codeception\Module
 	 * @since   1.2.0
 	 *
 	 * @param   AcceptanceTester $I     AcceptanceTester.
-	 * @param 	string 			 $name 	Membership Level Name.
-	 * @return 	int 					Membership Level ID.
+	 * @param   string           $name  Membership Level Name.
+	 * @return  int                     Membership Level ID.
 	 */
 	public function memberMouseCreateMembershipLevel($I, $name)
 	{
 		return $I->haveInDatabase(
 			'wp_mm_membership_levels',
 			[
-				'reference_key' => 'm9BvU2',
-				'is_free' => 1,
-				'is_default' => 0,
-				'name' => $name,
-				'description' => $name,
-				'wp_role' => 'mm-ignore-role',
+				'reference_key'      => 'm9BvU2',
+				'is_free'            => 1,
+				'is_default'         => 0,
+				'name'               => $name,
+				'description'        => $name,
+				'wp_role'            => 'mm-ignore-role',
 				'default_product_id' => 0,
-				'status' => 1,
+				'status'             => 1,
 			]
 		);
 	}

@@ -453,6 +453,33 @@ class ConvertKit_MM_Admin {
 	}
 
 	/**
+	 * Assign a tag to the subscriber when purchasing a MemberMouse Product
+	 * that is configured to tag a subscriber.
+	 * 
+	 * @since 	1.2.0
+	 * 
+	 * @param 	array 	$purchase_data 	Checkout purchase data.
+	 */
+	public function purchase_product( $purchase_data ) {
+
+		// Fetch data from purchase array.
+		$user_email = $purchase_data['email'];
+		$first_name = rawurlencode( $purchase_data['first_name'] );
+		$mapping    = 'convertkit-mapping-product-' . $purchase_data['product_id'] . '-cancel';
+		$tag_id     = $this->get_option( $mapping );
+
+		// If no tag assigned to this Product, bail.
+		if ( empty( $tag_id ) ) {
+			return;
+		}
+
+		// Assign tag to subscriber in ConvertKit.
+		$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
+		convertkit_mm_log( 'tag', 'Add product tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
+
+	}
+
+	/**
 	 * Get the setting option requested.
 	 *
 	 * @since   1.0.0

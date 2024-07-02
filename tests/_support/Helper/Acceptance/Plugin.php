@@ -34,4 +34,49 @@ class Plugin extends \Codeception\Module
 	{
 		$I->deactivateThirdPartyPlugin($I, 'convertkit-membermouse');
 	}
+
+	/**
+	 * Helper method to programmatically setup the Plugin's settings.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I         AcceptanceTester.
+	 * @param   bool|array       $options {
+	 *           Optional. An array of settings.
+	 *
+	 *     @type string $api_key            API Key (if specified, used instead of CONVERTKIT_API_KEY).
+	 *     @type string $debug              Enable debugging (default: on).
+	 * }
+	 */
+	public function setupConvertKitPlugin($I, $options = false)
+	{
+		// Define default options.
+		$defaults = [
+			'api-key' => $_ENV['CONVERTKIT_API_KEY'],
+			'debug'   => 'on',
+		];
+
+		// If supplied options are an array, merge them with the defaults.
+		if (is_array($options)) {
+			$options = array_merge($defaults, $options);
+		} else {
+			$options = $defaults;
+		}
+
+		// Define settings in options table.
+		$I->haveOptionInDatabase('convertkit-mm-options', $options);
+	}
+
+	/**
+	 * Helper method to reset the ConvertKit Plugin settings, as if it's a clean installation.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I     AcceptanceTester.
+	 */
+	public function resetConvertKitPlugin($I)
+	{
+		// Plugin Settings.
+		$I->dontHaveOptionInDatabase('convertkit-mm-options');
+	}
 }

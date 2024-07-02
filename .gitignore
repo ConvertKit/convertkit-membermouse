@@ -5,6 +5,7 @@ codeception.yml
 composer.lock
 log
 log.txt
+log-api.txt
 phpstan.neon
 tests/_output
 vendor

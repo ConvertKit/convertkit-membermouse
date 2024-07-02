@@ -20,6 +20,6 @@ class Email extends \Codeception\Module
 	 */
 	public function generateEmailAddress()
 	{
-		return 'wordpress-' . uniqid() . '-' . date( 'Y-m-d-H-i-s' ) . '-php-' . PHP_VERSION_ID . '@n7studios.com';
+		return 'wordpress-' . rand(0, 1000) . '-' . date( 'YmdHis' ) . '-php-' . PHP_VERSION_ID . '@n7studios.com'; // phpcs:ignore WordPress.WP.AlternativeFunctions
 	}
 }

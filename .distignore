@@ -24,6 +24,7 @@ convertkit-membermouse.zip
 DEPLOYMENT.md
 DEVELOPMENT.md
 log.txt
+log-api.txt
 phpcs.xml
 phpcs.tests.xml
 phpstan.neon

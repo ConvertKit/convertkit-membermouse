@@ -112,13 +112,14 @@ class ConvertKit_MM_Admin {
 			$this->plugin_name
 		);
 
-		// Get all MemberMouse membership levels.
-		$levels = $this->get_mm_membership_levels();
+		// Get all MemberMouse membership levels and products.
+		$levels   = $this->get_mm_membership_levels();
+		$products = $this->get_mm_products();
 
 		// Get all tags from ConvertKit.
 		$tags = $this->api->get_tags();
 
-		// No MM mappings created yet.
+		// Output level to tag mappings.
 		if ( empty( $levels ) ) {
 			add_settings_field(
 				'convertkit-empty-mapping',
@@ -142,7 +143,33 @@ class ConvertKit_MM_Admin {
 						'tags' => $tags,
 					)
 				);
+			}
+		}
 
+		// Output product to tag mappings.
+		if ( empty( $levels ) ) {
+			add_settings_field(
+				'convertkit-empty-mapping',
+				apply_filters( $this->plugin_name . '_display_convertkit_mapping', esc_html__( 'Mapping', 'convertkit-mm' ) ),
+				array( $this, 'display_options_empty_mapping' ),
+				$this->plugin_name,
+				$this->plugin_name . '-ck-mapping'
+			);
+
+		} else {
+			foreach ( $products as $key => $name ) {
+				add_settings_field(
+					'convertkit-mapping-product-' . $key,
+					apply_filters( $this->plugin_name . '_display_convertkit_mapping_product_' . $key, $name ),
+					array( $this, 'display_options_convertkit_mapping_product' ),
+					$this->plugin_name,
+					$this->plugin_name . '-ck-mapping',
+					array(
+						'key'  => $key,
+						'name' => $name,
+						'tags' => $tags,
+					)
+				);
 			}
 		}
 
@@ -292,7 +319,7 @@ class ConvertKit_MM_Admin {
 	}
 
 	/**
-	 * Display mapping for the specified key.
+	 * Display membership level to tag mapping for the specified key.
 	 *
 	 * @since 1.0.0
 	 *
@@ -351,6 +378,51 @@ class ConvertKit_MM_Admin {
 	}
 
 	/**
+	 * Display product to tag mapping for the specified key.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param array $args   Field arguments.
+	 */
+	public function display_options_convertkit_mapping_product( $args ) {
+
+		$option_name = 'convertkit-mapping-product-' . $args['key'];
+		$tag         = $this->get_option( $option_name );
+		$api_key     = $this->get_option( 'api-key' );
+
+		if ( empty( $api_key ) ) {
+			?>
+			<p><?php echo esc_html__( 'Enter API key to retrieve list of tags.', 'convertkit-mm' ); ?></p>
+			<?php
+		} elseif ( is_null( $args['tags'] ) ) {
+			?>
+			<p><?php echo esc_html__( 'No tags were returned from ConvertKit.', 'convertkit-mm' ); ?></p>
+			<?php
+		} else {
+			?>
+				<select id="<?php echo esc_attr( $this->plugin_name ); ?>-options[<?php echo esc_attr( $option_name ); ?>]" name="<?php echo esc_attr( $this->plugin_name ); ?>-options[<?php echo esc_attr( $option_name ); ?>]">
+					<?php
+					if ( empty( $tag ) ) {
+						?>
+						<option value=""><?php echo esc_attr__( 'Select a tag', 'convertkit-mm' ); ?></option>
+						<?php
+					}
+					foreach ( $args['tags'] as $value => $text ) {
+						?>
+						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $tag, $value ); ?>><?php echo esc_attr( $text ); ?></option>
+						<?php
+					}
+					?>
+				</select>
+			</td>
+			<td>
+				&nbsp;
+			<?php
+		}
+
+	}
+
+	/**
 	 * Get all MemberMouse membership levels
 	 *
 	 * @since 1.0.0
@@ -372,6 +444,32 @@ class ConvertKit_MM_Admin {
 		}
 
 		return $levels;
+
+	}
+
+	/**
+	 * Get all MemberMouse products
+	 *
+	 * @since   1.2.0
+	 *
+	 * @return  array
+	 */
+	public function get_mm_products() {
+
+		global $wpdb;
+
+		$products = array();
+		if ( ! defined( 'MM_TABLE_PRODUCTS' ) ) {
+			return $products;
+		}
+
+		$result = $wpdb->get_results( 'SELECT id, name, status FROM ' . MM_TABLE_PRODUCTS, OBJECT ); // phpcs:ignore WordPress.DB.PreparedSQL
+
+		foreach ( $result as $product ) {
+			$products[ $product->id ] = $product->name;
+		}
+
+		return $products;
 
 	}
 
@@ -455,17 +553,17 @@ class ConvertKit_MM_Admin {
 	/**
 	 * Assign a tag to the subscriber when purchasing a MemberMouse Product
 	 * that is configured to tag a subscriber.
-	 * 
-	 * @since 	1.2.0
-	 * 
-	 * @param 	array 	$purchase_data 	Checkout purchase data.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   array $purchase_data  Checkout purchase data.
 	 */
 	public function purchase_product( $purchase_data ) {
 
 		// Fetch data from purchase array.
 		$user_email = $purchase_data['email'];
 		$first_name = rawurlencode( $purchase_data['first_name'] );
-		$mapping    = 'convertkit-mapping-product-' . $purchase_data['product_id'] . '-cancel';
+		$mapping    = 'convertkit-mapping-product-' . $purchase_data['product_id'];
 		$tag_id     = $this->get_option( $mapping );
 
 		// If no tag assigned to this Product, bail.

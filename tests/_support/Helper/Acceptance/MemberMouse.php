@@ -34,4 +34,27 @@ class MemberMouse extends \Codeception\Module
 			]
 		);
 	}
+
+	/**
+	 * Helper method to create a product.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I     AcceptanceTester.
+	 * @param   string           $name  Product Name.
+	 * @param   string           $key   Product Reference Key.
+	 * @return  int                     Product ID.
+	 */
+	public function memberMouseCreateProduct($I, $name, $key)
+	{
+		return $I->haveInDatabase(
+			'wp_mm_products',
+			[
+				'reference_key' => $key,
+				'status'        => 1,
+				'name'          => $name,
+				'price'         => 1,
+			]
+		);
+	}
 }

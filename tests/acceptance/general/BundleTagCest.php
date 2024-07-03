@@ -67,9 +67,16 @@ class BundleTagCest
 	}
 
 	/**
-	 * 
+	 * Test that the member is tagged with the configured "apply tag on cancelled"
+	 * setting when the given bundle for the member is cancelled.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I  Tester.
+	 */
 	public function testMemberTaggedWhenBundleCancelled(AcceptanceTester $I)
 	{
+		// @TODO.
 	}
 
 	/**
@@ -114,8 +121,17 @@ class BundleTagCest
 		$subscriberID = $I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
 	}
 
+	/**
+	 * Test that the member is not tagged when the configured "apply tag on cancelled"
+	 * setting is set to 'None' and the given bundle for the member is cancelled.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I  Tester.
+	 */
 	public function testMemberNotTaggedWhenBundleCancelled(AcceptanceTester $I)
 	{
+		// @TODO.
 	}
 
 	/**

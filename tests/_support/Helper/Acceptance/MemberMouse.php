@@ -123,6 +123,15 @@ class MemberMouse extends \Codeception\Module
 		$I->click("//a[contains(@href,'action=logout')]");
 	}
 
+	/**
+	 * Helper method to complete the checkout process for the given MemberMouse
+	 * Product by its reference key.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I                     AcceptanceTester.
+	 * @param   string           $productReferenceKey   Product reference key.
+	 */
 	public function memberMouseCheckoutProduct($I, $productReferenceKey)
 	{
 		// Navigate to purchase screen for the product.

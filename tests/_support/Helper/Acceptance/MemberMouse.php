@@ -57,4 +57,95 @@ class MemberMouse extends \Codeception\Module
 			]
 		);
 	}
+
+	/**
+	 * Helper method to create a bundle.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I            AcceptanceTester.
+	 * @param   string           $name         Bundle Name.
+	 * @param   array            $productIDs   Product IDs to assign to the bundle.
+	 * @return  int                            Bundle ID.
+	 */
+	public function memberMouseCreateBundle($I, $name, $productIDs)
+	{
+		$bundleID = $I->haveInDatabase(
+			'wp_mm_bundles',
+			[
+				'name'    => $name,
+				'is_free' => 0,
+				'status'  => 1,
+			]
+		);
+
+		foreach ( $productIDs as $productID ) {
+			$I->haveInDatabase(
+				'wp_mm_bundle_products',
+				[
+					'bundle_id'  => $bundleID,
+					'product_id' => $productID,
+				]
+			);
+		}
+
+		return $bundleID;
+	}
+
+	/**
+	 * Helper method to enable test payments in MemberMouse.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I            AcceptanceTester.
+	 */
+	public function memberMouseEnableTestModeForPayments($I)
+	{
+		$I->amOnAdminPage('admin.php?page=payment_settings');
+		$I->checkOption('test_payment_service_enabled');
+		$I->click('Save Payment Methods');
+		$I->wait(5);
+		$I->acceptPopup();
+	}
+
+	/**
+	 * Helper method to log out from WordPress when MemberMouse is enabled.
+	 * We don't use logOut() as MemberMouse hijacks the logout process with a redirect,
+	 * resulting in the logOut() assertion `loggedout=true` failing.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I            AcceptanceTester.
+	 */
+	public function memberMouseLogOut($I)
+	{
+		$I->amOnPage('wp-login.php?action=logout');
+		$I->click("//a[contains(@href,'action=logout')]");
+	}
+
+	public function memberMouseCheckoutProduct($I, $productReferenceKey)
+	{
+		// Navigate to purchase screen for the product.
+		$I->amOnPage('checkout/?rid=' . $productReferenceKey);
+
+		// Complete checkout.
+		$I->fillField('mm_field_first_name', 'First');
+		$I->fillField('mm_field_last_name', 'Last');
+		$I->fillField('mm_field_email', $emailAddress);
+		$I->fillField('mm_field_password', '12345678');
+		$I->fillField('mm_field_phone', '12345678');
+		$I->fillField('mm_field_cc_number', '4242424242424242');
+		$I->fillField('mm_field_cc_cvv', '123');
+		$I->selectOption('mm_field_cc_exp_year', '2038');
+		$I->fillField('mm_field_billing_address', '123 Main Street');
+		$I->fillField('mm_field_billing_city', 'Nashville');
+		$I->selectOption('#mm_field_billing_state_dd', 'Tennessee');
+		$I->fillField('mm_field_billing_zip', '37208');
+
+		// Submit.
+		$I->click('Submit Order');
+
+		// Wait for confirmation.
+		$I->waitForText('Thank you for your order');
+	}
 }

@@ -146,10 +146,15 @@ class ConvertKit_MM {
 		$this->loader->add_filter( 'plugin_action_links_convertkit-membermouse/convertkit-membermouse.php', $plugin_admin, 'settings_link' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_menu' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
+
+		// Tag on Membership Level.
 		$this->loader->add_action( 'mm_member_add', $plugin_admin, 'add_member' );
 		$this->loader->add_action( 'mm_member_membership_change', $plugin_admin, 'add_member' );
 		$this->loader->add_action( 'mm_member_status_change', $plugin_admin, 'status_change_member' );
 		$this->loader->add_action( 'mm_member_delete', $plugin_admin, 'delete_member' );
+
+		// Tag on Product.
+		$this->loader->add_action( 'mm_product_purchase', $plugin_admin, 'purchase_product' );
 
 	}
 

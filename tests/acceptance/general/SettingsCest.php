@@ -95,14 +95,14 @@ class SettingsCest
 	}
 
 	/**
-	 * Test that saving an invalid API Key on the settings screen
+	 * Test that level to tag mapping changes on the settings screen
 	 * works with no errors.
 	 *
 	 * @since   1.2.0
 	 *
 	 * @param   AcceptanceTester $I  Tester.
 	 */
-	public function testSaveTagAssignment(AcceptanceTester $I)
+	public function testSaveLevelTagAssignment(AcceptanceTester $I)
 	{
 		// Setup Plugin.
 		$I->setupConvertKitPlugin($I);
@@ -122,6 +122,62 @@ class SettingsCest
 		// Confirm settings saved.
 		$I->see('Settings saved.');
 		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-1]', $_ENV['CONVERTKIT_API_TAG_NAME']);
+
+		// Change tag back to 'None'.
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-1]', '(None)');
+
+		// Click save settings.
+		$I->click('Save Settings');
+
+		// Check that no PHP warnings or notices were output.
+		$I->checkNoWarningsAndNoticesOnScreen($I);
+
+		// Confirm settings saved.
+		$I->see('Settings saved.');
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-1]', '(None)');
+	}
+
+	/**
+	 * Test that product to tag mapping changes on the settings screen
+	 * works with no errors.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I  Tester.
+	 */
+	public function testSaveProductTagAssignment(AcceptanceTester $I)
+	{
+		// Setup Plugin.
+		$I->setupConvertKitPlugin($I);
+
+		// Go to the Plugin's Settings > General Screen.
+		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
+
+		// Assign tags.
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-1]', $_ENV['CONVERTKIT_API_TAG_NAME']);
+
+		// Click save settings.
+		$I->click('Save Settings');
+
+		// Check that no PHP warnings or notices were output.
+		$I->checkNoWarningsAndNoticesOnScreen($I);
+
+		// Confirm settings saved.
+		$I->see('Settings saved.');
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-1]', $_ENV['CONVERTKIT_API_TAG_NAME']);
+
+		// Change tag back to 'None'.
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-1]', '(None)');
+
+		// Click save settings.
+		$I->click('Save Settings');
+
+		// Check that no PHP warnings or notices were output.
+		$I->checkNoWarningsAndNoticesOnScreen($I);
+
+		// Confirm settings saved.
+		$I->see('Settings saved.');
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-1]', '(None)');
 	}
 
 	/**

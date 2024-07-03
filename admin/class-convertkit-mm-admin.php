@@ -612,9 +612,6 @@ class ConvertKit_MM_Admin {
 	 */
 	public function add_member( $member_data ) {
 
-		error_log( 'add_member' );
-		error_log( print_r( $member_data, true ) );
-
 		if ( isset( $member_data['membership_level'] ) ) {
 			$user_email = $member_data['email'];
 			$first_name = rawurlencode( $member_data['first_name'] );
@@ -637,9 +634,6 @@ class ConvertKit_MM_Admin {
 	 * @param array $member_data    Member data.
 	 */
 	public function status_change_member( $member_data ) {
-
-		error_log( 'status_change_member' );
-		error_log( print_r( $member_data, true ) );
 
 		if ( isset( $member_data['membership_level'] ) ) {
 			if ( isset( $member_data['status_name'] ) && 'Canceled' === $member_data['status_name'] ) {
@@ -666,9 +660,6 @@ class ConvertKit_MM_Admin {
 	 */
 	public function delete_member( $member_data ) {
 
-		error_log( 'delete_member' );
-		error_log( print_r( $member_data, true ) );
-
 		if ( isset( $member_data['membership_level'] ) ) {
 			$user_email = $member_data['email'];
 			$first_name = rawurlencode( $member_data['first_name'] );
@@ -692,9 +683,6 @@ class ConvertKit_MM_Admin {
 	 * @param   array $purchase_data  Checkout purchase data.
 	 */
 	public function purchase_product( $purchase_data ) {
-
-		error_log( 'purchase_product' );
-		error_log( print_r( $purchase_data, true ) );
 
 		// Fetch data from purchase array.
 		$user_email = $purchase_data['email'];
@@ -745,17 +733,17 @@ class ConvertKit_MM_Admin {
 	 *
 	 * @since   1.2.0
 	 *
-	 * @param 	array $member_data    Member data.
+	 * @param   array $member_data    Member data.
 	 */
 	public function status_change_bundle( $member_data ) {
 
 		// Determine the status change.
 		switch ( $member_data['bundle_status_name'] ) {
 			case 'Active':
-				$mapping    = 'convertkit-mapping-bundle-' . $member_data['bundle_id'];
+				$mapping = 'convertkit-mapping-bundle-' . $member_data['bundle_id'];
 				break;
 			case 'Canceled':
-				$mapping    = 'convertkit-mapping-bundle-' . $member_data['bundle_id'] . '-cancel';
+				$mapping = 'convertkit-mapping-bundle-' . $member_data['bundle_id'] . '-cancel';
 				break;
 
 			default:

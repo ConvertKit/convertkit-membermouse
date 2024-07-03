@@ -112,6 +112,7 @@ class SettingsCest
 
 		// Assign tags.
 		$I->selectOption('convertkit-mm-options[convertkit-mapping-1]', $_ENV['CONVERTKIT_API_TAG_NAME']);
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-1-cancel]', $_ENV['CONVERTKIT_API_TAG_CANCEL_NAME']);
 
 		// Click save settings.
 		$I->click('Save Settings');
@@ -122,9 +123,11 @@ class SettingsCest
 		// Confirm settings saved.
 		$I->see('Settings saved.');
 		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-1]', $_ENV['CONVERTKIT_API_TAG_NAME']);
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-1-cancel]', $_ENV['CONVERTKIT_API_TAG_CANCEL_NAME']);
 
 		// Change tag back to 'None'.
 		$I->selectOption('convertkit-mm-options[convertkit-mapping-1]', '(None)');
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-1-cancel]', '(None)');
 
 		// Click save settings.
 		$I->click('Save Settings');
@@ -135,6 +138,7 @@ class SettingsCest
 		// Confirm settings saved.
 		$I->see('Settings saved.');
 		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-1]', '(None)');
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-1-cancel]', '(None)');
 	}
 
 	/**
@@ -147,6 +151,10 @@ class SettingsCest
 	 */
 	public function testSaveProductTagAssignment(AcceptanceTester $I)
 	{
+		// Create a product.
+		$productReferenceKey = 'pTRLc9';
+		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+
 		// Setup Plugin.
 		$I->setupConvertKitPlugin($I);
 
@@ -154,7 +162,7 @@ class SettingsCest
 		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
 
 		// Assign tags.
-		$I->selectOption('convertkit-mm-options[convertkit-mapping-1]', $_ENV['CONVERTKIT_API_TAG_NAME']);
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-product-' . $productID . ']', $_ENV['CONVERTKIT_API_TAG_NAME']);
 
 		// Click save settings.
 		$I->click('Save Settings');
@@ -164,10 +172,10 @@ class SettingsCest
 
 		// Confirm settings saved.
 		$I->see('Settings saved.');
-		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-1]', $_ENV['CONVERTKIT_API_TAG_NAME']);
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-product-' . $productID . ']', $_ENV['CONVERTKIT_API_TAG_NAME']);
 
 		// Change tag back to 'None'.
-		$I->selectOption('convertkit-mm-options[convertkit-mapping-1]', '(None)');
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-product-' . $productID . ']', '(None)');
 
 		// Click save settings.
 		$I->click('Save Settings');
@@ -177,7 +185,7 @@ class SettingsCest
 
 		// Confirm settings saved.
 		$I->see('Settings saved.');
-		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-1]', '(None)');
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-product-' . $productID . ']', '(None)');
 	}
 
 	/**

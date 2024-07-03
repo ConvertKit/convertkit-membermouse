@@ -416,12 +416,8 @@ class ConvertKit_MM_Admin {
 		} else {
 			?>
 				<select id="<?php echo esc_attr( $this->plugin_name ); ?>-options[<?php echo esc_attr( $option_name ); ?>]" name="<?php echo esc_attr( $this->plugin_name ); ?>-options[<?php echo esc_attr( $option_name ); ?>]">
+					<option value=""<?php selected( $tag, '' ); ?>><?php echo esc_attr__( '(None)', 'convertkit-mm' ); ?></option>
 					<?php
-					if ( empty( $tag ) ) {
-						?>
-						<option value=""><?php echo esc_attr__( 'Select a tag', 'convertkit-mm' ); ?></option>
-						<?php
-					}
 					foreach ( $args['tags'] as $value => $text ) {
 						?>
 						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $tag, $value ); ?>><?php echo esc_attr( $text ); ?></option>

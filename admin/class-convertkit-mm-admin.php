@@ -112,9 +112,10 @@ class ConvertKit_MM_Admin {
 			$this->plugin_name
 		);
 
-		// Get all MemberMouse membership levels and products.
+		// Get all MemberMouse membership levels, products and bundles.
 		$levels   = $this->get_mm_membership_levels();
 		$products = $this->get_mm_products();
+		$bundles  = $this->get_mm_bundles();
 
 		// Get all tags from ConvertKit.
 		$tags = $this->api->get_tags();
@@ -128,7 +129,6 @@ class ConvertKit_MM_Admin {
 				$this->plugin_name,
 				$this->plugin_name . '-ck-mapping'
 			);
-
 		} else {
 			foreach ( $levels as $key => $name ) {
 				add_settings_field(
@@ -155,13 +155,38 @@ class ConvertKit_MM_Admin {
 				$this->plugin_name,
 				$this->plugin_name . '-ck-mapping'
 			);
-
 		} else {
 			foreach ( $products as $key => $name ) {
 				add_settings_field(
 					'convertkit-mapping-product-' . $key,
 					apply_filters( $this->plugin_name . '_display_convertkit_mapping_product_' . $key, $name ),
 					array( $this, 'display_options_convertkit_mapping_product' ),
+					$this->plugin_name,
+					$this->plugin_name . '-ck-mapping',
+					array(
+						'key'  => $key,
+						'name' => $name,
+						'tags' => $tags,
+					)
+				);
+			}
+		}
+
+		// Output bundle to tag mappings.
+		if ( empty( $bundles ) ) {
+			add_settings_field(
+				'convertkit-empty-mapping',
+				apply_filters( $this->plugin_name . '_display_convertkit_mapping_bundle', esc_html__( 'Mapping', 'convertkit-mm' ) ),
+				array( $this, 'display_options_empty_mapping_bundles' ),
+				$this->plugin_name,
+				$this->plugin_name . '-ck-mapping'
+			);
+		} else {
+			foreach ( $bundles as $key => $name ) {
+				add_settings_field(
+					'convertkit-mapping-bundle-' . $key,
+					apply_filters( $this->plugin_name . '_display_convertkit_mapping_bundle_' . $key, $name ),
+					array( $this, 'display_options_convertkit_mapping_bundle' ),
 					$this->plugin_name,
 					$this->plugin_name . '-ck-mapping',
 					array(
@@ -369,7 +394,6 @@ class ConvertKit_MM_Admin {
 
 	}
 
-
 	/**
 	 * Outputs a notice in the Mapping section when no MemberMouse products have been added
 	 *
@@ -402,6 +426,69 @@ class ConvertKit_MM_Admin {
 	public function display_options_convertkit_mapping_product( $args ) {
 
 		$option_name = 'convertkit-mapping-product-' . $args['key'];
+		$tag         = $this->get_option( $option_name );
+		$api_key     = $this->get_option( 'api-key' );
+
+		if ( empty( $api_key ) ) {
+			?>
+			<p><?php echo esc_html__( 'Enter API key to retrieve list of tags.', 'convertkit-mm' ); ?></p>
+			<?php
+		} elseif ( is_null( $args['tags'] ) ) {
+			?>
+			<p><?php echo esc_html__( 'No tags were returned from ConvertKit.', 'convertkit-mm' ); ?></p>
+			<?php
+		} else {
+			?>
+				<select id="<?php echo esc_attr( $this->plugin_name ); ?>-options[<?php echo esc_attr( $option_name ); ?>]" name="<?php echo esc_attr( $this->plugin_name ); ?>-options[<?php echo esc_attr( $option_name ); ?>]">
+					<option value=""<?php selected( $tag, '' ); ?>><?php echo esc_attr__( '(None)', 'convertkit-mm' ); ?></option>
+					<?php
+					foreach ( $args['tags'] as $value => $text ) {
+						?>
+						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $tag, $value ); ?>><?php echo esc_attr( $text ); ?></option>
+						<?php
+					}
+					?>
+				</select>
+			</td>
+			<td>
+				&nbsp;
+			<?php
+		}
+
+	}
+
+	/**
+	 * Outputs a notice in the Mapping section when no MemberMouse products have been added
+	 *
+	 * @since       1.2.0
+	 */
+	public function display_options_empty_mapping_bundles() {
+
+		?>
+		<p>
+			<?php echo esc_html__( 'No MM Bundles have been added yet.', 'convertkit-mm' ); ?><br/>
+			<?php
+			printf(
+				/* translators: Link to MemberMouse Membership Levels */
+				esc_html__( 'You can add one <a href="%s">here</a>.', 'convertkit-mm' ),
+				esc_url( get_admin_url( null, '/admin.php?page=product_settings&module=bundles' ) )
+			);
+			?>
+		</p>
+		<?php
+
+	}
+
+	/**
+	 * Display bundle to tag mapping for the specified key.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param array $args   Field arguments.
+	 */
+	public function display_options_convertkit_mapping_bundle( $args ) {
+
+		$option_name = 'convertkit-mapping-bundle-' . $args['key'];
 		$tag         = $this->get_option( $option_name );
 		$api_key     = $this->get_option( 'api-key' );
 
@@ -474,13 +561,39 @@ class ConvertKit_MM_Admin {
 			return $products;
 		}
 
-		$result = $wpdb->get_results( 'SELECT id, name, status FROM ' . MM_TABLE_PRODUCTS, OBJECT ); // phpcs:ignore WordPress.DB.PreparedSQL
+		$result = $wpdb->get_results( 'SELECT id, name FROM ' . MM_TABLE_PRODUCTS, OBJECT ); // phpcs:ignore WordPress.DB.PreparedSQL
 
 		foreach ( $result as $product ) {
 			$products[ $product->id ] = $product->name;
 		}
 
 		return $products;
+
+	}
+
+	/**
+	 * Get all MemberMouse bundles
+	 *
+	 * @since   1.2.0
+	 *
+	 * @return  array
+	 */
+	public function get_mm_bundles() {
+
+		global $wpdb;
+
+		$bundles = array();
+		if ( ! defined( 'MM_TABLE_BUNDLES' ) ) {
+			return $bundles;
+		}
+
+		$result = $wpdb->get_results( 'SELECT id, name FROM ' . MM_TABLE_BUNDLES, OBJECT ); // phpcs:ignore WordPress.DB.PreparedSQL
+
+		foreach ( $result as $bundle ) {
+			$bundles[ $bundle->id ] = $bundle->name;
+		}
+
+		return $bundles;
 
 	}
 
@@ -498,6 +611,9 @@ class ConvertKit_MM_Admin {
 	 * @param array $member_data    Member data.
 	 */
 	public function add_member( $member_data ) {
+
+		error_log( 'add_member' );
+		error_log( print_r( $member_data, true ) );
 
 		if ( isset( $member_data['membership_level'] ) ) {
 			$user_email = $member_data['email'];
@@ -521,6 +637,9 @@ class ConvertKit_MM_Admin {
 	 * @param array $member_data    Member data.
 	 */
 	public function status_change_member( $member_data ) {
+
+		error_log( 'status_change_member' );
+		error_log( print_r( $member_data, true ) );
 
 		if ( isset( $member_data['membership_level'] ) ) {
 			if ( isset( $member_data['status_name'] ) && 'Canceled' === $member_data['status_name'] ) {
@@ -547,6 +666,9 @@ class ConvertKit_MM_Admin {
 	 */
 	public function delete_member( $member_data ) {
 
+		error_log( 'delete_member' );
+		error_log( print_r( $member_data, true ) );
+
 		if ( isset( $member_data['membership_level'] ) ) {
 			$user_email = $member_data['email'];
 			$first_name = rawurlencode( $member_data['first_name'] );
@@ -571,6 +693,9 @@ class ConvertKit_MM_Admin {
 	 */
 	public function purchase_product( $purchase_data ) {
 
+		error_log( 'purchase_product' );
+		error_log( print_r( $purchase_data, true ) );
+
 		// Fetch data from purchase array.
 		$user_email = $purchase_data['email'];
 		$first_name = rawurlencode( $purchase_data['first_name'] );
@@ -585,6 +710,72 @@ class ConvertKit_MM_Admin {
 		// Assign tag to subscriber in ConvertKit.
 		$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
 		convertkit_mm_log( 'tag', 'Add product tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
+
+	}
+
+	/**
+	 * Assign a tag to the subscriber when purchasing a MemberMouse Product
+	 * that is assigned to a bundle, and the bundle is configured to tag a subscriber.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   array $purchase_data  Checkout purchase data.
+	 */
+	public function add_bundle( $purchase_data ) {
+
+		// Fetch data from purchase array.
+		$user_email = $purchase_data['email'];
+		$first_name = rawurlencode( $purchase_data['first_name'] );
+		$mapping    = 'convertkit-mapping-bundle-' . $purchase_data['bundle_id'];
+		$tag_id     = $this->get_option( $mapping );
+
+		// If no tag assigned to this Bundle, bail.
+		if ( empty( $tag_id ) ) {
+			return;
+		}
+
+		// Assign tag to subscriber in ConvertKit.
+		$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
+		convertkit_mm_log( 'tag', 'Add bundle tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
+
+	}
+
+	/**
+	 * Assign a tag to the subscriber when a member's bundle status is changed in MemberMouse.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param 	array $member_data    Member data.
+	 */
+	public function status_change_bundle( $member_data ) {
+
+		// Determine the status change.
+		switch ( $member_data['bundle_status_name'] ) {
+			case 'Active':
+				$mapping    = 'convertkit-mapping-bundle-' . $member_data['bundle_id'];
+				break;
+			case 'Canceled':
+				$mapping    = 'convertkit-mapping-bundle-' . $member_data['bundle_id'] . '-cancel';
+				break;
+
+			default:
+				// Unsupported status at this time.
+				return;
+		}
+
+		// Fetch data from member array.
+		$user_email = $member_data['email'];
+		$first_name = rawurlencode( $member_data['first_name'] );
+		$tag_id     = $this->get_option( $mapping );
+
+		// If no tag assigned to this Bundle, bail.
+		if ( empty( $tag_id ) ) {
+			return;
+		}
+
+		// Assign tag to subscriber in ConvertKit.
+		$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
+		convertkit_mm_log( 'tag', 'Add bundle tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
 
 	}
 

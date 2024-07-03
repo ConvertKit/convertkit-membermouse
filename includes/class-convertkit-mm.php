@@ -156,6 +156,10 @@ class ConvertKit_MM {
 		// Tag on Product.
 		$this->loader->add_action( 'mm_product_purchase', $plugin_admin, 'purchase_product' );
 
+		// Tag on Bundle.
+		$this->loader->add_action( 'mm_bundles_add', $plugin_admin, 'add_bundle' );
+		$this->loader->add_action( 'mm_bundles_status_change', $plugin_admin, 'status_change_bundle' );
+
 	}
 
 	/**

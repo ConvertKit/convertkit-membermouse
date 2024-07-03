@@ -365,13 +365,7 @@ class ConvertKit_MM_Admin {
 			return $levels;
 		}
 
-		$result = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT id, name, status FROM %s',
-				array( MM_TABLE_MEMBERSHIP_LEVELS )
-			),
-			OBJECT
-		);
+		$result = $wpdb->get_results( 'SELECT id, name, status FROM ' . MM_TABLE_MEMBERSHIP_LEVELS, OBJECT ); // phpcs:ignore WordPress.DB.PreparedSQL
 
 		foreach ( $result as $_level ) {
 			$levels[ $_level->id ] = $_level->name;

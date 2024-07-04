@@ -124,6 +124,37 @@ class MemberMouse extends \Codeception\Module
 	}
 
 	/**
+	 * Helper method to assign a bundle to the given email address.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I             AcceptanceTester.
+	 * @param   string           $emailAddress  Email Address.
+	 * @param   string           $bundleName    Bundle name to cancel.
+	 */
+	public function memberMouseAssignBundleToMember($I, $emailAddress, $bundleName)
+	{
+		// Cancel the user's bundle.
+		$I->amOnAdminPage('admin.php?page=manage_members');
+		$I->click($emailAddress);
+		$I->click('Access Rights');
+		$I->selectOption('bundle-seletor', $bundleName);
+		$I->click('Apply Bundle');
+
+		// Wait for modal.
+		$I->waitForElementVisible('#mm-payment-options-dialog');
+
+		// Comp product for free.
+		$I->click('Comp ' . $bundleName);
+		$I->wait(3);
+		$I->acceptPopup();
+
+		// Accept popups.
+		$I->wait(3);
+		$I->acceptPopup();
+	}
+
+	/**
 	 * Helper method to cancel a bundle for the given email address.
 	 *
 	 * @since   1.2.0
@@ -166,11 +197,14 @@ class MemberMouse extends \Codeception\Module
 		$I->click('Access Rights');
 		$I->click('a[title="Activate ' . $bundleName . '"]');
 
-		// Accept popups
-		// We have to wait as there's no specific event MemberMouse fires to tell
-		// us it completed changing the membership level.
+		// Wait for modal.
+		$I->waitForElementVisible('#mm-payment-options-dialog');
+
+		$I->click('Comp ' . $bundleName);
 		$I->wait(3);
 		$I->acceptPopup();
+
+		// Accept popups.
 		$I->wait(3);
 		$I->acceptPopup();
 	}
@@ -214,8 +248,9 @@ class MemberMouse extends \Codeception\Module
 	 *
 	 * @param   AcceptanceTester $I                     AcceptanceTester.
 	 * @param   string           $productReferenceKey   Product reference key.
+	 * @param 	string 			 $emailAddress 			Email Address.
 	 */
-	public function memberMouseCheckoutProduct($I, $productReferenceKey)
+	public function memberMouseCheckoutProduct($I, $productReferenceKey, $emailAddress)
 	{
 		// Navigate to purchase screen for the product.
 		$I->amOnPage('checkout/?rid=' . $productReferenceKey);

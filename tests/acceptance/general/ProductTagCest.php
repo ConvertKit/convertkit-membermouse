@@ -54,7 +54,7 @@ class ProductTagCest
 		$I->memberMouseLogOut($I);
 
 		// Complete checkout.
-		$I->memberMouseCheckoutProduct($I, $productReferenceKey);
+		$I->memberMouseCheckoutProduct($I, $productReferenceKey, $emailAddress);
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
@@ -96,7 +96,7 @@ class ProductTagCest
 		$I->memberMouseLogOut($I);
 
 		// Complete checkout.
-		$I->memberMouseCheckoutProduct($I, $productReferenceKey);
+		$I->memberMouseCheckoutProduct($I, $productReferenceKey, $emailAddress);
 
 		// Check subscriber does not exist.
 		$subscriberID = $I->apiCheckSubscriberDoesNotExist($I, $emailAddress);

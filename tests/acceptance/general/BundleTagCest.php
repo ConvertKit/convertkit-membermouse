@@ -57,7 +57,7 @@ class BundleTagCest
 		$I->memberMouseLogOut($I);
 
 		// Complete checkout.
-		$I->memberMouseCheckoutProduct($I, $productReferenceKey);
+		$I->memberMouseCheckoutProduct($I, $productReferenceKey, $emailAddress);
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
@@ -87,23 +87,23 @@ class BundleTagCest
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
 
-		// Enable test mode for payments.
-		$I->memberMouseEnableTestModeForPayments($I);
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
 
-		// Logout.
-		$I->memberMouseLogOut($I);
+		// Check that the subscriber does not exist, as no tagging took place.
+		$I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
 
-		// Complete checkout.
-		$I->memberMouseCheckoutProduct($I, $productReferenceKey);
+		// Assign bundle.
+		$I->memberMouseAssignBundleToMember($I, $emailAddress, 'Bundle');
 
-		// Check subscriber exists.
-		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
-
-		// Check that the subscriber has been assigned to the tag.
-		$I->apiCheckSubscriberHasNoTags($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);
+		// Check that the subscriber does not exist, as no tagging took place.
+		$I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
 
 		// Cancel the user's bundle.
-		$I->memberMouseCancelMemberBundle($I, $emailAddress, 'Paid Bundle');
+		$I->memberMouseCancelMemberBundle($I, $emailAddress, 'Bundle');
+
+		// Check that the subscriber does not exist, as no tagging took place.
+		$I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
 
 		// Setup Plugin to tag users assigned / reactivated to the bundle.
 		$I->setupConvertKitPlugin(
@@ -114,9 +114,12 @@ class BundleTagCest
 		);
 
 		// Re-activate the user's bundle.
-		$I->memberMouseResumeMemberBundle($I, $emailAddress, 'Paid Bundle');
+		$I->memberMouseResumeMemberBundle($I, $emailAddress, 'Bundle');
 
-		// Check that the subscriber has been assigned to the second bundle's tag.
+		// Check subscriber exists.
+		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
+
+		// Check that the subscriber has been assigned to the bundle's tag.
 		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);
 	}
 
@@ -137,12 +140,10 @@ class BundleTagCest
 		// Create bundle.
 		$bundleID = $I->memberMouseCreateBundle($I, 'Bundle', [ $productID ]);
 
-		// Setup Plugin to tag users purchasing the bundle to the
-		// ConvertKit Tag ID.
+		// Setup Plugin to tag users when the bundle is cancelled.
 		$I->setupConvertKitPlugin(
 			$I,
 			[
-				'convertkit-mapping-bundle-' . $bundleID => $_ENV['CONVERTKIT_API_TAG_ID'],
 				'convertkit-mapping-bundle-' . $bundleID . '-cancel' => $_ENV['CONVERTKIT_API_TAG_CANCEL_ID'],
 			]
 		);
@@ -150,34 +151,23 @@ class BundleTagCest
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
 
-		// Enable test mode for payments.
-		$I->memberMouseEnableTestModeForPayments($I);
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
 
-		// Logout.
-		$I->memberMouseLogOut($I);
+		// Check that the subscriber does not exist, as no tagging took place.
+		$I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
 
-		// Complete checkout.
-		$I->memberMouseCheckoutProduct($I, $productReferenceKey);
+		// Assign bundle.
+		$I->memberMouseAssignBundleToMember($I, $emailAddress, 'Bundle');
+
+		// Check that the subscriber does not exist, as no tagging took place.
+		$I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
+
+		// Cancel the user's bundle.
+		$I->memberMouseCancelMemberBundle($I, $emailAddress, 'Bundle');
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
-
-		// Check that the subscriber has been assigned to the tag.
-		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);
-
-		// Cancel the user's bundle.
-		$I->amOnAdminPage('admin.php?page=manage_members');
-		$I->click($emailAddress);
-		$I->click('Access Rights');
-		$I->click('a[title="Cancel Paid Bundle"]');
-
-		// Accept popups
-		// We have to wait as there's no specific event MemberMouse fires to tell
-		// us it completed changing the membership level.
-		$I->wait(3);
-		$I->acceptPopup();
-		$I->wait(3);
-		$I->acceptPopup();
 
 		// Check that the subscriber has been assigned to the cancelled tag.
 		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_CANCEL_ID']);
@@ -219,14 +209,55 @@ class BundleTagCest
 		$I->memberMouseLogOut($I);
 
 		// Complete checkout.
-		$I->memberMouseCheckoutProduct($I, $productReferenceKey);
+		$I->memberMouseCheckoutProduct($I, $productReferenceKey, $emailAddress);
 
 		// Check subscriber does not exist.
 		$subscriberID = $I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
 	}
 
-	public function testMemberNotTaggedWhenBundleChanged(AcceptanceTester $I)
+	/**
+	 * Test that the member is not tagged when a previously cancelled bundle is
+	 * re-activated on their account in MemberMouse and no tagging is configured.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I  Tester.
+	 */
+	public function testMemberNotTaggedWhenBundleReactivated(AcceptanceTester $I)
 	{
+		// Create a product.
+		$productReferenceKey = 'pTRLc9';
+		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+
+		// Create bundle.
+		$bundleID = $I->memberMouseCreateBundle($I, 'Bundle', [ $productID ]);
+
+		// Generate email address for test.
+		$emailAddress = $I->generateEmailAddress();
+
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
+
+		// Check that the subscriber does not exist, as no tagging took place.
+		$I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
+
+		// Assign bundle.
+		$I->memberMouseAssignBundleToMember($I, $emailAddress, 'Bundle');
+
+		// Check that the subscriber does not exist, as no tagging took place.
+		$I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
+
+		// Cancel the user's bundle.
+		$I->memberMouseCancelMemberBundle($I, $emailAddress, 'Bundle');
+
+		// Check that the subscriber does not exist, as no tagging took place.
+		$I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
+
+		// Re-activate the user's bundle.
+		$I->memberMouseResumeMemberBundle($I, $emailAddress, 'Bundle');
+
+		// Check that the subscriber does not exist, as no tagging took place.
+		$I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
 	}
 
 	/**
@@ -259,34 +290,20 @@ class BundleTagCest
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
 
-		// Enable test mode for payments.
-		$I->memberMouseEnableTestModeForPayments($I);
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
 
-		// Logout.
-		$I->memberMouseLogOut($I);
-
-		// Complete checkout.
-		$I->memberMouseCheckoutProduct($I, $productReferenceKey);
+		// Assign bundle.
+		$I->memberMouseAssignBundleToMember($I, $emailAddress, 'Bundle');
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
 
-		// Check that the subscriber has been assigned to the tag.
+		// Check that the subscriber was tagged.
 		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);
 
 		// Cancel the user's bundle.
-		$I->amOnAdminPage('admin.php?page=manage_members');
-		$I->click($emailAddress);
-		$I->click('Access Rights');
-		$I->click('a[title="Cancel Paid Bundle"]');
-
-		// Accept popups
-		// We have to wait as there's no specific event MemberMouse fires to tell
-		// us it completed changing the membership level.
-		$I->wait(3);
-		$I->acceptPopup();
-		$I->wait(3);
-		$I->acceptPopup();
+		$I->memberMouseCancelMemberBundle($I, $emailAddress, 'Bundle');
 
 		// Check that the subscriber is still assigned to the first tag and has no additional tags.
 		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);

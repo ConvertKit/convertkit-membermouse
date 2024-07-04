@@ -68,6 +68,7 @@ class BundleTagCest
 
 	public function testMemberTaggedWhenBundleChanged(AcceptanceTester $I)
 	{
+		
 	}
 
 	/**

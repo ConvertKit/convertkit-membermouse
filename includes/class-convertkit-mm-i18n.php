@@ -25,7 +25,6 @@
  */
 class ConvertKit_MM_I18n {
 
-
 	/**
 	 * Load the plugin text domain for translation.
 	 *
@@ -33,13 +32,11 @@ class ConvertKit_MM_I18n {
 	 */
 	public function load_plugin_textdomain() {
 
-		load_plugin_textdomain(
-			'convertkit-mm',
-			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
-		);
+		// If the .mo file for a given language is available in WP_LANG_DIR/convertkit-membermouse
+		// i.e. it's available as a translation at https://translate.wordpress.org/projects/wp-plugins/convertkit-membermouse/,
+		// it will be used instead of the .mo file in convertkit-membermouse/languages.
+		load_plugin_textdomain( 'convertkit-mm', false, 'convertkit-membermouse/languages' );
 
 	}
-
 
 }

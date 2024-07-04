@@ -248,7 +248,7 @@ class MemberMouse extends \Codeception\Module
 	 *
 	 * @param   AcceptanceTester $I                     AcceptanceTester.
 	 * @param   string           $productReferenceKey   Product reference key.
-	 * @param 	string 			 $emailAddress 			Email Address.
+	 * @param   string           $emailAddress          Email Address.
 	 */
 	public function memberMouseCheckoutProduct($I, $productReferenceKey, $emailAddress)
 	{

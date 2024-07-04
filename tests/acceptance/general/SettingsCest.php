@@ -213,6 +213,7 @@ class SettingsCest
 
 		// Assign tags.
 		$I->selectOption('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . ']', $_ENV['CONVERTKIT_API_TAG_NAME']);
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . '-cancel]', $_ENV['CONVERTKIT_API_TAG_CANCEL_NAME']);
 
 		// Click save settings.
 		$I->click('Save Settings');
@@ -223,9 +224,11 @@ class SettingsCest
 		// Confirm settings saved.
 		$I->see('Settings saved.');
 		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . ']', $_ENV['CONVERTKIT_API_TAG_NAME']);
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . '-cancel]', $_ENV['CONVERTKIT_API_TAG_CANCEL_NAME']);
 
 		// Change tag back to 'None'.
 		$I->selectOption('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . ']', '(None)');
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . '-cancel]', '(None)');
 
 		// Click save settings.
 		$I->click('Save Settings');
@@ -236,6 +239,7 @@ class SettingsCest
 		// Confirm settings saved.
 		$I->see('Settings saved.');
 		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . ']', '(None)');
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . '-cancel]', '(None)');
 	}
 
 	/**

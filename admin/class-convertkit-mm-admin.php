@@ -490,6 +490,7 @@ class ConvertKit_MM_Admin {
 
 		$option_name = 'convertkit-mapping-bundle-' . $args['key'];
 		$tag         = $this->get_option( $option_name );
+		$tag_cancel  = $this->get_option( $option_name . '-cancel' );
 		$api_key     = $this->get_option( 'api-key' );
 
 		if ( empty( $api_key ) ) {
@@ -514,7 +515,16 @@ class ConvertKit_MM_Admin {
 				</select>
 			</td>
 			<td>
-				&nbsp;
+				<select id="<?php echo esc_attr( $this->plugin_name ); ?>-options[<?php echo esc_attr( $option_name ); ?>-cancel]" name="<?php echo esc_attr( $this->plugin_name ); ?>-options[<?php echo esc_attr( $option_name ); ?>-cancel]">
+					<option value=""<?php selected( $tag_cancel, '' ); ?>><?php echo esc_attr__( '(None)', 'convertkit-mm' ); ?></option>
+					<?php
+					foreach ( $args['tags'] as $value => $text ) {
+						?>
+						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $tag_cancel, $value ); ?>><?php echo esc_attr( $text ); ?></option>
+						<?php
+					}
+					?>
+				</select>
 			<?php
 		}
 

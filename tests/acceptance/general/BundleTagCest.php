@@ -66,9 +66,58 @@ class BundleTagCest
 		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);
 	}
 
-	public function testMemberTaggedWhenBundleChanged(AcceptanceTester $I)
+	/**
+	 * Test that the member is tagged with the configured "apply tag on add"
+	 * setting when a previously cancelled bundle is re-activated on their account
+	 * in MemberMouse
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I  Tester.
+	 */
+	public function testMemberTaggedWhenBundleReactivated(AcceptanceTester $I)
 	{
-		
+		// Create a product.
+		$productReferenceKey = 'pTRLc9';
+		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+
+		// Create bundle.
+		$bundleID = $I->memberMouseCreateBundle($I, 'Bundle', [ $productID ]);
+
+		// Generate email address for test.
+		$emailAddress = $I->generateEmailAddress();
+
+		// Enable test mode for payments.
+		$I->memberMouseEnableTestModeForPayments($I);
+
+		// Logout.
+		$I->memberMouseLogOut($I);
+
+		// Complete checkout.
+		$I->memberMouseCheckoutProduct($I, $productReferenceKey);
+
+		// Check subscriber exists.
+		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
+
+		// Check that the subscriber has been assigned to the tag.
+		$I->apiCheckSubscriberHasNoTags($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);
+
+		// Cancel the user's bundle.
+		$I->memberMouseCancelMemberBundle($I, $emailAddress, 'Paid Bundle');
+
+		// Setup Plugin to tag users assigned / reactivated to the bundle.
+		$I->setupConvertKitPlugin(
+			$I,
+			[
+				'convertkit-mapping-bundle-' . $bundleID => $_ENV['CONVERTKIT_API_TAG_ID'],
+			]
+		);
+
+		// Re-activate the user's bundle.
+		$I->memberMouseResumeMemberBundle($I, $emailAddress, 'Paid Bundle');
+
+		// Check that the subscriber has been assigned to the second bundle's tag.
+		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);
 	}
 
 	/**

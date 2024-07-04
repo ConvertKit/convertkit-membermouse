@@ -94,11 +94,11 @@ class MemberMouse extends \Codeception\Module
 
 	/**
 	 * Helper method to create a member in MemberMouse.
-	 * 
-	 * @since 	1.2.0
-	 * 
-	 * @param   AcceptanceTester $I     		AcceptanceTester.
-	 * @param   string 			 $emailAddress 	Email Address.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I             AcceptanceTester.
+	 * @param   string           $emailAddress  Email Address.
 	 */
 	public function memberMouseCreateMember($I, $emailAddress)
 	{
@@ -121,6 +121,58 @@ class MemberMouse extends \Codeception\Module
 		$I->wait(3);
 		$I->acceptPopup();
 		$I->wait(3);
+	}
+
+	/**
+	 * Helper method to cancel a bundle for the given email address.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I             AcceptanceTester.
+	 * @param   string           $emailAddress  Email Address.
+	 * @param   string           $bundleName    Bundle name to cancel.
+	 */
+	public function memberMouseCancelMemberBundle($I, $emailAddress, $bundleName)
+	{
+		// Cancel the user's bundle.
+		$I->amOnAdminPage('admin.php?page=manage_members');
+		$I->click($emailAddress);
+		$I->click('Access Rights');
+		$I->click('a[title="Cancel ' . $bundleName . '"]');
+
+		// Accept popups
+		// We have to wait as there's no specific event MemberMouse fires to tell
+		// us it completed changing the membership level.
+		$I->wait(3);
+		$I->acceptPopup();
+		$I->wait(3);
+		$I->acceptPopup();
+	}
+
+	/**
+	 * Helper method to re-activate a previously cancelled bundle for the given email address.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I             AcceptanceTester.
+	 * @param   string           $emailAddress  Email Address.
+	 * @param   string           $bundleName    Bundle name to activate.
+	 */
+	public function memberMouseResumeMemberBundle($I, $emailAddress, $bundleName)
+	{
+		// Activate the user's bundle.
+		$I->amOnAdminPage('admin.php?page=manage_members');
+		$I->click($emailAddress);
+		$I->click('Access Rights');
+		$I->click('a[title="Activate ' . $bundleName . '"]');
+
+		// Accept popups
+		// We have to wait as there's no specific event MemberMouse fires to tell
+		// us it completed changing the membership level.
+		$I->wait(3);
+		$I->acceptPopup();
+		$I->wait(3);
+		$I->acceptPopup();
 	}
 
 	/**

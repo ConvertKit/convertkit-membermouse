@@ -1,23 +1,16 @@
 <?php
 /**
- * The admin-specific functionality for ConvertKit Paid Memberships Pro
+ * Admin class.
  *
- * @link       http://www.convertkit.com
- * @since      1.0.0
- *
- * @package    ConvertKit_MM
- * @subpackage ConvertKit_MM/admin
+ * @package ConvertKit_MM
+ * @author ConvertKit
  */
 
 /**
- * The admin-specific functionality of the plugin.
+ * Registers the admin settings screen and saves settings.
  *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
- *
- * @package    ConvertKit_MM
- * @subpackage ConvertKit_MM/admin
- * @author     Daniel Espinoza <daniel@growdevelopment.com>
+ * @package ConvertKit_MM
+ * @author ConvertKit
  */
 class ConvertKit_MM_Admin {
 
@@ -26,7 +19,7 @@ class ConvertKit_MM_Admin {
 	 *
 	 * @since   1.0.0
 	 *
-	 * @var     ConvertKit_MM_API $api
+	 * @var     ConvertKit_MM_API
 	 */
 	private $api;
 
@@ -43,7 +36,7 @@ class ConvertKit_MM_Admin {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 
 		// Initialize API.
-		$api_key = convertkit_mm_get_option( 'api-key' );
+		$api_key   = convertkit_mm_get_option( 'api-key' );
 		$this->api = new ConvertKit_MM_API( $api_key );
 
 	}

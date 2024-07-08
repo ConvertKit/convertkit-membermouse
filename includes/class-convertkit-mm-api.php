@@ -1,22 +1,16 @@
 <?php
 /**
- * ConvertKit API specific functionality
+ * ConvertKit API class
  *
- * @link       http://www.convertkit.com
- * @since      1.0.0
- *
- * @package    ConvertKit_MM
- * @subpackage ConvertKit_MM/includes
+ * @package ConvertKit_MM
+ * @author ConvertKit
  */
 
 /**
- * ConvertKit API specific functionality.
+ * Class to make ConvertKit v3 API calls. 
  *
- * Handles all API calls.
- *
- * @package    ConvertKit_MM
- * @subpackage ConvertKit_MM/includes
- * @author     Daniel Espinoza <daniel@growdevelopment.com>
+ * @package ConvertKit_MM
+ * @author ConvertKit
  */
 class ConvertKit_MM_API {
 

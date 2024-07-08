@@ -152,8 +152,7 @@ class SettingsCest
 	public function testSaveProductTagAssignment(AcceptanceTester $I)
 	{
 		// Create a product.
-		$productReferenceKey = 'pTRLc9';
-		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+		$productID = $I->memberMouseCreateProduct($I, 'Product', $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY']);
 
 		// Setup Plugin.
 		$I->setupConvertKitPlugin($I);
@@ -199,8 +198,7 @@ class SettingsCest
 	public function testSaveBundleTagAssignment(AcceptanceTester $I)
 	{
 		// Create a product.
-		$productReferenceKey = 'pTRLc9';
-		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+		$productID = $I->memberMouseCreateProduct($I, 'Product', $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY']);
 
 		// Create bundle.
 		$bundleID = $I->memberMouseCreateBundle($I, 'Bundle', [ $productID ]);

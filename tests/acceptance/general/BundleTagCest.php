@@ -32,8 +32,7 @@ class BundleTagCest
 	public function testMemberTaggedWhenBundleAdded(AcceptanceTester $I)
 	{
 		// Create a product.
-		$productReferenceKey = 'pTRLc9';
-		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+		$productID = $I->memberMouseCreateProduct($I, 'Product', $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY']);
 
 		// Create bundle.
 		$bundleID = $I->memberMouseCreateBundle($I, 'Bundle', [ $productID ]);
@@ -57,7 +56,7 @@ class BundleTagCest
 		$I->memberMouseLogOut($I);
 
 		// Complete checkout.
-		$I->memberMouseCheckoutProduct($I, $productReferenceKey, $emailAddress);
+		$I->memberMouseCheckoutProduct($I, $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY'], $emailAddress);
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
@@ -78,8 +77,7 @@ class BundleTagCest
 	public function testMemberTaggedWhenBundleReactivated(AcceptanceTester $I)
 	{
 		// Create a product.
-		$productReferenceKey = 'pTRLc9';
-		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+		$productID = $I->memberMouseCreateProduct($I, 'Product', $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY']);
 
 		// Create bundle.
 		$bundleID = $I->memberMouseCreateBundle($I, 'Bundle', [ $productID ]);
@@ -134,8 +132,7 @@ class BundleTagCest
 	public function testMemberTaggedWhenBundleCancelled(AcceptanceTester $I)
 	{
 		// Create a product.
-		$productReferenceKey = 'pTRLc9';
-		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+		$productID = $I->memberMouseCreateProduct($I, 'Product', $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY']);
 
 		// Create bundle.
 		$bundleID = $I->memberMouseCreateBundle($I, 'Bundle', [ $productID ]);
@@ -184,8 +181,7 @@ class BundleTagCest
 	public function testMemberNotTaggedWhenBundleAdded(AcceptanceTester $I)
 	{
 		// Create a product.
-		$productReferenceKey = 'pTRLc9';
-		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+		$productID = $I->memberMouseCreateProduct($I, 'Product', $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY']);
 
 		// Create bundle.
 		$bundleID = $I->memberMouseCreateBundle($I, 'Bundle', [ $productID ]);
@@ -209,7 +205,7 @@ class BundleTagCest
 		$I->memberMouseLogOut($I);
 
 		// Complete checkout.
-		$I->memberMouseCheckoutProduct($I, $productReferenceKey, $emailAddress);
+		$I->memberMouseCheckoutProduct($I, $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY'], $emailAddress);
 
 		// Check subscriber does not exist.
 		$subscriberID = $I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
@@ -226,8 +222,7 @@ class BundleTagCest
 	public function testMemberNotTaggedWhenBundleReactivated(AcceptanceTester $I)
 	{
 		// Create a product.
-		$productReferenceKey = 'pTRLc9';
-		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+		$productID = $I->memberMouseCreateProduct($I, 'Product', $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY']);
 
 		// Create bundle.
 		$bundleID = $I->memberMouseCreateBundle($I, 'Bundle', [ $productID ]);
@@ -271,8 +266,7 @@ class BundleTagCest
 	public function testMemberNotTaggedWhenBundleCancelled(AcceptanceTester $I)
 	{
 		// Create a product.
-		$productReferenceKey = 'pTRLc9';
-		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+		$productID = $I->memberMouseCreateProduct($I, 'Product', $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY']);
 
 		// Create bundle.
 		$bundleID = $I->memberMouseCreateBundle($I, 'Bundle', [ $productID ]);

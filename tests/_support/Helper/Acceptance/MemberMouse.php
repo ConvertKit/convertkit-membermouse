@@ -138,6 +138,8 @@ class MemberMouse extends \Codeception\Module
 		$I->amOnAdminPage('admin.php?page=manage_members');
 		$I->click($emailAddress);
 		$I->click('Access Rights');
+
+		// This isn't a typo; MemberMouse's bundle <select> dropdown has this name.
 		$I->selectOption('bundle-seletor', $bundleName);
 		$I->click('Apply Bundle');
 

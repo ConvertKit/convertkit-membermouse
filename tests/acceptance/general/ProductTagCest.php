@@ -32,8 +32,7 @@ class ProductTagCest
 	public function testMemberTaggedWhenProductPurchased(AcceptanceTester $I)
 	{
 		// Create a product.
-		$productReferenceKey = 'pTRLc9';
-		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+		$productID = $I->memberMouseCreateProduct($I, 'Product', $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY']);
 
 		// Setup Plugin to tag users purchasing the product to the
 		// ConvertKit Tag ID.
@@ -54,7 +53,7 @@ class ProductTagCest
 		$I->memberMouseLogOut($I);
 
 		// Complete checkout.
-		$I->memberMouseCheckoutProduct($I, $productReferenceKey, $emailAddress);
+		$I->memberMouseCheckoutProduct($I, $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY'], $emailAddress);
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
@@ -74,8 +73,7 @@ class ProductTagCest
 	public function testMemberNotTaggedWhenProductPurchased(AcceptanceTester $I)
 	{
 		// Create a product.
-		$productReferenceKey = 'pTRLc9';
-		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+		$productID = $I->memberMouseCreateProduct($I, 'Product', $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY']);
 
 		// Setup Plugin to not tag users purchasing the product to the
 		// ConvertKit Tag ID.
@@ -96,7 +94,7 @@ class ProductTagCest
 		$I->memberMouseLogOut($I);
 
 		// Complete checkout.
-		$I->memberMouseCheckoutProduct($I, $productReferenceKey, $emailAddress);
+		$I->memberMouseCheckoutProduct($I, $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY'], $emailAddress);
 
 		// Check subscriber does not exist.
 		$subscriberID = $I->apiCheckSubscriberDoesNotExist($I, $emailAddress);

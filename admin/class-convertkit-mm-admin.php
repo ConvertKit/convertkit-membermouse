@@ -42,21 +42,8 @@ class ConvertKit_MM_Admin {
 		add_action( 'admin_menu', array( $this, 'add_menu' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 
-		// Tag on Membership Level.
-		add_action( 'mm_member_add', array( $this, 'add_member' ) );
-		add_action( 'mm_member_membership_change', array( $this, 'add_member' ) );
-		add_action( 'mm_member_status_change', array( $this, 'status_change_member' ) );
-		add_action( 'mm_member_delete', array( $this, 'delete_member' ) );
-
-		// Tag on Product.
-		add_action( 'mm_product_purchase', array( $this, 'purchase_product' ) );
-
-		// Tag on Bundle.
-		add_action( 'mm_bundles_add', array( $this, 'add_bundle' ) );
-		add_action( 'mm_bundles_status_change', array( $this, 'status_change_bundle' ) );
-
 		// Initialize API.
-		$api_key = $this->get_option( 'api-key' );
+		$api_key = convertkit_mm_get_option( 'api-key' );
 		$this->api = new ConvertKit_MM_API( $api_key );
 
 	}
@@ -291,7 +278,7 @@ class ConvertKit_MM_Admin {
 	 */
 	public function display_options_api_key() {
 
-		$api_key = $this->get_option( 'api-key' );
+		$api_key = convertkit_mm_get_option( 'api-key' );
 		?>
 		<input type="text" id="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[api-key]" name="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[api-key]" value="<?php echo esc_attr( $api_key ); ?>" /><br/>
 		<p class="description"><a href="https://app.convertkit.com/account/edit" target="_blank"><?php echo esc_html__( 'Get your ConvertKit API Key', 'convertkit-mm' ); ?></a></p>
@@ -306,7 +293,7 @@ class ConvertKit_MM_Admin {
 	 */
 	public function display_options_debug() {
 
-		$debug = $this->get_option( 'debug' );
+		$debug = convertkit_mm_get_option( 'debug' );
 		?>
 		<input type="checkbox" id="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[debug]" name="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[debug]"<?php echo ( ( 'on' === $debug ) ? ' checked' : '' ); ?> />
 		<?php
@@ -346,9 +333,9 @@ class ConvertKit_MM_Admin {
 	public function display_options_convertkit_mapping( $args ) {
 
 		$option_name = 'convertkit-mapping-' . $args['key'];
-		$tag         = $this->get_option( $option_name );
-		$tag_cancel  = $this->get_option( $option_name . '-cancel' );
-		$api_key     = $this->get_option( 'api-key' );
+		$tag         = convertkit_mm_get_option( $option_name );
+		$tag_cancel  = convertkit_mm_get_option( $option_name . '-cancel' );
+		$api_key     = convertkit_mm_get_option( 'api-key' );
 
 		if ( empty( $api_key ) ) {
 			?>
@@ -419,8 +406,8 @@ class ConvertKit_MM_Admin {
 	public function display_options_convertkit_mapping_product( $args ) {
 
 		$option_name = 'convertkit-mapping-product-' . $args['key'];
-		$tag         = $this->get_option( $option_name );
-		$api_key     = $this->get_option( 'api-key' );
+		$tag         = convertkit_mm_get_option( $option_name );
+		$api_key     = convertkit_mm_get_option( 'api-key' );
 
 		if ( empty( $api_key ) ) {
 			?>
@@ -482,9 +469,9 @@ class ConvertKit_MM_Admin {
 	public function display_options_convertkit_mapping_bundle( $args ) {
 
 		$option_name = 'convertkit-mapping-bundle-' . $args['key'];
-		$tag         = $this->get_option( $option_name );
-		$tag_cancel  = $this->get_option( $option_name . '-cancel' );
-		$api_key     = $this->get_option( 'api-key' );
+		$tag         = convertkit_mm_get_option( $option_name );
+		$tag_cancel  = convertkit_mm_get_option( $option_name . '-cancel' );
+		$api_key     = convertkit_mm_get_option( 'api-key' );
 
 		if ( empty( $api_key ) ) {
 			?>
@@ -597,197 +584,6 @@ class ConvertKit_MM_Admin {
 		}
 
 		return $bundles;
-
-	}
-
-	/**
-	 * A member was added to MemberMouse
-	 *
-	 * Member Data is sent to this hook including the new `membership_level`
-	 * If membership level is > 0 then the user is being added to level with that ID.
-	 * For info what is contained in the member_data see link.
-	 *
-	 * @see https://membermouse.uservoice.com/knowledgebase/articles/319072-membermouse-wordpress-hooks#member-data
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param array $member_data    Member data.
-	 */
-	public function add_member( $member_data ) {
-
-		if ( isset( $member_data['membership_level'] ) ) {
-			$user_email = $member_data['email'];
-			$first_name = rawurlencode( $member_data['first_name'] );
-			$mapping    = 'convertkit-mapping-' . $member_data['membership_level'];
-			$tag_id     = $this->get_option( $mapping );
-
-			if ( ! empty( $tag_id ) ) {
-				$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
-				convertkit_mm_log( 'tag', 'Add tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
-			}
-		}
-
-	}
-
-	/**
-	 * Called when a member's status is changed in MemberMouse.
-	 *
-	 * @since   1.0.0
-	 *
-	 * @param array $member_data    Member data.
-	 */
-	public function status_change_member( $member_data ) {
-
-		if ( isset( $member_data['membership_level'] ) ) {
-			if ( isset( $member_data['status_name'] ) && 'Canceled' === $member_data['status_name'] ) {
-				$user_email = $member_data['email'];
-				$first_name = rawurlencode( $member_data['first_name'] );
-				$mapping    = 'convertkit-mapping-' . $member_data['membership_level'] . '-cancel';
-				$tag_id     = $this->get_option( $mapping );
-
-				if ( ! empty( $tag_id ) ) {
-					$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
-					convertkit_mm_log( 'tag', 'Delete tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
-				}
-			}
-		}
-
-	}
-
-	/**
-	 * Called when a member is deleted in MemberMouse.
-	 *
-	 * @since   1.0.0
-	 *
-	 * @param array $member_data    Member data.
-	 */
-	public function delete_member( $member_data ) {
-
-		if ( isset( $member_data['membership_level'] ) ) {
-			$user_email = $member_data['email'];
-			$first_name = rawurlencode( $member_data['first_name'] );
-			$mapping    = 'convertkit-mapping-' . $member_data['membership_level'] . '-cancel';
-			$tag_id     = $this->get_option( $mapping );
-
-			if ( ! empty( $tag_id ) ) {
-				$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
-				convertkit_mm_log( 'tag', 'Delete tag ' . $tag_id . ' to user ' . $user_email . ' (' . $user_name . ')' );
-			}
-		}
-
-	}
-
-	/**
-	 * Assign a tag to the subscriber when purchasing a MemberMouse Product
-	 * that is configured to tag a subscriber.
-	 *
-	 * @since   1.2.0
-	 *
-	 * @param   array $purchase_data  Checkout purchase data.
-	 */
-	public function purchase_product( $purchase_data ) {
-
-		// Fetch data from purchase array.
-		$user_email = $purchase_data['email'];
-		$first_name = rawurlencode( $purchase_data['first_name'] );
-		$mapping    = 'convertkit-mapping-product-' . $purchase_data['product_id'];
-		$tag_id     = $this->get_option( $mapping );
-
-		// If no tag assigned to this Product, bail.
-		if ( empty( $tag_id ) ) {
-			return;
-		}
-
-		// Assign tag to subscriber in ConvertKit.
-		$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
-		convertkit_mm_log( 'tag', 'Add product tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
-
-	}
-
-	/**
-	 * Assign a tag to the subscriber when purchasing a MemberMouse Product
-	 * that is assigned to a bundle, and the bundle is configured to tag a subscriber.
-	 *
-	 * @since   1.2.0
-	 *
-	 * @param   array $purchase_data  Checkout purchase data.
-	 */
-	public function add_bundle( $purchase_data ) {
-
-		// Fetch data from purchase array.
-		$user_email = $purchase_data['email'];
-		$first_name = rawurlencode( $purchase_data['first_name'] );
-		$mapping    = 'convertkit-mapping-bundle-' . $purchase_data['bundle_id'];
-		$tag_id     = $this->get_option( $mapping );
-
-		// If no tag assigned to this Bundle, bail.
-		if ( empty( $tag_id ) ) {
-			return;
-		}
-
-		// Assign tag to subscriber in ConvertKit.
-		$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
-		convertkit_mm_log( 'tag', 'Add bundle tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
-
-	}
-
-	/**
-	 * Assign a tag to the subscriber when a member's bundle status is changed in MemberMouse.
-	 *
-	 * @since   1.2.0
-	 *
-	 * @param   array $member_data    Member data.
-	 */
-	public function status_change_bundle( $member_data ) {
-
-		// Determine the status change.
-		switch ( $member_data['bundle_status_name'] ) {
-			case 'Active':
-				$mapping = 'convertkit-mapping-bundle-' . $member_data['bundle_id'];
-				break;
-			case 'Canceled':
-				$mapping = 'convertkit-mapping-bundle-' . $member_data['bundle_id'] . '-cancel';
-				break;
-
-			default:
-				// Unsupported status at this time.
-				return;
-		}
-
-		// Fetch data from member array.
-		$user_email = $member_data['email'];
-		$first_name = rawurlencode( $member_data['first_name'] );
-		$tag_id     = $this->get_option( $mapping );
-
-		// If no tag assigned to this Bundle, bail.
-		if ( empty( $tag_id ) ) {
-			return;
-		}
-
-		// Assign tag to subscriber in ConvertKit.
-		$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
-		convertkit_mm_log( 'tag', 'Add bundle tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
-
-	}
-
-	/**
-	 * Get the setting option requested.
-	 *
-	 * @since   1.0.0
-	 *
-	 * @param   string $option_name    Option name.
-	 * @return  string                  Option value
-	 */
-	public function get_option( $option_name ) {
-
-		$options = get_option( CONVERTKIT_MM_NAME . '-options' );
-		$option  = '';
-
-		if ( ! empty( $options[ $option_name ] ) ) {
-			$option = $options[ $option_name ];
-		}
-
-		return $option;
 
 	}
 

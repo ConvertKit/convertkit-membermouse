@@ -16,7 +16,7 @@
  */
 function convertkit_mm_get_option( $option_name ) {
 
-	$options = get_option( 'convertkit-mm-options' );
+	$options = get_option( CONVERTKIT_MM_NAME . '-options' );
 	$option  = '';
 
 	if ( ! empty( $options[ $option_name ] ) ) {

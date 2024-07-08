@@ -128,9 +128,6 @@ class ConvertKit_MM {
 	 */
 	private function initialize_global() {
 
-		// @TODO Load hooks for frontend.
-		// @TODO load review request later on.
-
 		/**
 		 * Initialize integration classes for the frontend web site.
 		 *

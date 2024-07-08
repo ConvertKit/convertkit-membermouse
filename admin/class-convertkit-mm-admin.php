@@ -56,7 +56,7 @@ class ConvertKit_MM_Admin {
 		add_action( 'mm_bundles_status_change', array( $this, 'status_change_bundle' ) );
 
 		// Initialize API.
-		$api_key = $this->get_option( 'api-key' );
+		$api_key   = $this->get_option( 'api-key' );
 		$this->api = new ConvertKit_MM_API( $api_key );
 
 	}

@@ -7,7 +7,7 @@
  */
 
 /**
- * Class to make ConvertKit v3 API calls. 
+ * Class to make ConvertKit v3 API calls.
  *
  * @package ConvertKit_MM
  * @author ConvertKit

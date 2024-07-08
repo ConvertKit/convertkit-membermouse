@@ -36,11 +36,16 @@ define( 'CONVERTKIT_MM_URL', plugin_dir_url( __FILE__ ) );
 define( 'CONVERTKIT_MM_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CONVERTKIT_MM_VERSION', '1.2.0' );
 
-// Load plugin files.
-require CONVERTKIT_MM_PATH . 'admin/class-convertkit-mm-admin.php';
+// Load plugin files that are always required.
+require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-actions.php';
 require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-api.php';
 require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm.php';
 require CONVERTKIT_MM_PATH . 'includes/convertkit-mm-functions.php';
+
+// Load files that are only used in the WordPress Administration interface.
+if ( is_admin() ) {
+	require CONVERTKIT_MM_PATH . 'admin/class-convertkit-mm-admin.php';
+}
 
 /**
  * Main function to return Plugin instance.

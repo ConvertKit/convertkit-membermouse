@@ -30,7 +30,7 @@ function convertkit_mm_get_option( $option_name ) {
 /**
  * Debug log.
  *
- * @since 	1.0.2
+ * @since   1.0.2
  *
  * @param   string $log        Log filename.
  * @param   string $message    Message to put in the log.

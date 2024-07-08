@@ -46,23 +46,31 @@ class ConvertKit_MM_Actions {
 	 *
 	 * @see https://membermouse.uservoice.com/knowledgebase/articles/319072-membermouse-wordpress-hooks#member-data
 	 *
-	 * @since 1.0.0
+	 * @since   1.0.0
 	 *
-	 * @param array $member_data    Member data.
+	 * @param   array $member_data    Member data.
 	 */
 	public function add_member( $member_data ) {
 
-		if ( isset( $member_data['membership_level'] ) ) {
-			$user_email = $member_data['email'];
-			$first_name = rawurlencode( $member_data['first_name'] );
-			$mapping    = 'convertkit-mapping-' . $member_data['membership_level'];
-			$tag_id     = convertkit_mm_get_option( $mapping );
-
-			if ( ! empty( $tag_id ) ) {
-				$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
-				convertkit_mm_log( 'tag', 'Add tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
-			}
+		// Bail if no membership level data exists.
+		if ( ! isset( $member_data['membership_level'] ) ) {
+			return;
 		}
+
+		// Fetch data from member array.
+		$user_email = $member_data['email'];
+		$first_name = rawurlencode( $member_data['first_name'] );
+		$mapping    = 'convertkit-mapping-' . $member_data['membership_level'];
+		$tag_id     = convertkit_mm_get_option( $mapping );
+
+		// Bail if no tag mapping exists, as this means we don't need to tag the subscriber.
+		if ( empty( $tag_id ) ) {
+			return;
+		}
+
+		// Subscribe and tag.
+		$this->add_tag_to_user( $user_email, $first_name, $tag_id );
+		convertkit_mm_log( 'tag', 'Add tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
 
 	}
 
@@ -71,23 +79,37 @@ class ConvertKit_MM_Actions {
 	 *
 	 * @since   1.0.0
 	 *
-	 * @param array $member_data    Member data.
+	 * @param   array $member_data    Member data.
 	 */
 	public function status_change_member( $member_data ) {
 
-		if ( isset( $member_data['membership_level'] ) ) {
-			if ( isset( $member_data['status_name'] ) && 'Canceled' === $member_data['status_name'] ) {
-				$user_email = $member_data['email'];
-				$first_name = rawurlencode( $member_data['first_name'] );
-				$mapping    = 'convertkit-mapping-' . $member_data['membership_level'] . '-cancel';
-				$tag_id     = convertkit_mm_get_option( $mapping );
-
-				if ( ! empty( $tag_id ) ) {
-					$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
-					convertkit_mm_log( 'tag', 'Delete tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
-				}
-			}
+		// Bail if no membership level data exists.
+		if ( ! isset( $member_data['membership_level'] ) ) {
+			return;
 		}
+
+		// Bail if the status isn't set to cancelled.
+		if ( ! isset( $member_data['status_name'] ) ) {
+			return;
+		}
+		if ( $member_data['status_name'] !== 'Canceled' ) {
+			return;
+		}
+
+		// Fetch data from member array.
+		$user_email = $member_data['email'];
+		$first_name = rawurlencode( $member_data['first_name'] );
+		$mapping    = 'convertkit-mapping-' . $member_data['membership_level'] . '-cancel';
+		$tag_id     = convertkit_mm_get_option( $mapping );
+
+		// Bail if no tag mapping exists, as this means we don't need to tag the subscriber.
+		if ( empty( $tag_id ) ) {
+			return;
+		}
+
+		// Subscribe and tag.
+		$this->add_tag_to_user( $user_email, $first_name, $tag_id );
+		convertkit_mm_log( 'tag', 'Delete tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
 
 	}
 
@@ -96,21 +118,29 @@ class ConvertKit_MM_Actions {
 	 *
 	 * @since   1.0.0
 	 *
-	 * @param array $member_data    Member data.
+	 * @param   array $member_data    Member data.
 	 */
 	public function delete_member( $member_data ) {
 
-		if ( isset( $member_data['membership_level'] ) ) {
-			$user_email = $member_data['email'];
-			$first_name = rawurlencode( $member_data['first_name'] );
-			$mapping    = 'convertkit-mapping-' . $member_data['membership_level'] . '-cancel';
-			$tag_id     = convertkit_mm_get_option( $mapping );
-
-			if ( ! empty( $tag_id ) ) {
-				$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
-				convertkit_mm_log( 'tag', 'Delete tag ' . $tag_id . ' to user ' . $user_email . ' (' . $user_name . ')' );
-			}
+		// Bail if no membership level data exists.
+		if ( ! isset( $member_data['membership_level'] ) ) {
+			return;
 		}
+
+		// Fetch data from member array.
+		$user_email = $member_data['email'];
+		$first_name = rawurlencode( $member_data['first_name'] );
+		$mapping    = 'convertkit-mapping-' . $member_data['membership_level'] . '-cancel';
+		$tag_id     = convertkit_mm_get_option( $mapping );
+
+		// Bail if no tag mapping exists, as this means we don't need to tag the subscriber.
+		if ( empty( $tag_id ) ) {
+			return;
+		}
+
+		// Subscribe and tag.
+		$this->add_tag_to_user( $user_email, $first_name, $tag_id );
+		convertkit_mm_log( 'tag', 'Delete tag ' . $tag_id . ' to user ' . $user_email . ' (' . $user_name . ')' );
 
 	}
 
@@ -136,7 +166,7 @@ class ConvertKit_MM_Actions {
 		}
 
 		// Assign tag to subscriber in ConvertKit.
-		$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
+		$this->add_tag_to_user( $user_email, $first_name, $tag_id );
 		convertkit_mm_log( 'tag', 'Add product tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
 
 	}
@@ -163,7 +193,7 @@ class ConvertKit_MM_Actions {
 		}
 
 		// Assign tag to subscriber in ConvertKit.
-		$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
+		$this->add_tag_to_user( $user_email, $first_name, $tag_id );
 		convertkit_mm_log( 'tag', 'Add bundle tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
 
 	}
@@ -202,8 +232,29 @@ class ConvertKit_MM_Actions {
 		}
 
 		// Assign tag to subscriber in ConvertKit.
-		$this->api->add_tag_to_user( $user_email, $first_name, $tag_id );
+		$this->add_tag_to_user( $user_email, $first_name, $tag_id );
 		convertkit_mm_log( 'tag', 'Add bundle tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
+
+	}
+
+	/**
+	 * Initializes the API, subscribing the given email address and assigning the
+	 * subscriber to the ConvertKit Tag ID.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   string $email          Email Address.
+	 * @param   string $first_name     First Name.
+	 * @param   int    $tag_id         Tag ID.
+	 */
+	private function add_tag_to_user( $email, $first_name, $tag_id ) {
+
+		// Initialize API.
+		$api_key   = convertkit_mm_get_option( 'api-key' );
+		$api = new ConvertKit_MM_API( $api_key );
+
+		// Send request.
+		$api->add_tag_to_user( $email, $first_name, absint( $tag_id ) );
 
 	}
 

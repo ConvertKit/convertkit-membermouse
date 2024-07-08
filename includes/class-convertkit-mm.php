@@ -88,8 +88,6 @@ class ConvertKit_MM {
 			return;
 		}
 
-		$this->classes['admin'] = new ConvertKit_MM_Admin();
-
 		/**
 		 * Initialize integration classes for the WordPress Administration interface.
 		 *
@@ -128,8 +126,7 @@ class ConvertKit_MM {
 	 */
 	private function initialize_global() {
 
-		// @TODO Load hooks for frontend.
-		// @TODO load review request later on.
+		$this->classes['admin'] = new ConvertKit_MM_Admin();
 
 		/**
 		 * Initialize integration classes for the frontend web site.

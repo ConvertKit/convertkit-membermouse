@@ -29,47 +29,29 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+// Define ConverKit Plugin paths and version number.
+define( 'CONVERTKIT_MM_NAME', 'convertkit-mm' ); // Used for settings.
+define( 'CONVERTKIT_MM_FILE', plugin_basename( __FILE__ ) );
+define( 'CONVERTKIT_MM_URL', plugin_dir_url( __FILE__ ) );
 define( 'CONVERTKIT_MM_PATH', plugin_dir_path( __FILE__ ) );
-/**
- * The code that runs during plugin activation.
- * This action is documented in includes/class-convertkit-mm-activator.php
- */
-function activate_convertkit_mm() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-convertkit-mm-activator.php';
-	ConvertKit_MM_Activator::activate();
-}
+define( 'CONVERTKIT_MM_VERSION', '1.2.0' );
+
+// Load plugin files.
+require CONVERTKIT_MM_PATH . 'admin/class-convertkit-mm-admin.php';
+require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-api.php';
+require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm.php';
+require CONVERTKIT_MM_PATH . 'includes/convertkit-mm-functions.php';
 
 /**
- * The code that runs during plugin deactivation.
- * This action is documented in includes/class-convertkit-mm-deactivator.php
- */
-function deactivate_convertkit_mm() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-convertkit-mm-deactivator.php';
-	ConvertKit_MM_Deactivator::deactivate();
-}
-
-register_activation_hook( __FILE__, 'activate_convertkit_mm' );
-register_deactivation_hook( __FILE__, 'deactivate_convertkit_mm' );
-
-/**
- * Helper functions
- */
-require plugin_dir_path( __FILE__ ) . 'includes/convertkit-mm-functions.php';
-
-/**
- * The core plugin class
- */
-require plugin_dir_path( __FILE__ ) . 'includes/class-convertkit-mm.php';
-
-/**
- * Start execution of the plugin.
+ * Main function to return Plugin instance.
  *
- * @since    1.0.0
+ * @since   1.2.0
  */
-function run_convertkit_mm() {
+function ConvertKit_MM() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
 
-	$plugin = new ConvertKit_MM();
-	$plugin->run();
+	return ConvertKit_MM::get_instance();
 
 }
-run_convertkit_mm();
+
+// Finally, initialize the Plugin.
+ConvertKit_MM();

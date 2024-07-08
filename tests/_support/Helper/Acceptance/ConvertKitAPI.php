@@ -78,6 +78,28 @@ class ConvertKitAPI extends \Codeception\Module
 	}
 
 	/**
+	 * Check the given subscriber ID has been assigned to the given number
+	 * of tags.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I             AcceptanceTester.
+	 * @param   int              $subscriberID  Subscriber ID.
+	 * @param   int              $numberOfTags  Number of tags.
+	 */
+	public function apiCheckSubscriberTagCount($I, $subscriberID, $numberOfTags)
+	{
+		// Run request.
+		$results = $this->apiRequest(
+			'subscribers/' . $subscriberID . '/tags',
+			'GET'
+		);
+
+		// Confirm the correct number of tags have been assigned to the subscriber.
+		$I->assertEquals($numberOfTags, count($results['tags']));
+	}
+
+	/**
 	 * Check the given email address does not exists as a subscriber.
 	 *
 	 * @since   1.2.0

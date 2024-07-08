@@ -152,8 +152,7 @@ class SettingsCest
 	public function testSaveProductTagAssignment(AcceptanceTester $I)
 	{
 		// Create a product.
-		$productReferenceKey = 'pTRLc9';
-		$productID           = $I->memberMouseCreateProduct($I, 'Product', $productReferenceKey);
+		$productID = $I->memberMouseCreateProduct($I, 'Product', $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY']);
 
 		// Setup Plugin.
 		$I->setupConvertKitPlugin($I);
@@ -186,6 +185,59 @@ class SettingsCest
 		// Confirm settings saved.
 		$I->see('Settings saved.');
 		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-product-' . $productID . ']', '(None)');
+	}
+
+	/**
+	 * Test that bundle to tag mapping changes on the settings screen
+	 * works with no errors.
+	 *
+	 * @since   1.2.0
+	 *
+	 * @param   AcceptanceTester $I  Tester.
+	 */
+	public function testSaveBundleTagAssignment(AcceptanceTester $I)
+	{
+		// Create a product.
+		$productID = $I->memberMouseCreateProduct($I, 'Product', $_ENV['MEMBERMOUSE_PRODUCT_REFERENCE_KEY']);
+
+		// Create bundle.
+		$bundleID = $I->memberMouseCreateBundle($I, 'Bundle', [ $productID ]);
+
+		// Setup Plugin.
+		$I->setupConvertKitPlugin($I);
+
+		// Go to the Plugin's Settings > General Screen.
+		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
+
+		// Assign tags.
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . ']', $_ENV['CONVERTKIT_API_TAG_NAME']);
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . '-cancel]', $_ENV['CONVERTKIT_API_TAG_CANCEL_NAME']);
+
+		// Click save settings.
+		$I->click('Save Settings');
+
+		// Check that no PHP warnings or notices were output.
+		$I->checkNoWarningsAndNoticesOnScreen($I);
+
+		// Confirm settings saved.
+		$I->see('Settings saved.');
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . ']', $_ENV['CONVERTKIT_API_TAG_NAME']);
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . '-cancel]', $_ENV['CONVERTKIT_API_TAG_CANCEL_NAME']);
+
+		// Change tag back to 'None'.
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . ']', '(None)');
+		$I->selectOption('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . '-cancel]', '(None)');
+
+		// Click save settings.
+		$I->click('Save Settings');
+
+		// Check that no PHP warnings or notices were output.
+		$I->checkNoWarningsAndNoticesOnScreen($I);
+
+		// Confirm settings saved.
+		$I->see('Settings saved.');
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . ']', '(None)');
+		$I->seeOptionIsSelected('convertkit-mm-options[convertkit-mapping-bundle-' . $bundleID . '-cancel]', '(None)');
 	}
 
 	/**

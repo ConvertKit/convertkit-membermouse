@@ -43,25 +43,8 @@ class MemberTagCest
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
 
-		// Navigate to MemberMouse > Manage Members.
-		$I->amOnAdminPage('admin.php?page=manage_members');
-
-		// Create Member.
-		$I->click('Create Member');
-		$I->waitForElementVisible('#mm-new-member-form-container');
-		$I->fillField('#mm-new-first-name', 'First');
-		$I->fillField('#mm-new-last-name', 'Last');
-		$I->fillField('#mm-new-email', $emailAddress);
-		$I->fillField('#mm-new-password', '12345678');
-		$I->click('Create Member', '.mm-dialog-button-container');
-		$I->waitForElementNotVisible('#mm-new-member-form-container');
-
-		// Accept popup once user created.
-		// We have to wait as there's no specific event MemberMouse fires to tell
-		// us it completed adding the member.
-		$I->wait(3);
-		$I->acceptPopup();
-		$I->wait(3);
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
@@ -95,25 +78,8 @@ class MemberTagCest
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
 
-		// Navigate to MemberMouse > Manage Members.
-		$I->amOnAdminPage('admin.php?page=manage_members');
-
-		// Create Member.
-		$I->click('Create Member');
-		$I->waitForElementVisible('#mm-new-member-form-container');
-		$I->fillField('#mm-new-first-name', 'First');
-		$I->fillField('#mm-new-last-name', 'Last');
-		$I->fillField('#mm-new-email', $emailAddress);
-		$I->fillField('#mm-new-password', '12345678');
-		$I->click('Create Member', '.mm-dialog-button-container');
-		$I->waitForElementNotVisible('#mm-new-member-form-container');
-
-		// Accept popup once user created.
-		// We have to wait as there's no specific event MemberMouse fires to tell
-		// us it completed adding the member.
-		$I->wait(3);
-		$I->acceptPopup();
-		$I->wait(3);
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
 
 		// Change the user's membership level.
 		$I->amOnAdminPage('admin.php?page=manage_members');
@@ -156,32 +122,14 @@ class MemberTagCest
 			[
 				'convertkit-mapping-1'        => $_ENV['CONVERTKIT_API_TAG_ID'],
 				'convertkit-mapping-1-cancel' => $_ENV['CONVERTKIT_API_TAG_CANCEL_ID'],
-
 			]
 		);
 
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
 
-		// Navigate to MemberMouse > Manage Members.
-		$I->amOnAdminPage('admin.php?page=manage_members');
-
-		// Create Member.
-		$I->click('Create Member');
-		$I->waitForElementVisible('#mm-new-member-form-container');
-		$I->fillField('#mm-new-first-name', 'First');
-		$I->fillField('#mm-new-last-name', 'Last');
-		$I->fillField('#mm-new-email', $emailAddress);
-		$I->fillField('#mm-new-password', '12345678');
-		$I->click('Create Member', '.mm-dialog-button-container');
-		$I->waitForElementNotVisible('#mm-new-member-form-container');
-
-		// Accept popup once user created.
-		// We have to wait as there's no specific event MemberMouse fires to tell
-		// us it completed adding the member.
-		$I->wait(3);
-		$I->acceptPopup();
-		$I->wait(3);
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
@@ -233,25 +181,8 @@ class MemberTagCest
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
 
-		// Navigate to MemberMouse > Manage Members.
-		$I->amOnAdminPage('admin.php?page=manage_members');
-
-		// Create Member.
-		$I->click('Create Member');
-		$I->waitForElementVisible('#mm-new-member-form-container');
-		$I->fillField('#mm-new-first-name', 'First');
-		$I->fillField('#mm-new-last-name', 'Last');
-		$I->fillField('#mm-new-email', $emailAddress);
-		$I->fillField('#mm-new-password', '12345678');
-		$I->click('Create Member', '.mm-dialog-button-container');
-		$I->waitForElementNotVisible('#mm-new-member-form-container');
-
-		// Accept popup once user created.
-		// We have to wait as there's no specific event MemberMouse fires to tell
-		// us it completed adding the member.
-		$I->wait(3);
-		$I->acceptPopup();
-		$I->wait(3);
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
@@ -299,25 +230,8 @@ class MemberTagCest
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
 
-		// Navigate to MemberMouse > Manage Members.
-		$I->amOnAdminPage('admin.php?page=manage_members');
-
-		// Create Member.
-		$I->click('Create Member');
-		$I->waitForElementVisible('#mm-new-member-form-container');
-		$I->fillField('#mm-new-first-name', 'First');
-		$I->fillField('#mm-new-last-name', 'Last');
-		$I->fillField('#mm-new-email', $emailAddress);
-		$I->fillField('#mm-new-password', '12345678');
-		$I->click('Create Member', '.mm-dialog-button-container');
-		$I->waitForElementNotVisible('#mm-new-member-form-container');
-
-		// Accept popup once user created.
-		// We have to wait as there's no specific event MemberMouse fires to tell
-		// us it completed adding the member.
-		$I->wait(3);
-		$I->acceptPopup();
-		$I->wait(3);
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
 
 		// Check subscriber does not exist.
 		$subscriberID = $I->apiCheckSubscriberDoesNotExist($I, $emailAddress);
@@ -350,25 +264,8 @@ class MemberTagCest
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
 
-		// Navigate to MemberMouse > Manage Members.
-		$I->amOnAdminPage('admin.php?page=manage_members');
-
-		// Create Member.
-		$I->click('Create Member');
-		$I->waitForElementVisible('#mm-new-member-form-container');
-		$I->fillField('#mm-new-first-name', 'First');
-		$I->fillField('#mm-new-last-name', 'Last');
-		$I->fillField('#mm-new-email', $emailAddress);
-		$I->fillField('#mm-new-password', '12345678');
-		$I->click('Create Member', '.mm-dialog-button-container');
-		$I->waitForElementNotVisible('#mm-new-member-form-container');
-
-		// Accept popup once user created.
-		// We have to wait as there's no specific event MemberMouse fires to tell
-		// us it completed adding the member.
-		$I->wait(3);
-		$I->acceptPopup();
-		$I->wait(3);
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
@@ -425,25 +322,8 @@ class MemberTagCest
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
 
-		// Navigate to MemberMouse > Manage Members.
-		$I->amOnAdminPage('admin.php?page=manage_members');
-
-		// Create Member.
-		$I->click('Create Member');
-		$I->waitForElementVisible('#mm-new-member-form-container');
-		$I->fillField('#mm-new-first-name', 'First');
-		$I->fillField('#mm-new-last-name', 'Last');
-		$I->fillField('#mm-new-email', $emailAddress);
-		$I->fillField('#mm-new-password', '12345678');
-		$I->click('Create Member', '.mm-dialog-button-container');
-		$I->waitForElementNotVisible('#mm-new-member-form-container');
-
-		// Accept popup once user created.
-		// We have to wait as there's no specific event MemberMouse fires to tell
-		// us it completed adding the member.
-		$I->wait(3);
-		$I->acceptPopup();
-		$I->wait(3);
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
@@ -496,25 +376,8 @@ class MemberTagCest
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
 
-		// Navigate to MemberMouse > Manage Members.
-		$I->amOnAdminPage('admin.php?page=manage_members');
-
-		// Create Member.
-		$I->click('Create Member');
-		$I->waitForElementVisible('#mm-new-member-form-container');
-		$I->fillField('#mm-new-first-name', 'First');
-		$I->fillField('#mm-new-last-name', 'Last');
-		$I->fillField('#mm-new-email', $emailAddress);
-		$I->fillField('#mm-new-password', '12345678');
-		$I->click('Create Member', '.mm-dialog-button-container');
-		$I->waitForElementNotVisible('#mm-new-member-form-container');
-
-		// Accept popup once user created.
-		// We have to wait as there's no specific event MemberMouse fires to tell
-		// us it completed adding the member.
-		$I->wait(3);
-		$I->acceptPopup();
-		$I->wait(3);
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
 
 		// Check subscriber exists.
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);

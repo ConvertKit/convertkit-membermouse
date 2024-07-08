@@ -250,8 +250,8 @@ class ConvertKit_MM_Actions {
 	private function add_tag_to_user( $email, $first_name, $tag_id ) {
 
 		// Initialize API.
-		$api_key   = convertkit_mm_get_option( 'api-key' );
-		$api = new ConvertKit_MM_API( $api_key );
+		$api_key = convertkit_mm_get_option( 'api-key' );
+		$api     = new ConvertKit_MM_API( $api_key );
 
 		// Send request.
 		$api->add_tag_to_user( $email, $first_name, absint( $tag_id ) );

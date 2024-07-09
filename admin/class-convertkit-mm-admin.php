@@ -507,6 +507,22 @@ class ConvertKit_MM_Admin {
 	}
 
 	/**
+	 * Adds a link to the plugin settings page
+	 *
+	 * @since       1.0.0
+	 *
+	 * @param       array $links    Settings links.
+	 * @return      array           Settings links
+	 */
+	public function settings_link( $links ) {
+
+		$settings_link = sprintf( '<a href="%s">%s</a>', admin_url( 'options-general.php?page=' . CONVERTKIT_MM_NAME ), esc_html__( 'Settings', 'convertkit-mm' ) );
+		array_unshift( $links, $settings_link );
+		return $links;
+
+	}
+
+	/**
 	 * Get all MemberMouse membership levels
 	 *
 	 * @since 1.0.0
@@ -580,22 +596,6 @@ class ConvertKit_MM_Admin {
 		}
 
 		return $bundles;
-
-	}
-
-	/**
-	 * Adds a link to the plugin settings page
-	 *
-	 * @since       1.0.0
-	 *
-	 * @param       array $links    Settings links.
-	 * @return      array           Settings links
-	 */
-	public function settings_link( $links ) {
-
-		$settings_link = sprintf( '<a href="%s">%s</a>', admin_url( 'options-general.php?page=' . CONVERTKIT_MM_NAME ), esc_html__( 'Settings', 'convertkit-mm' ) );
-		array_unshift( $links, $settings_link );
-		return $links;
 
 	}
 

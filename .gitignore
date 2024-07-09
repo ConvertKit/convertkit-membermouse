@@ -6,6 +6,7 @@ composer.lock
 log
 log.txt
 log-api.txt
+log-tag.txt
 phpstan.neon
 tests/_output
 vendor

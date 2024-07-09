@@ -21,6 +21,8 @@ class ConvertKit_MM_Admin {
 	 */
 	const SETTINGS_PAGE_SLUG = 'convertkit-mm';
 
+	public $settings_key =  CONVERTKIT_MM_NAME . '-options';
+
 	/**
 	 * API functionality class
 	 *
@@ -43,10 +45,6 @@ class ConvertKit_MM_Admin {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_filter( 'plugin_action_links_convertkit-membermouse/convertkit-membermouse.php', array( $this, 'settings_link' ) );
-
-		// Initialize API.
-		$api_key   = convertkit_mm_get_option( 'api-key' );
-		$this->api = new ConvertKit_MM_API( $api_key );
 
 	}
 
@@ -112,16 +110,35 @@ class ConvertKit_MM_Admin {
 		add_settings_field(
 			'api-key',
 			__( 'API Key', 'convertkit-mm' ),
-			array( $this, 'api_key_callback' ),
+			array( $this, 'text_field_callback' ),
 			CONVERTKIT_MM_NAME,
-			CONVERTKIT_MM_NAME . '-display-options'
+			CONVERTKIT_MM_NAME . '-display-options',
+			array(
+				'name'        => 'api-key',
+				'label_for'   => 'api-key',
+				'css_classes' => array( 'widefat' ),
+				'description' => array(
+					'<a href="https://app.convertkit.com/account/edit" target="_blank">' . esc_html__( 'Get your ConvertKit API Key', 'convertkit-mm' ) . '</a>',
+				),
+			)
 		);
+
 		add_settings_field(
 			'debug',
 			__( 'Debug', 'convertkit-mm' ),
-			array( $this, 'debug_callback' ),
+			array( $this, 'checkbox_field_callback' ),
 			CONVERTKIT_MM_NAME,
-			CONVERTKIT_MM_NAME . '-display-options'
+			CONVERTKIT_MM_NAME . '-display-options',
+			array(
+				'name'        => 'debug',
+				'value'		  => '1',
+				'checked'	  => true,
+				'label' => __( 'Log requests to file and output browser console messages.', 'convertkit-mm' ),
+				'label_for'   => 'debug',
+				'description' => array(
+					__( 'You can ignore this unless you\'re working with our support team to resolve an issue. Decheck this option to improve performance.', 'convertkit-mm' ),
+				),
+			)
 		);
 
 		// If the API hasn't been configured, don't display any further settings, as
@@ -129,6 +146,9 @@ class ConvertKit_MM_Admin {
 		if ( empty( convertkit_mm_get_option( 'api-key' ) ) ) {
 			return;
 		}
+
+		// Initialize API.
+		$this->api = new ConvertKit_MM_API( convertkit_mm_get_option( 'api-key' ) );
 
 		// Get all tags from ConvertKit.
 		$tags = $this->api->get_tags();
@@ -147,7 +167,7 @@ class ConvertKit_MM_Admin {
 			add_settings_field(
 				'convertkit-mapping-' . $key,
 				$name,
-				array( $this, '?' ),
+				array( $this, 'tag_callback' ),
 				CONVERTKIT_MM_NAME,
 				CONVERTKIT_MM_NAME . '-ck-mapping-membership-levels',
 				array(
@@ -170,7 +190,7 @@ class ConvertKit_MM_Admin {
 			add_settings_field(
 				'convertkit-mapping-product-' . $key,
 				$name,
-				array( $this, '?' ),
+				array( $this, 'tag_callback' ),
 				CONVERTKIT_MM_NAME,
 				CONVERTKIT_MM_NAME . '-ck-mapping-products',
 				array(
@@ -193,7 +213,7 @@ class ConvertKit_MM_Admin {
 			add_settings_field(
 				'convertkit-mapping-bundle-' . $key,
 				$name,
-				array( $this, '?' ),
+				array( $this, 'tag_callback' ),
 				CONVERTKIT_MM_NAME,
 				CONVERTKIT_MM_NAME . '-ck-mapping-bundles',
 				array(
@@ -307,6 +327,105 @@ class ConvertKit_MM_Admin {
 	}
 
 	/**
+	 * Renders a text input field.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @param   array $args   Setting field arguments.
+	 */
+	public function text_field_callback( $args ) {
+
+		// Output field.
+		$html = sprintf(
+			'<input type="text" class="%s" id="%s" name="%s[%s]" value="%s" />',
+			( is_array( $args['css_classes'] ) ? implode( ' ', $args['css_classes'] ) : 'regular-text' ),
+			$args['name'],
+			$this->settings_key,
+			$args['name'],
+			convertkit_mm_get_option( $args['name'] )
+		);
+
+		// If no description exists, just return the field.
+		if ( empty( $args['description'] ) ) {
+			echo $html;
+		}
+
+		// Return field with description appended to it.
+		echo $html . $this->get_description( $args['description'] );
+
+	}
+
+	/**
+	 * Renders a checkbox field.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @param 	array 	$args 	Setting field arguments.
+	 */
+	public function checkbox_field_callback( $args ) {
+
+		$html = '';
+
+		if ( $args['label'] ) {
+			$html .= sprintf(
+				'<label for="%s">',
+				$args['name']
+			);
+		}
+
+		$html .= sprintf(
+			'<input type="checkbox" id="%s" name="%s[%s]" class="%s" value="%s" %s />',
+			$args['name'],
+			$this->settings_key,
+			$args['name'],
+			( array_key_exists( 'css_classes', $args ) && is_array( $args['css_classes'] ) ? implode( ' ', $args['css_classes'] ) : '' ),
+			$args['value'],
+			( $args['checked'] ? ' checked' : '' )
+		);
+
+		if ( $args['label'] ) {
+			$html .= sprintf(
+				'%s</label>',
+				$args['label']
+			);
+		}
+
+		// If no description exists, just return the field.
+		if ( empty( $args['description'] ) ) {
+			echo $html;
+		}
+
+		// Return field with description appended to it.
+		echo $html . $this->get_description( $args['description'] );
+
+	}
+
+	/**
+	 * Returns the given text wrapped in a paragraph with the description class.
+	 *
+	 * @since   1.9.6
+	 *
+	 * @param   bool|string|array $description    Description.
+	 * @return  string                              HTML Description
+	 */
+	private function get_description( $description ) {
+
+		// Return blank string if no description specified.
+		if ( ! $description ) {
+			return '';
+		}
+
+		// Return description in paragraph if a string.
+		if ( ! is_array( $description ) ) {
+			return '<p class="description">' . $description . '</p>';
+		}
+
+		// Return description lines in a paragraph, using breaklines for each description entry in the array.
+		return '<p class="description">' . implode( '<br />', $description ) . '</p>';
+
+	}
+
+	/**
 	 * Outputs a description for the Mapping section of the settings screen
 	 *
 	 * @since       1.0.0
@@ -314,37 +433,6 @@ class ConvertKit_MM_Admin {
 	public function display_mapping_section() {
 
 		echo '<p>' . esc_html__( 'Below is a list of the defined MemberMouse Membership Levels. Assign a membership level to a ConvertKit tag that will be assigned to members of that level.', 'convertkit-mm' ) . '</p>';
-		echo '<table class="form-table"><tbody><tr><th scope="row">Membership</th><td><strong>Apply tag on add</strong></td><td><strong>Apply tag on cancel</strong></td></tr></tbody></table>';
-
-	}
-
-	/**
-	 * Outputs the API Key field in the settings screen
-	 *
-	 * @since       1.0.0
-	 */
-	public function api_key_callback() {
-
-		$api_key = convertkit_mm_get_option( 'api-key' );
-		?>
-		<input type="text" id="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[api-key]" name="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[api-key]" value="<?php echo esc_attr( $api_key ); ?>" /><br/>
-		<p class="description"><a href="https://app.convertkit.com/account/edit" target="_blank"><?php echo esc_html__( 'Get your ConvertKit API Key', 'convertkit-mm' ); ?></a></p>
-		<?php
-
-	}
-
-	/**
-	 * Outputs the Debug field in the settings screen
-	 *
-	 * @since       1.0.0
-	 */
-	public function debug_callback() {
-
-		$debug = convertkit_mm_get_option( 'debug' );
-		?>
-		<input type="checkbox" id="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[debug]" name="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[debug]"<?php echo ( ( 'on' === $debug ) ? ' checked' : '' ); ?> />
-		<?php
-		echo esc_html__( 'Add data to a debug log.', 'convertkit-mm' );
 
 	}
 

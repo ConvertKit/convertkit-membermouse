@@ -5,7 +5,7 @@ Tags: convertkit, email, marketing, membermouse
 Requires at least: 5.0
 Tested up to: 6.5.3
 Requires PHP: 5.6.20
-Stable tag: 1.1.3
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,6 +40,12 @@ This plugin integrates ConvertKit with Member Mouse.
 No. You must first have an account on [convertkit.com](https://convertkit.com?utm_source=wordpress&utm_term=en_US&utm_content=readme), but you do not have to use a paid plan!
 
 == Changelog ==
+
+### 1.2.0 2024-07-09
+* Added: Tag on Product purchase
+* Added: Tag on Bundle purchase / assignment
+* Fix: Settings: Add 'None' option when tagging by Membership Level, Product or Bundle
+* Fix: Ensure code meets WordPress Coding Standards
 
 ### 1.1.3 2024-06-04
 * Updated: Support for WordPress 6.5.3

@@ -29,177 +29,189 @@
 class ConvertKit_MM {
 
 	/**
-	 * The loader that's responsible for maintaining and registering all hooks that power
-	 * the plugin.
+	 * Holds the class object.
 	 *
-	 * @since    1.0.0
-	 * @access   protected
-	 * @var      ConvertKit_MM_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @since   1.2.0
+	 *
+	 * @var     object
 	 */
-	protected $loader;
+	private static $instance;
 
 	/**
-	 * The unique identifier of this plugin.
+	 * Holds singleton initialized classes that include
+	 * action and filter hooks.
 	 *
-	 * @since    1.0.0
-	 * @access   protected
-	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
+	 * @since   1.2.0
+	 *
+	 * @var     array
 	 */
-	protected $plugin_name;
+	private $classes = array();
 
 	/**
-	 * The current version of the plugin.
+	 * Constructor. Acts as a bootstrap to load the rest of the plugin
 	 *
-	 * @since    1.0.0
-	 * @access   protected
-	 * @var      string    $version    The current version of the plugin.
-	 */
-	protected $version;
-
-	/**
-	 * Define the core functionality of the plugin.
-	 *
-	 * Set the plugin name and the plugin version that can be used throughout the plugin.
-	 * Load the dependencies, define the locale, and set the hooks for the admin area and
-	 * the public-facing side of the site.
-	 *
-	 * @since    1.0.0
+	 * @since   1.0.0
 	 */
 	public function __construct() {
 
-		$this->plugin_name = 'convertkit-mm';
-		$this->version     = '1.1.3';
+		// Initialize.
+		add_action( 'init', array( $this, 'init' ) );
 
-		$this->load_dependencies();
-		$this->set_locale();
-		$this->define_admin_hooks();
+		// Load language files.
+		add_action( 'init', array( $this, 'load_language_files' ) );
 
 	}
 
 	/**
-	 * Load the required dependencies for this plugin.
+	 * Initialize admin, frontend and global Plugin classes.
 	 *
-	 * Include the following files that make up the plugin:
-	 *
-	 * - ConvertKit_MM_Loader. Orchestrates the hooks of the plugin.
-	 * - ConvertKit_MM_I18n. Defines internationalization functionality.
-	 * - ConvertKit_MM_Admin. Defines all hooks for the admin area.
-	 * - ConvertKit_MM_Public. Defines all hooks for the public side of the site.
-	 *
-	 * Create an instance of the loader which will be used to register the hooks
-	 * with WordPress.
-	 *
-	 * @since    1.0.0
-	 * @access   private
+	 * @since   1.2.0
 	 */
-	private function load_dependencies() {
+	public function init() {
+
+		// Initialize class(es) to register hooks.
+		$this->initialize_admin();
+		$this->initialize_frontend();
+		$this->initialize_global();
+
+	}
+
+	/**
+	 * Initialize classes for the WordPress Administration interface
+	 *
+	 * @since   1.2.0
+	 */
+	private function initialize_admin() {
+
+		// Bail if this request isn't for the WordPress Administration interface.
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		$this->classes['admin'] = new ConvertKit_MM_Admin();
 
 		/**
-		 * The class responsible for orchestrating the actions and filters of the
-		 * core plugin.
+		 * Initialize integration classes for the WordPress Administration interface.
+		 *
+		 * @since   1.2.2
 		 */
-		require_once plugin_dir_path( __DIR__ ) . 'includes/class-convertkit-mm-loader.php';
+		do_action( 'convertkit_membermouse_initialize_admin' );
+
+	}
+
+	/**
+	 * Initialize classes for the frontend web site
+	 *
+	 * @since   1.2.0
+	 */
+	private function initialize_frontend() {
+
+		// Bail if this request isn't for the frontend web site.
+		if ( is_admin() ) {
+			return;
+		}
 
 		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
+		 * Initialize integration classes for the frontend web site.
+		 *
+		 * @since   1.2.0
 		 */
-		require_once plugin_dir_path( __DIR__ ) . 'includes/class-convertkit-mm-i18n.php';
+		do_action( 'convertkit_membermouse_initialize_frontend' );
+
+	}
+
+	/**
+	 * Initialize classes required globally, across the WordPress Administration, CLI, Cron and Frontend
+	 * web site.
+	 *
+	 * @since   1.2.0
+	 */
+	private function initialize_global() {
+
+		$this->classes['actions'] = new ConvertKit_MM_Actions();
 
 		/**
-		 * The class responsible for defining all actions that occur in the admin area.
+		 * Initialize integration classes for the frontend web site.
+		 *
+		 * @since   1.2.0
 		 */
-		require_once plugin_dir_path( __DIR__ ) . 'admin/class-convertkit-mm-admin.php';
-
-		$this->loader = new ConvertKit_MM_Loader();
+		do_action( 'convertkit_membermouse_initialize_global' );
 
 	}
 
 	/**
-	 * Define the locale for this plugin for internationalization.
+	 * Loads the plugin's translated strings, if available.
 	 *
-	 * Uses the ConvertKit_MM_I18n class in order to set the domain and to register the hook
-	 * with WordPress.
-	 *
-	 * @since    1.0.0
-	 * @access   private
+	 * @since   1.2.0
 	 */
-	private function set_locale() {
+	public function load_language_files() {
 
-		$plugin_i18n = new ConvertKit_MM_I18n();
-
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
+		// If the .mo file for a given language is available in WP_LANG_DIR/convertkit-membermouse
+		// i.e. it's available as a translation at https://translate.wordpress.org/projects/wp-plugins/convertkit-membermouse/,
+		// it will be used instead of the .mo file in convertkit-membermouse/languages.
+		load_plugin_textdomain( 'convertkit-mm', false, 'convertkit-membermouse/languages' );
 
 	}
 
 	/**
-	 * Register all of the hooks related to the admin area functionality
-	 * of the plugin.
+	 * Returns the given class
 	 *
-	 * @since    1.0.0
-	 * @access   private
+	 * @since   1.2.0
+	 *
+	 * @param   string $name   Class Name.
+	 * @return  object          Class Object
 	 */
-	private function define_admin_hooks() {
+	public function get_class( $name ) {
 
-		$plugin_admin = new ConvertKit_MM_Admin( $this->get_plugin_name(), $this->get_version() );
+		// If the class hasn't been loaded, throw a WordPress die screen
+		// to avoid a PHP fatal error.
+		if ( ! isset( $this->classes[ $name ] ) ) {
+			// Define the error.
+			$error = new WP_Error(
+				'convertkit_membermouse_get_class',
+				sprintf(
+					/* translators: %1$s: PHP class name */
+					__( 'ConvertKit for MemberMouse Error: Could not load Plugin class <strong>%1$s</strong>', 'convertkit-mm' ),
+					$name
+				)
+			);
 
-		$this->loader->add_filter( 'plugin_action_links_convertkit-membermouse/convertkit-membermouse.php', $plugin_admin, 'settings_link' );
-		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_menu' );
-		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
+			// Depending on the request, return or display an error.
+			// Admin UI.
+			if ( is_admin() ) {
+				wp_die(
+					esc_attr( $error->get_error_message() ),
+					esc_html__( 'ConvertKit for MemberMouse Error', 'convertkit-mm' ),
+					array(
+						'back_link' => true,
+					)
+				);
+			}
 
-		// Tag on Membership Level.
-		$this->loader->add_action( 'mm_member_add', $plugin_admin, 'add_member' );
-		$this->loader->add_action( 'mm_member_membership_change', $plugin_admin, 'add_member' );
-		$this->loader->add_action( 'mm_member_status_change', $plugin_admin, 'status_change_member' );
-		$this->loader->add_action( 'mm_member_delete', $plugin_admin, 'delete_member' );
+			// Cron / CLI.
+			return $error;
+		}
 
-		// Tag on Product.
-		$this->loader->add_action( 'mm_product_purchase', $plugin_admin, 'purchase_product' );
-
-		// Tag on Bundle.
-		$this->loader->add_action( 'mm_bundles_add', $plugin_admin, 'add_bundle' );
-		$this->loader->add_action( 'mm_bundles_status_change', $plugin_admin, 'status_change_bundle' );
+		// Return the class object.
+		return $this->classes[ $name ];
 
 	}
 
 	/**
-	 * Run the loader to execute all of the hooks with WordPress.
+	 * Returns the singleton instance of the class.
 	 *
-	 * @since    1.0.0
+	 * @since   1.2.0
+	 *
+	 * @return  object Class.
 	 */
-	public function run() {
-		$this->loader->run();
-	}
+	public static function get_instance() {
 
-	/**
-	 * The name of the plugin used to uniquely identify it within the context of
-	 * WordPress and to define internationalization functionality.
-	 *
-	 * @since     1.0.0
-	 * @return    string    The name of the plugin.
-	 */
-	public function get_plugin_name() {
-		return $this->plugin_name;
-	}
+		if ( null === self::$instance ) {
+			self::$instance = new self();
+		}
 
-	/**
-	 * The reference to the class that orchestrates the hooks with the plugin.
-	 *
-	 * @since     1.0.0
-	 * @return    ConvertKit_MM_Loader    Orchestrates the hooks of the plugin.
-	 */
-	public function get_loader() {
-		return $this->loader;
-	}
+		return self::$instance;
 
-	/**
-	 * Retrieve the version number of the plugin.
-	 *
-	 * @since     1.0.0
-	 * @return    string    The version number of the plugin.
-	 */
-	public function get_version() {
-		return $this->version;
 	}
 
 }

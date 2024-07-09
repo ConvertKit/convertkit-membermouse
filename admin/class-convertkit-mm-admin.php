@@ -40,7 +40,6 @@ class ConvertKit_MM_Admin {
 	public function __construct() {
 
 		// Register settings screen.
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
@@ -49,25 +48,9 @@ class ConvertKit_MM_Admin {
 	}
 
 	/**
-	 * Enqueue JavaScript in Admin
-	 *
-	 * @since   1.9.6
-	 *
-	 * @param   string $hook   Hook.
-	 */
-	public function enqueue_scripts( $hook ) {
-
-		// Bail if we are not on the Settings screen.
-		if ( $hook !== 'settings_page_' . self::SETTINGS_PAGE_SLUG ) {
-			return;
-		}
-
-	}
-
-	/**
 	 * Enqueue CSS for the Settings Screens at Settings > ConvertKit
 	 *
-	 * @since   1.9.6
+	 * @since   1.3.0
 	 *
 	 * @param   string $hook   Hook.
 	 */
@@ -84,12 +67,9 @@ class ConvertKit_MM_Admin {
 	}
 
 	/**
-	 * Register settings for the plugin.
-	 *
-	 * The mapping section is dynamic and depends on defined membership levels and defined tags.
+	 * Register settings sections and fields on the settings screen.
 	 *
 	 * @since       1.0.0
-	 * @return      void
 	 */
 	public function register_settings() {
 
@@ -104,8 +84,11 @@ class ConvertKit_MM_Admin {
 		add_settings_section(
 			CONVERTKIT_MM_NAME . '-display-options',
 			__( 'General', 'convertkit-mm' ),
-			array( $this, 'display_options_section' ),
-			CONVERTKIT_MM_NAME
+			array( $this, 'display_section_introduction' ),
+			CONVERTKIT_MM_NAME,
+			array(
+				'description' => esc_html__( 'Add your API key below, and then choose when to tag subscribers based on MemberMouse actions.', 'convertkit-mm' ),
+			)
 		);
 		add_settings_field(
 			'api-key',
@@ -122,7 +105,6 @@ class ConvertKit_MM_Admin {
 				),
 			)
 		);
-
 		add_settings_field(
 			'debug',
 			__( 'Debug', 'convertkit-mm' ),
@@ -159,67 +141,94 @@ class ConvertKit_MM_Admin {
 		add_settings_section(
 			CONVERTKIT_MM_NAME . '-ck-mapping-membership-levels',
 			__( 'Tagging: Membership Levels', 'convertkit-mm' ),
-			array( $this, 'display_mapping_section' ),
-			CONVERTKIT_MM_NAME
+			array( $this, 'display_section_introduction' ),
+			CONVERTKIT_MM_NAME,
+			array(
+				'before_section' => '<br /><br />', // @TODO Hacky, improve.
+				'description' => esc_html__( 'For each MemberMouse Membership Level, assign a ConvertKit Tag that you wish to be assigned to members of that level.', 'convertkit-mm' ),
+			)
 		);
 		$levels   = $this->get_mm_membership_levels();
 		foreach ( $levels as $key => $name ) {
 			add_settings_field(
 				'convertkit-mapping-' . $key,
 				$name,
-				array( $this, 'tag_callback' ),
+				array( $this, 'mapping_fields_callback' ),
 				CONVERTKIT_MM_NAME,
 				CONVERTKIT_MM_NAME . '-ck-mapping-membership-levels',
 				array(
-					'key'  => $key,
-					'name' => $name,
-					'tags' => $tags,
+					'key' => $key,
+
+					'name' => 'convertkit-mapping-' . $key,
+					'value' => convertkit_mm_get_option( 'convertkit-mapping-' . $key ),
+
+					'name_cancel' => 'convertkit-mapping-' . $key . '-cancel',
+					'value_cancel' => convertkit_mm_get_option( 'convertkit-mapping-' . $key . '-cancel' ),
+
+					'options' => $tags,
 				)
 			);
 		}
 
-		// Regsiter "Tagging: Products" settings section and fields.
+		// Register "Tagging: Products" settings section and fields.
 		add_settings_section(
 			CONVERTKIT_MM_NAME . '-ck-mapping-products',
 			__( 'Tagging: Products', 'convertkit-mm' ),
-			array( $this, 'display_mapping_section' ),
-			CONVERTKIT_MM_NAME
+			array( $this, 'display_section_introduction' ),
+			CONVERTKIT_MM_NAME,
+			array(
+				'before_section' => '<br /><br />', // @TODO Hacky, improve.
+				'description' => esc_html__( 'For each MemberMouse Product, assign a ConvertKit Tag that you wish to be assigned to members of that MemberMouse Product.', 'convertkit-mm' ),
+			)
 		);
 		$products = $this->get_mm_products();
 		foreach ( $products as $key => $name ) {
 			add_settings_field(
 				'convertkit-mapping-product-' . $key,
 				$name,
-				array( $this, 'tag_callback' ),
+				array( $this, 'mapping_fields_callback' ),
 				CONVERTKIT_MM_NAME,
 				CONVERTKIT_MM_NAME . '-ck-mapping-products',
 				array(
-					'key'  => $key,
-					'name' => $name,
-					'tags' => $tags,
+					'key' => $key,
+
+					'name' => 'convertkit-mapping-product-' . $key,
+					'value' => convertkit_mm_get_option( 'convertkit-mapping-product-' . $key ),
+
+					'options' => $tags,
 				)
 			);
 		}
 
-		// Regsiter "Bundles: Membership Levels" settings section and fields.
+		// Regsiter "Tagging: Bundles" settings section and fields.
 		add_settings_section(
 			CONVERTKIT_MM_NAME . '-ck-mapping-bundles',
 			__( 'Tagging: Bundles', 'convertkit-mm' ),
-			array( $this, 'display_mapping_section' ),
-			CONVERTKIT_MM_NAME
+			array( $this, 'display_section_introduction' ),
+			CONVERTKIT_MM_NAME,
+			array(
+				'before_section' => '<br /><br />', // @TODO Hacky, improve.
+				'description' => esc_html__( 'For each MemberMouse Bundle, assign a ConvertKit Tag that you wish to be assigned to members of that bundle.', 'convertkit-mm' ),
+			)
 		);
-		$bundles  = $this->get_mm_bundles();
+		$bundles   = $this->get_mm_bundles();
 		foreach ( $bundles as $key => $name ) {
 			add_settings_field(
 				'convertkit-mapping-bundle-' . $key,
 				$name,
-				array( $this, 'tag_callback' ),
+				array( $this, 'mapping_fields_callback' ),
 				CONVERTKIT_MM_NAME,
 				CONVERTKIT_MM_NAME . '-ck-mapping-bundles',
 				array(
-					'key'  => $key,
-					'name' => $name,
-					'tags' => $tags,
+					'key' => $key,
+
+					'name' => 'convertkit-mapping-bundle-' . $key,
+					'value' => convertkit_mm_get_option( 'convertkit-mapping-bundle-' . $key ),
+
+					'name_cancel' => 'convertkit-mapping-bundle-' . $key . '-cancel',
+					'value_cancel' => convertkit_mm_get_option( 'convertkit-mapping-bundle-' . $key . '-cancel' ),
+
+					'options' => $tags,
 				)
 			);
 		}
@@ -254,18 +263,16 @@ class ConvertKit_MM_Admin {
 
 		?>
 		<header>
-			<h1><?php esc_html_e( 'ConvertKit', 'convertkit' ); ?></h1>
+			<h1><?php esc_html_e( 'ConvertKit for MemberMouse', 'convertkit' ); ?></h1>
 
 			<?php
-			// Output Help link tab, if it exists.
-			$documentation_url = 'blah';
-			if ( $documentation_url !== false ) {
-				printf(
-					'<a href="%s" class="convertkit-docs" target="_blank">%s</a>',
-					esc_attr( $documentation_url ),
-					esc_html__( 'Help', 'convertkit' )
-				);
-			}
+			// Output Help link.
+			$documentation_url = '@TODO';
+			printf(
+				'<a href="%s" class="convertkit-docs" target="_blank">%s</a>',
+				esc_attr( $documentation_url ),
+				esc_html__( 'Help', 'convertkit' )
+			);
 			?>
 		</header>
 
@@ -284,16 +291,13 @@ class ConvertKit_MM_Admin {
 
 			<p class="description">
 				<?php
-				// Output Help link, if it exists.
-				$documentation_url = 'blah';
-				if ( $documentation_url !== false ) {
-					printf(
-						'%s <a href="%s" target="_blank">%s</a>',
-						esc_html__( 'If you need help setting up the plugin please refer to the', 'convertkit' ),
-						esc_attr( $documentation_url ),
-						esc_html__( 'plugin documentation', 'convertkit' )
-					);
-				}
+				// Output Help link.
+				printf(
+					'%s <a href="%s" target="_blank">%s</a>',
+					esc_html__( 'If you need help setting up the plugin please refer to the', 'convertkit' ),
+					esc_attr( $documentation_url ),
+					esc_html__( 'plugin documentation', 'convertkit' )
+				);
 				?>
 			</p>
 		</div>
@@ -302,27 +306,13 @@ class ConvertKit_MM_Admin {
 	}
 
 	/**
-	 * Validates saved options
+	 * Outputs a description at the start of a settings section, before its fields.
 	 *
-	 * @since       1.0.0
-	 *
-	 * @param       array $input          Submitted plugin options.
-	 * @return      array                 Validated plugin options
+	 * @since       1.3.0
 	 */
-	public function validate_options( $input ) {
+	public function display_section_introduction( $args ) {
 
-		return $input;
-
-	}
-
-	/**
-	 * Outputs a description for the General section of the settings screen
-	 *
-	 * @since       1.0.0
-	 */
-	public function display_options_section() {
-
-		echo '<p>' . esc_html__( 'Add your API key below, and then choose when to tag subscribers based on MemberMouse actions.', 'convertkit-mm' ) . '</p>';
+		echo '<p>' . esc_html( $args['description'] ) . '</p>';
 
 	}
 
@@ -400,6 +390,67 @@ class ConvertKit_MM_Admin {
 
 	}
 
+	public function mapping_fields_callback( $args ) {
+
+		$html = $this->get_select_field(
+			$args['name'],
+			$args['value'],
+			$args['options']
+		);
+
+		// If a cancel option is not specified, return the single field now.
+		if ( ! array_key_exists( 'name_cancel', $args ) ) {
+			echo $html;
+			return;
+		}
+
+		$html .= $this->get_select_field(
+			$args['name_cancel'],
+			$args['value_cancel'],
+			$args['options']
+		);
+
+		echo $html;
+
+	}
+
+	/**
+	 * Returns a select dropdown field.
+	 *
+	 * @since   1.9.6
+	 *
+	 * @param   string      $name            Name.
+	 * @param   string      $value           Value.
+	 * @param   array       $options         Options / Choices.
+	 * @return  string                       HTML Select Field
+	 */
+	private function get_select_field( $name, $value = '', $options = array() ) {
+
+		// Build opening <select> tag.
+		$html = sprintf(
+			'<select id="%s" name="%s[%s]" size="1">',
+			$name,
+			$this->settings_key,
+			$name
+		);
+
+		// Build <option> tags.
+		foreach ( $options as $option => $label ) {
+			$html .= sprintf(
+				'<option value="%s"%s>%s</option>',
+				$option,
+				selected( $value, $option, false ),
+				$label
+			);
+		}
+
+		// Close <select>.
+		$html .= '</select>';
+
+		return $html;
+
+	}
+
 	/**
 	 * Returns the given text wrapped in a paragraph with the description class.
 	 *
@@ -426,222 +477,19 @@ class ConvertKit_MM_Admin {
 	}
 
 	/**
-	 * Outputs a description for the Mapping section of the settings screen
+	 * Validates saved options
 	 *
 	 * @since       1.0.0
+	 *
+	 * @param       array $input          Submitted plugin options.
+	 * @return      array                 Validated plugin options
 	 */
-	public function display_mapping_section() {
+	public function validate_options( $input ) {
 
-		echo '<p>' . esc_html__( 'Below is a list of the defined MemberMouse Membership Levels. Assign a membership level to a ConvertKit tag that will be assigned to members of that level.', 'convertkit-mm' ) . '</p>';
+		var_dump( $input );
+		die();
 
-	}
-
-	/**
-	 * Outputs a notice in the Mapping section when no MemberMouse levels have been added
-	 *
-	 * @since       1.0.0
-	 */
-	public function display_options_empty_mapping() {
-
-		?>
-		<p>
-			<?php echo esc_html__( 'No MM Membership Levels have been added yet.', 'convertkit-mm' ); ?><br/>
-			<?php
-			printf(
-				/* translators: Link to MemberMouse Membership Levels */
-				esc_html__( 'You can add one <a href="%s">here</a>.', 'convertkit-mm' ),
-				esc_url( get_admin_url( null, '/admin.php?page=mmro-membershiplevels' ) )
-			);
-			?>
-		</p>
-		<?php
-
-	}
-
-	/**
-	 * Display membership level to tag mapping for the specified key.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param array $args   Field arguments.
-	 */
-	public function display_options_convertkit_mapping( $args ) {
-
-		$option_name = 'convertkit-mapping-' . $args['key'];
-		$tag         = convertkit_mm_get_option( $option_name );
-		$tag_cancel  = convertkit_mm_get_option( $option_name . '-cancel' );
-		$api_key     = convertkit_mm_get_option( 'api-key' );
-
-		if ( empty( $api_key ) ) {
-			?>
-			<p><?php echo esc_html__( 'Enter API key to retrieve list of tags.', 'convertkit-mm' ); ?></p>
-			<?php
-		} elseif ( is_null( $args['tags'] ) ) {
-			?>
-			<p><?php echo esc_html__( 'No tags were returned from ConvertKit.', 'convertkit-mm' ); ?></p>
-			<?php
-		} else {
-			?>
-				<select id="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[<?php echo esc_attr( $option_name ); ?>]" name="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[<?php echo esc_attr( $option_name ); ?>]">
-					<option value=""<?php selected( $tag, '' ); ?>><?php echo esc_attr__( '(None)', 'convertkit-mm' ); ?></option>
-					<?php
-					foreach ( $args['tags'] as $value => $text ) {
-						?>
-						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $tag, $value ); ?>><?php echo esc_attr( $text ); ?></option>
-						<?php
-					}
-					?>
-				</select>
-			</td>
-			<td>
-				<select id="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[<?php echo esc_attr( $option_name ); ?>-cancel]" name="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[<?php echo esc_attr( $option_name ); ?>-cancel]">
-					<option value=""<?php selected( $tag_cancel, '' ); ?>><?php echo esc_attr__( '(None)', 'convertkit-mm' ); ?></option>
-					<?php
-					foreach ( $args['tags'] as $value => $text ) {
-						?>
-						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $tag_cancel, $value ); ?>><?php echo esc_attr( $text ); ?></option>
-						<?php
-					}
-					?>
-				</select>
-			<?php
-		}
-
-	}
-
-	/**
-	 * Outputs a notice in the Mapping section when no MemberMouse products have been added
-	 *
-	 * @since       1.2.0
-	 */
-	public function display_options_empty_mapping_products() {
-
-		?>
-		<p>
-			<?php echo esc_html__( 'No MM Products have been added yet.', 'convertkit-mm' ); ?><br/>
-			<?php
-			printf(
-				/* translators: Link to MemberMouse Membership Levels */
-				esc_html__( 'You can add one <a href="%s">here</a>.', 'convertkit-mm' ),
-				esc_url( get_admin_url( null, '/admin.php?page=product_settings' ) )
-			);
-			?>
-		</p>
-		<?php
-
-	}
-
-	/**
-	 * Display product to tag mapping for the specified key.
-	 *
-	 * @since 1.2.0
-	 *
-	 * @param array $args   Field arguments.
-	 */
-	public function display_options_convertkit_mapping_product( $args ) {
-
-		$option_name = 'convertkit-mapping-product-' . $args['key'];
-		$tag         = convertkit_mm_get_option( $option_name );
-		$api_key     = convertkit_mm_get_option( 'api-key' );
-
-		if ( empty( $api_key ) ) {
-			?>
-			<p><?php echo esc_html__( 'Enter API key to retrieve list of tags.', 'convertkit-mm' ); ?></p>
-			<?php
-		} elseif ( is_null( $args['tags'] ) ) {
-			?>
-			<p><?php echo esc_html__( 'No tags were returned from ConvertKit.', 'convertkit-mm' ); ?></p>
-			<?php
-		} else {
-			?>
-				<select id="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[<?php echo esc_attr( $option_name ); ?>]" name="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[<?php echo esc_attr( $option_name ); ?>]">
-					<option value=""<?php selected( $tag, '' ); ?>><?php echo esc_attr__( '(None)', 'convertkit-mm' ); ?></option>
-					<?php
-					foreach ( $args['tags'] as $value => $text ) {
-						?>
-						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $tag, $value ); ?>><?php echo esc_attr( $text ); ?></option>
-						<?php
-					}
-					?>
-				</select>
-			</td>
-			<td>
-				&nbsp;
-			<?php
-		}
-
-	}
-
-	/**
-	 * Outputs a notice in the Mapping section when no MemberMouse products have been added
-	 *
-	 * @since       1.2.0
-	 */
-	public function display_options_empty_mapping_bundles() {
-
-		?>
-		<p>
-			<?php echo esc_html__( 'No MM Bundles have been added yet.', 'convertkit-mm' ); ?><br/>
-			<?php
-			printf(
-				/* translators: Link to MemberMouse Membership Levels */
-				esc_html__( 'You can add one <a href="%s">here</a>.', 'convertkit-mm' ),
-				esc_url( get_admin_url( null, '/admin.php?page=product_settings&module=bundles' ) )
-			);
-			?>
-		</p>
-		<?php
-
-	}
-
-	/**
-	 * Display bundle to tag mapping for the specified key.
-	 *
-	 * @since 1.2.0
-	 *
-	 * @param array $args   Field arguments.
-	 */
-	public function display_options_convertkit_mapping_bundle( $args ) {
-
-		$option_name = 'convertkit-mapping-bundle-' . $args['key'];
-		$tag         = convertkit_mm_get_option( $option_name );
-		$tag_cancel  = convertkit_mm_get_option( $option_name . '-cancel' );
-		$api_key     = convertkit_mm_get_option( 'api-key' );
-
-		if ( empty( $api_key ) ) {
-			?>
-			<p><?php echo esc_html__( 'Enter API key to retrieve list of tags.', 'convertkit-mm' ); ?></p>
-			<?php
-		} elseif ( is_null( $args['tags'] ) ) {
-			?>
-			<p><?php echo esc_html__( 'No tags were returned from ConvertKit.', 'convertkit-mm' ); ?></p>
-			<?php
-		} else {
-			?>
-				<select id="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[<?php echo esc_attr( $option_name ); ?>]" name="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[<?php echo esc_attr( $option_name ); ?>]">
-					<option value=""<?php selected( $tag, '' ); ?>><?php echo esc_attr__( '(None)', 'convertkit-mm' ); ?></option>
-					<?php
-					foreach ( $args['tags'] as $value => $text ) {
-						?>
-						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $tag, $value ); ?>><?php echo esc_attr( $text ); ?></option>
-						<?php
-					}
-					?>
-				</select>
-			</td>
-			<td>
-				<select id="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[<?php echo esc_attr( $option_name ); ?>-cancel]" name="<?php echo esc_attr( CONVERTKIT_MM_NAME ); ?>-options[<?php echo esc_attr( $option_name ); ?>-cancel]">
-					<option value=""<?php selected( $tag_cancel, '' ); ?>><?php echo esc_attr__( '(None)', 'convertkit-mm' ); ?></option>
-					<?php
-					foreach ( $args['tags'] as $value => $text ) {
-						?>
-						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $tag_cancel, $value ); ?>><?php echo esc_attr( $text ); ?></option>
-						<?php
-					}
-					?>
-				</select>
-			<?php
-		}
+		return $input;
 
 	}
 
@@ -651,7 +499,7 @@ class ConvertKit_MM_Admin {
 	 * @since 1.0.0
 	 * @return array
 	 */
-	public function get_mm_membership_levels() {
+	private function get_mm_membership_levels() {
 
 		global $wpdb;
 
@@ -677,7 +525,7 @@ class ConvertKit_MM_Admin {
 	 *
 	 * @return  array
 	 */
-	public function get_mm_products() {
+	private function get_mm_products() {
 
 		global $wpdb;
 
@@ -703,7 +551,7 @@ class ConvertKit_MM_Admin {
 	 *
 	 * @return  array
 	 */
-	public function get_mm_bundles() {
+	private function get_mm_bundles() {
 
 		global $wpdb;
 

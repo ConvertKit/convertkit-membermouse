@@ -63,6 +63,9 @@ body.settings_page_convertkit-mm .wrap .postbox {
 	font-size: 14px;
 	border: 1px solid #EDF2F4;
 }
+body.settings_page_convertkit-mm .wrap .postbox .section {
+	margin-top: 40px;
+}
 body.settings_page_convertkit-mm .wrap .postbox h2 {
 	margin: 0 0 30px 0;
 	padding: 0 0 30px 0;

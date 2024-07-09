@@ -15,6 +15,13 @@
 class ConvertKit_MM_Admin {
 
 	/**
+	 * Holds the Settings Page Slug
+	 *
+	 * @var     string
+	 */
+	const SETTINGS_PAGE_SLUG = 'convertkit-mm';
+
+	/**
 	 * API functionality class
 	 *
 	 * @since   1.0.0
@@ -31,13 +38,50 @@ class ConvertKit_MM_Admin {
 	public function __construct() {
 
 		// Register settings screen.
-		add_filter( 'plugin_action_links_convertkit-membermouse/convertkit-membermouse.php', array( $this, 'settings_link' ) );
-		add_action( 'admin_menu', array( $this, 'add_menu' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_filter( 'plugin_action_links_convertkit-membermouse/convertkit-membermouse.php', array( $this, 'settings_link' ) );
 
 		// Initialize API.
 		$api_key   = convertkit_mm_get_option( 'api-key' );
 		$this->api = new ConvertKit_MM_API( $api_key );
+
+	}
+
+	/**
+	 * Enqueue JavaScript in Admin
+	 *
+	 * @since   1.9.6
+	 *
+	 * @param   string $hook   Hook.
+	 */
+	public function enqueue_scripts( $hook ) {
+
+		// Bail if we are not on the Settings screen.
+		if ( $hook !== 'settings_page_' . self::SETTINGS_PAGE_SLUG ) {
+			return;
+		}
+
+	}
+
+	/**
+	 * Enqueue CSS for the Settings Screens at Settings > ConvertKit
+	 *
+	 * @since   1.9.6
+	 *
+	 * @param   string $hook   Hook.
+	 */
+	public function enqueue_styles( $hook ) {
+
+		// Bail if we are not on the Settings screen.
+		if ( $hook !== 'settings_page_' . self::SETTINGS_PAGE_SLUG ) {
+			return;
+		}
+
+		// Always enqueue Settings CSS, as this is used for the UI across all settings sections.
+		wp_enqueue_style( 'convertkit-admin-settings', CONVERTKIT_MM_URL . 'resources/backend/css/settings.css', array(), CONVERTKIT_MM_VERSION );
 
 	}
 
@@ -51,124 +95,113 @@ class ConvertKit_MM_Admin {
 	 */
 	public function register_settings() {
 
+		// Register settings store.
 		register_setting(
 			CONVERTKIT_MM_NAME . '-options',
 			CONVERTKIT_MM_NAME . '-options',
 			array( $this, 'validate_options' )
 		);
 
+		// Register "General" settings section and fields.
 		add_settings_section(
 			CONVERTKIT_MM_NAME . '-display-options',
-			apply_filters( CONVERTKIT_MM_NAME . '_display_section_title', esc_html__( 'General', 'convertkit-mm' ) ),
+			__( 'General', 'convertkit-mm' ),
 			array( $this, 'display_options_section' ),
 			CONVERTKIT_MM_NAME
 		);
-
 		add_settings_field(
 			'api-key',
-			apply_filters( CONVERTKIT_MM_NAME . '_display_api_key', esc_html__( 'API Key', 'convertkit-mm' ) ),
-			array( $this, 'display_options_api_key' ),
+			__( 'API Key', 'convertkit-mm' ),
+			array( $this, 'api_key_callback' ),
 			CONVERTKIT_MM_NAME,
 			CONVERTKIT_MM_NAME . '-display-options'
 		);
 		add_settings_field(
 			'debug',
-			apply_filters( CONVERTKIT_MM_NAME . '_display_debug', esc_html__( 'Debug', 'convertkit-mm' ) ),
-			array( $this, 'display_options_debug' ),
+			__( 'Debug', 'convertkit-mm' ),
+			array( $this, 'debug_callback' ),
 			CONVERTKIT_MM_NAME,
 			CONVERTKIT_MM_NAME . '-display-options'
 		);
-		add_settings_section(
-			CONVERTKIT_MM_NAME . '-ck-mapping',
-			apply_filters( CONVERTKIT_MM_NAME . '_display_mapping_title', esc_html__( 'Assign Tags', 'convertkit-mm' ) ),
-			array( $this, 'display_mapping_section' ),
-			CONVERTKIT_MM_NAME
-		);
 
-		// Get all MemberMouse membership levels, products and bundles.
-		$levels   = $this->get_mm_membership_levels();
-		$products = $this->get_mm_products();
-		$bundles  = $this->get_mm_bundles();
+		// If the API hasn't been configured, don't display any further settings, as
+		// we cannot fetch tags from the API to populate dropdown fields.
+		if ( empty( convertkit_mm_get_option( 'api-key' ) ) ) {
+			return;
+		}
 
 		// Get all tags from ConvertKit.
 		$tags = $this->api->get_tags();
 
-		// Output level to tag mappings.
-		if ( empty( $levels ) ) {
+		// @TODO If no tags bail.
+
+		// Regsiter "Tagging: Membership Levels" settings section and fields.
+		add_settings_section(
+			CONVERTKIT_MM_NAME . '-ck-mapping-membership-levels',
+			__( 'Tagging: Membership Levels', 'convertkit-mm' ),
+			array( $this, 'display_mapping_section' ),
+			CONVERTKIT_MM_NAME
+		);
+		$levels   = $this->get_mm_membership_levels();
+		foreach ( $levels as $key => $name ) {
 			add_settings_field(
-				'convertkit-empty-mapping',
-				apply_filters( CONVERTKIT_MM_NAME . '_display_convertkit_mapping', esc_html__( 'Mapping', 'convertkit-mm' ) ),
-				array( $this, 'display_options_empty_mapping' ),
+				'convertkit-mapping-' . $key,
+				$name,
+				array( $this, '?' ),
 				CONVERTKIT_MM_NAME,
-				CONVERTKIT_MM_NAME . '-ck-mapping'
+				CONVERTKIT_MM_NAME . '-ck-mapping-membership-levels',
+				array(
+					'key'  => $key,
+					'name' => $name,
+					'tags' => $tags,
+				)
 			);
-		} else {
-			foreach ( $levels as $key => $name ) {
-				add_settings_field(
-					'convertkit-mapping-' . $key,
-					apply_filters( CONVERTKIT_MM_NAME . '_display_convertkit_mapping_' . $key, $name ),
-					array( $this, 'display_options_convertkit_mapping' ),
-					CONVERTKIT_MM_NAME,
-					CONVERTKIT_MM_NAME . '-ck-mapping',
-					array(
-						'key'  => $key,
-						'name' => $name,
-						'tags' => $tags,
-					)
-				);
-			}
 		}
 
-		// Output product to tag mappings.
-		if ( empty( $products ) ) {
+		// Regsiter "Tagging: Products" settings section and fields.
+		add_settings_section(
+			CONVERTKIT_MM_NAME . '-ck-mapping-products',
+			__( 'Tagging: Products', 'convertkit-mm' ),
+			array( $this, 'display_mapping_section' ),
+			CONVERTKIT_MM_NAME
+		);
+		$products = $this->get_mm_products();
+		foreach ( $products as $key => $name ) {
 			add_settings_field(
-				'convertkit-empty-mapping',
-				apply_filters( CONVERTKIT_MM_NAME . '_display_convertkit_mapping_product', esc_html__( 'Mapping', 'convertkit-mm' ) ),
-				array( $this, 'display_options_empty_mapping_products' ),
+				'convertkit-mapping-product-' . $key,
+				$name,
+				array( $this, '?' ),
 				CONVERTKIT_MM_NAME,
-				CONVERTKIT_MM_NAME . '-ck-mapping'
+				CONVERTKIT_MM_NAME . '-ck-mapping-products',
+				array(
+					'key'  => $key,
+					'name' => $name,
+					'tags' => $tags,
+				)
 			);
-		} else {
-			foreach ( $products as $key => $name ) {
-				add_settings_field(
-					'convertkit-mapping-product-' . $key,
-					apply_filters( CONVERTKIT_MM_NAME . '_display_convertkit_mapping_product_' . $key, $name ),
-					array( $this, 'display_options_convertkit_mapping_product' ),
-					CONVERTKIT_MM_NAME,
-					CONVERTKIT_MM_NAME . '-ck-mapping',
-					array(
-						'key'  => $key,
-						'name' => $name,
-						'tags' => $tags,
-					)
-				);
-			}
 		}
 
-		// Output bundle to tag mappings.
-		if ( empty( $bundles ) ) {
+		// Regsiter "Bundles: Membership Levels" settings section and fields.
+		add_settings_section(
+			CONVERTKIT_MM_NAME . '-ck-mapping-bundles',
+			__( 'Tagging: Bundles', 'convertkit-mm' ),
+			array( $this, 'display_mapping_section' ),
+			CONVERTKIT_MM_NAME
+		);
+		$bundles  = $this->get_mm_bundles();
+		foreach ( $bundles as $key => $name ) {
 			add_settings_field(
-				'convertkit-empty-mapping',
-				apply_filters( CONVERTKIT_MM_NAME . '_display_convertkit_mapping_bundle', esc_html__( 'Mapping', 'convertkit-mm' ) ),
-				array( $this, 'display_options_empty_mapping_bundles' ),
+				'convertkit-mapping-bundle-' . $key,
+				$name,
+				array( $this, '?' ),
 				CONVERTKIT_MM_NAME,
-				CONVERTKIT_MM_NAME . '-ck-mapping'
+				CONVERTKIT_MM_NAME . '-ck-mapping-bundles',
+				array(
+					'key'  => $key,
+					'name' => $name,
+					'tags' => $tags,
+				)
 			);
-		} else {
-			foreach ( $bundles as $key => $name ) {
-				add_settings_field(
-					'convertkit-mapping-bundle-' . $key,
-					apply_filters( CONVERTKIT_MM_NAME . '_display_convertkit_mapping_bundle_' . $key, $name ),
-					array( $this, 'display_options_convertkit_mapping_bundle' ),
-					CONVERTKIT_MM_NAME,
-					CONVERTKIT_MM_NAME . '-ck-mapping',
-					array(
-						'key'  => $key,
-						'name' => $name,
-						'tags' => $tags,
-					)
-				);
-			}
 		}
 
 	}
@@ -179,14 +212,14 @@ class ConvertKit_MM_Admin {
 	 * @since       1.0.0
 	 * @return      void
 	 */
-	public function add_menu() {
+	public function add_settings_page() {
 
 		add_options_page(
 			apply_filters( CONVERTKIT_MM_NAME . '_settings_page_title', esc_html__( 'ConvertKit MemberMouse Settings', 'convertkit-mm' ) ),
 			apply_filters( CONVERTKIT_MM_NAME . '_settings_menu_title', esc_html__( 'ConvertKit MemberMouse', 'convertkit-mm' ) ),
 			'manage_options',
 			CONVERTKIT_MM_NAME,
-			array( $this, 'options_page' )
+			array( $this, 'display_settings_page' )
 		);
 
 	}
@@ -197,16 +230,53 @@ class ConvertKit_MM_Admin {
 	 * @since       1.0.0
 	 * @return      void
 	 */
-	public function options_page() {
+	public function display_settings_page() {
 
-		?><div class="wrap"><h1><?php echo esc_html( get_admin_page_title() ); ?></h1></div>
-		<form action="options.php" method="post">
-		<?php
-		settings_fields( 'convertkit-mm-options' );
-		do_settings_sections( CONVERTKIT_MM_NAME );
-		submit_button( 'Save Settings' );
 		?>
-		</form>
+		<header>
+			<h1><?php esc_html_e( 'ConvertKit', 'convertkit' ); ?></h1>
+
+			<?php
+			// Output Help link tab, if it exists.
+			$documentation_url = 'blah';
+			if ( $documentation_url !== false ) {
+				printf(
+					'<a href="%s" class="convertkit-docs" target="_blank">%s</a>',
+					esc_attr( $documentation_url ),
+					esc_html__( 'Help', 'convertkit' )
+				);
+			}
+			?>
+		</header>
+
+		<div class="wrap">
+			<form method="post" action="options.php" enctype="multipart/form-data">
+				<div class="metabox-holder">
+					<div class="postbox">
+						<?php
+						do_settings_sections( CONVERTKIT_MM_NAME );
+						settings_fields( 'convertkit-mm-options' );
+						submit_button();
+						?>
+						</div>
+				</div>
+			</form>
+
+			<p class="description">
+				<?php
+				// Output Help link, if it exists.
+				$documentation_url = 'blah';
+				if ( $documentation_url !== false ) {
+					printf(
+						'%s <a href="%s" target="_blank">%s</a>',
+						esc_html__( 'If you need help setting up the plugin please refer to the', 'convertkit' ),
+						esc_attr( $documentation_url ),
+						esc_html__( 'plugin documentation', 'convertkit' )
+					);
+				}
+				?>
+			</p>
+		</div>
 		<?php
 
 	}
@@ -232,7 +302,7 @@ class ConvertKit_MM_Admin {
 	 */
 	public function display_options_section() {
 
-		echo '<p>' . esc_html__( 'Add your API key below and then choose a default form to add subscribers to.', 'convertkit-mm' ) . '</p>';
+		echo '<p>' . esc_html__( 'Add your API key below, and then choose when to tag subscribers based on MemberMouse actions.', 'convertkit-mm' ) . '</p>';
 
 	}
 
@@ -249,27 +319,11 @@ class ConvertKit_MM_Admin {
 	}
 
 	/**
-	 * Adds a link to the plugin settings page
-	 *
-	 * @since       1.0.0
-	 *
-	 * @param       array $links    Settings links.
-	 * @return      array           Settings links
-	 */
-	public function settings_link( $links ) {
-
-		$settings_link = sprintf( '<a href="%s">%s</a>', admin_url( 'options-general.php?page=' . CONVERTKIT_MM_NAME ), esc_html__( 'Settings', 'convertkit-mm' ) );
-		array_unshift( $links, $settings_link );
-		return $links;
-
-	}
-
-	/**
 	 * Outputs the API Key field in the settings screen
 	 *
 	 * @since       1.0.0
 	 */
-	public function display_options_api_key() {
+	public function api_key_callback() {
 
 		$api_key = convertkit_mm_get_option( 'api-key' );
 		?>
@@ -284,7 +338,7 @@ class ConvertKit_MM_Admin {
 	 *
 	 * @since       1.0.0
 	 */
-	public function display_options_debug() {
+	public function debug_callback() {
 
 		$debug = convertkit_mm_get_option( 'debug' );
 		?>
@@ -577,6 +631,22 @@ class ConvertKit_MM_Admin {
 		}
 
 		return $bundles;
+
+	}
+
+	/**
+	 * Adds a link to the plugin settings page
+	 *
+	 * @since       1.0.0
+	 *
+	 * @param       array $links    Settings links.
+	 * @return      array           Settings links
+	 */
+	public function settings_link( $links ) {
+
+		$settings_link = sprintf( '<a href="%s">%s</a>', admin_url( 'options-general.php?page=' . CONVERTKIT_MM_NAME ), esc_html__( 'Settings', 'convertkit-mm' ) );
+		array_unshift( $links, $settings_link );
+		return $links;
 
 	}
 

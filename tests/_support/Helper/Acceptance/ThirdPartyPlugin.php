@@ -51,6 +51,13 @@ class ThirdPartyPlugin extends \Codeception\Module
 		// Login as the Administrator.
 		$I->loginAsAdmin();
 
+		// Wait for the MemberMouse dashboard to load.
+		switch ( $name ) {
+			case 'membermouse-platform':
+				$I->waitForElementVisible('#mm-view-container');
+				break;
+		}
+
 		// Go to the Plugins screen in the WordPress Administration interface.
 		$I->amOnPluginsPage();
 

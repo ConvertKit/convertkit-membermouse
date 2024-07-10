@@ -220,22 +220,11 @@ class MemberMouse extends \Codeception\Module
 	 */
 	public function memberMouseEnableTestModeForPayments($I)
 	{
-		$I->dontHaveInDatabase('wp_mm_payment_services', [ 'token' => 'TEST' ]);
-		$I->haveInDatabase(
-			'wp_mm_payment_services',
-			[
-				'id'     => 14,
-				'token'  => 'TEST',
-				'name'   => serialize(
-					[
-						'mode'                           => 'always-override',
-						'testProcessorOverrideKey'       => '',
-						'productionProcessorOverrideKey' => '',
-					]
-				),
-				'active' => 1,
-			]
-		);
+		$I->amOnAdminPage('admin.php?page=payment_settings');
+		$I->checkOption('test_payment_service_enabled');
+		$I->click('Save Payment Methods');
+		$I->wait(5);
+		$I->acceptPopup();
 	}
 
 	/**

@@ -83,6 +83,9 @@ body.settings_page_convertkit-mm .wrap .postbox table.form-table tbody td div {
 	display: inline-block;
 	width: 50%;
 }
+body.settings_page_convertkit-mm .wrap .postbox table.form-table tbody td div label {
+	display: block;
+}
 body.settings_page_convertkit-mm .wrap .postbox .button {
 	margin:  0 5px 0 0;
 	padding: 4px 12px;

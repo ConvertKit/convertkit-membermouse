@@ -19,6 +19,7 @@ class BundleTagCest
 		// Activate Plugins.
 		$I->activateConvertKitPlugin($I);
 		$I->activateThirdPartyPlugin($I, 'membermouse-platform');
+		$I->memberMouseSetupPlugin($I);
 	}
 
 	/**
@@ -48,9 +49,6 @@ class BundleTagCest
 
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
-
-		// Enable test mode for payments.
-		$I->memberMouseEnableTestModeForPayments($I);
 
 		// Logout.
 		$I->memberMouseLogOut($I);
@@ -197,9 +195,6 @@ class BundleTagCest
 
 		// Generate email address for test.
 		$emailAddress = $I->generateEmailAddress();
-
-		// Enable test mode for payments.
-		$I->memberMouseEnableTestModeForPayments($I);
 
 		// Logout.
 		$I->memberMouseLogOut($I);

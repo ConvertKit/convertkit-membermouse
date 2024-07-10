@@ -361,4 +361,12 @@ CREATE TABLE `wp_users` (
 INSERT INTO `wp_users` (`ID`, `user_login`, `user_pass`, `user_nicename`, `user_email`, `user_url`, `user_registered`, `user_activation_key`, `user_status`, `display_name`) VALUES
 (1, 'admin',  '$P$BPKHO1xSCwu6j57sJB/p7JndeBdRVd.', 'admin',  'dev-email@flywheel.local', 'http://convertkit.local',  '2023-07-03 13:38:12',  '', 0,  'admin');
 
+DROP TABLE IF EXISTS `wp_mm_test_cardonfile`;
+CREATE TABLE `wp_mm_test_cardonfile` (
+  `user_id` bigint(20) NOT NULL,
+  `last_four` varchar(4) DEFAULT NULL,
+  `expiration_date` datetime NOT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- 2023-02-17 12:37:57

@@ -220,11 +220,22 @@ class MemberMouse extends \Codeception\Module
 	 */
 	public function memberMouseEnableTestModeForPayments($I)
 	{
-		$I->amOnAdminPage('admin.php?page=payment_settings');
-		$I->checkOption('test_payment_service_enabled');
-		$I->click('Save Payment Methods');
-		$I->wait(5);
-		$I->acceptPopup();
+		$I->dontHaveInDatabase('wp_mm_payment_services', [ 'token' => 'TEST' ]);
+		$I->haveInDatabase(
+			'wp_mm_payment_services',
+			[
+				'id'     => 14,
+				'token'  => 'TEST',
+				'name'   => serialize(
+					[
+						'mode'                           => 'always-override',
+						'testProcessorOverrideKey'       => '',
+						'productionProcessorOverrideKey' => '',
+					]
+				),
+				'active' => 1,
+			]
+		);
 	}
 
 	/**
@@ -272,6 +283,7 @@ class MemberMouse extends \Codeception\Module
 		$I->fillField('mm_field_billing_zip', '37208');
 
 		// Submit.
+		$I->waitForElementNotVisible('.lock-area');
 		$I->click('Submit Order');
 
 		// Wait for confirmation.

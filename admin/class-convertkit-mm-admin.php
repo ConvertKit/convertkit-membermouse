@@ -411,7 +411,8 @@ class ConvertKit_MM_Admin {
 		$html = $this->get_select_field(
 			$args['name'],
 			$args['value'],
-			$args['options']
+			$args['options'],
+			__( 'Apply tag on add', 'convertkit-mm' )
 		);
 
 		// If a cancel option is not specified, return the single field now.
@@ -423,7 +424,8 @@ class ConvertKit_MM_Admin {
 		$html .= $this->get_select_field(
 			$args['name_cancel'],
 			$args['value_cancel'],
-			$args['options']
+			$args['options'],
+			__( 'Apply tag on cancel', 'convertkit-mm' )
 		);
 
 		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -435,15 +437,26 @@ class ConvertKit_MM_Admin {
 	 *
 	 * @since   1.9.6
 	 *
-	 * @param   string $name            Name.
-	 * @param   string $value           Value.
-	 * @param   array  $options         Options / Choices.
-	 * @return  string                       HTML Select Field
+	 * @param   string 			$name            Name.
+	 * @param   string 			$value           Value.
+	 * @param   array  			$options         Options / Choices.
+	 * @param 	bool|string 	$label 			 Label.
+	 * @return  string                       	 HTML Select Field
 	 */
-	private function get_select_field( $name, $value = '', $options = array() ) {
+	private function get_select_field( $name, $value = '', $options = array(), $label = false ) {
+
+		$html = '';
+
+		if ( $label ) {
+			$html .= sprintf(
+				'<div><label for="%s">%s</label>',
+				$name,
+				$label
+			);
+		}
 
 		// Build opening <select> tag.
-		$html = sprintf(
+		$html .= sprintf(
 			'<select id="%s" name="%s[%s]" size="1">',
 			$name,
 			$this->settings_key,
@@ -462,6 +475,10 @@ class ConvertKit_MM_Admin {
 
 		// Close <select>.
 		$html .= '</select>';
+
+		if ( $label ) {
+			$html .= '</div>';
+		}
 
 		return $html;
 

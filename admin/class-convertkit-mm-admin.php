@@ -149,7 +149,7 @@ class ConvertKit_MM_Admin {
 			array(
 				'before_section' => '<div class="section">',
 				'after_section'  => '</div>',
-				'description'    => esc_html__( 'For each MemberMouse Membership Level, assign a ConvertKit Tag that you wish to be assigned to members of that level.', 'convertkit-mm' ),
+				'description'    => esc_html__( 'For each MemberMouse membership level, assign a ConvertKit Tag that you wish to be assigned to members of that level.', 'convertkit-mm' ),
 			)
 		);
 		$levels = $this->get_mm_membership_levels();
@@ -183,7 +183,7 @@ class ConvertKit_MM_Admin {
 			array(
 				'before_section' => '<div class="section">',
 				'after_section'  => '</div>',
-				'description'    => esc_html__( 'For each MemberMouse Product, assign a ConvertKit Tag that you wish to be assigned to members of that MemberMouse Product.', 'convertkit-mm' ),
+				'description'    => esc_html__( 'For each MemberMouse product, assign a ConvertKit Tag that you wish to be assigned to members of that product.', 'convertkit-mm' ),
 			)
 		);
 		$products = $this->get_mm_products();
@@ -214,7 +214,7 @@ class ConvertKit_MM_Admin {
 			array(
 				'before_section' => '<div class="section">',
 				'after_section'  => '</div>',
-				'description'    => esc_html__( 'For each MemberMouse Bundle, assign a ConvertKit Tag that you wish to be assigned to members of that bundle.', 'convertkit-mm' ),
+				'description'    => esc_html__( 'For each MemberMouse bundle, assign a ConvertKit Tag that you wish to be assigned to members of that bundle.', 'convertkit-mm' ),
 			)
 		);
 		$bundles = $this->get_mm_bundles();

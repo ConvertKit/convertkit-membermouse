@@ -212,19 +212,34 @@ class MemberMouse extends \Codeception\Module
 	}
 
 	/**
-	 * Helper method to enable test payments in MemberMouse.
+	 * Helper method to setup the MemberMouse Plugin for tests
 	 *
 	 * @since   1.2.0
 	 *
 	 * @param   AcceptanceTester $I            AcceptanceTester.
 	 */
-	public function memberMouseEnableTestModeForPayments($I)
+	public function memberMouseSetupPlugin($I)
 	{
-		$I->amOnAdminPage('admin.php?page=payment_settings');
-		$I->checkOption('test_payment_service_enabled');
-		$I->click('Save Payment Methods');
-		$I->wait(5);
-		$I->acceptPopup();
+		// Define test payment service.
+		$I->dontHaveInDatabase('wp_mm_payment_services', [ 'token' => 'TEST' ]);
+		$I->haveInDatabase(
+			'wp_mm_payment_services',
+			[
+				'id'     => 14,
+				'token'  => 'TEST',
+				'name'   => serialize(
+					[
+						'mode'                           => 'always-override',
+						'testProcessorOverrideKey'       => '',
+						'productionProcessorOverrideKey' => '',
+					]
+				),
+				'active' => 1,
+			]
+		);
+
+		// Don't use MemberMouse login page, as it breaks some tests when cleaning up / deactivating Plugins.
+		$I->haveOptionInDatabase('mm-option-use-mm-login-page', '0');
 	}
 
 	/**

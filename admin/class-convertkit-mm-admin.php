@@ -365,9 +365,10 @@ class ConvertKit_MM_Admin {
 
 			<?php
 			// Output Help link.
+			$documentation_url = 'https://help.convertkit.com/en/articles/2502605-membermouse-integration';
 			printf(
 				'<a href="%s" class="convertkit-docs" target="_blank">%s</a>',
-				esc_attr( 'https://help.convertkit.com/en/articles/2502605-membermouse-integration' ),
+				esc_attr( $documentation_url ),
 				esc_html__( 'Help', 'convertkit-mm' )
 			);
 			?>

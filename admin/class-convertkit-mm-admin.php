@@ -127,7 +127,7 @@ class ConvertKit_MM_Admin {
 				'label'       => __( 'Log requests to file and output browser console messages.', 'convertkit-mm' ),
 				'label_for'   => 'debug',
 				'description' => array(
-					__( 'You can ignore this unless you\'re working with our support team to resolve an issue. Decheck this option to improve performance.', 'convertkit-mm' ),
+					__( 'You can ignore this unless you\'re working with our support team to resolve an issue. Uncheck this option to improve performance.', 'convertkit-mm' ),
 				),
 			)
 		);
@@ -365,10 +365,9 @@ class ConvertKit_MM_Admin {
 
 			<?php
 			// Output Help link.
-			$documentation_url = '@TODO';
 			printf(
 				'<a href="%s" class="convertkit-docs" target="_blank">%s</a>',
-				esc_attr( $documentation_url ),
+				esc_attr( 'https://help.convertkit.com/en/articles/2502605-membermouse-integration' ),
 				esc_html__( 'Help', 'convertkit-mm' )
 			);
 			?>
@@ -435,12 +434,7 @@ class ConvertKit_MM_Admin {
 			convertkit_mm_get_option( $args['name'] )
 		);
 
-		// If no description exists, just return the field.
-		if ( empty( $args['description'] ) ) {
-			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		}
-
-		// Return field with description appended to it.
+		// Output field with description appended to it.
 		echo $html . $this->get_description( $args['description'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	}
@@ -480,12 +474,7 @@ class ConvertKit_MM_Admin {
 			);
 		}
 
-		// If no description exists, just return the field.
-		if ( empty( $args['description'] ) ) {
-			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		}
-
-		// Return field with description appended to it.
+		// Output field with description appended to it.
 		echo $html . $this->get_description( $args['description'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	}
@@ -527,7 +516,7 @@ class ConvertKit_MM_Admin {
 	/**
 	 * Returns a select dropdown field.
 	 *
-	 * @since   1.9.6
+	 * @since   1.3.0
 	 *
 	 * @param   string      $name            Name.
 	 * @param   string      $value           Value.
@@ -584,17 +573,18 @@ class ConvertKit_MM_Admin {
 	}
 
 	/**
-	 * Returns the given text wrapped in a paragraph with the description class.
+	 * Returns the given text wrapped in a paragraph with the description class,
+	 * if a description is specified.
 	 *
-	 * @since   1.9.6
+	 * @since   1.3.0
 	 *
-	 * @param   bool|string|array $description    Description.
-	 * @return  string                              HTML Description
+	 * @param   string|array $description    Description.
+	 * @return  string                       HTML Description
 	 */
-	private function get_description( $description ) {
+	private function get_description( $description = '' ) {
 
 		// Return blank string if no description specified.
-		if ( ! $description ) {
+		if ( empty( $description ) ) {
 			return '';
 		}
 

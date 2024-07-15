@@ -5,7 +5,7 @@ namespace Helper\Acceptance;
  * Helper methods and actions related to third party Plugins,
  * which are then available using $I->{yourFunctionName}.
  *
- * @since   1.9.6
+ * @since   1.2.0
  */
 class ThirdPartyPlugin extends \Codeception\Module
 {

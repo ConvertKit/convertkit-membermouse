@@ -15,7 +15,7 @@
  * Plugin Name:       ConvertKit MemberMouse Integration
  * Plugin URI:        http://www.convertkit.com
  * Description:       This plugin integrates ConvertKit with MemberMouse.
- * Version:           1.2.0
+ * Version:           1.2.1
  * Author:            ConvertKit
  * Author URI:        https://convertkit.com
  * License:           GPL-2.0+
@@ -34,7 +34,7 @@ define( 'CONVERTKIT_MM_NAME', 'convertkit-mm' ); // Used for settings.
 define( 'CONVERTKIT_MM_FILE', plugin_basename( __FILE__ ) );
 define( 'CONVERTKIT_MM_URL', plugin_dir_url( __FILE__ ) );
 define( 'CONVERTKIT_MM_PATH', plugin_dir_path( __FILE__ ) );
-define( 'CONVERTKIT_MM_VERSION', '1.2.0' );
+define( 'CONVERTKIT_MM_VERSION', '1.2.1' );
 
 // Load plugin files that are always required.
 require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-actions.php';

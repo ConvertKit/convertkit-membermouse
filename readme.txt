@@ -3,9 +3,9 @@ Contributors: nathanbarry, growdev, travisnorthcutt
 Donate link: http://convertkit.com/
 Tags: convertkit, email, marketing, membermouse
 Requires at least: 5.0
-Tested up to: 6.5.3
+Tested up to: 6.6
 Requires PHP: 5.6.20
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,9 +13,9 @@ This plugin integrates ConvertKit with Member Mouse.
 
 == Description ==
 
-[ConvertKit](https://convertkit.com) makes it easy to capture more leads and sell more products. This plugin makes it a little bit easier for those of us using Member Mouse to subscribe and tag customers that signup for memberships.
+[ConvertKit](https://convertkit.com) makes it easy to capture more leads and sell more products. This plugin makes it a little bit easier for those of us using Member Mouse to subscribe and tag customers that signup for memberships, products or bundles.
 
-**New to ConvertKit? [Creating an account](https://app.convertkit.com/users/signup?plan=1k&utm_source=wordpress&utm_term=en_US&utm_content=readme) is 100% free for your first 1,000 subscribers, making ConvertKit an email marketing solution for everyone - whether you're new to email marketing or a seasoned professional email marketer.**
+**New to ConvertKit? [Creating an account](https://app.convertkit.com/users/signup?plan=newsletter-free&utm_source=wordpress&utm_term=en_US&utm_content=readme) is 100% free for your first 10,000 subscribers, making ConvertKit an email marketing solution for everyone - whether you're new to email marketing or a seasoned professional email marketer.**
 
 == Installation ==
 
@@ -40,6 +40,9 @@ This plugin integrates ConvertKit with Member Mouse.
 No. You must first have an account on [convertkit.com](https://convertkit.com?utm_source=wordpress&utm_term=en_US&utm_content=readme), but you do not have to use a paid plan!
 
 == Changelog ==
+
+### 1.2.1 2024-07-16
+* Fix: Settings: Improved UI
 
 ### 1.2.0 2024-07-09
 * Added: Tag on Product purchase

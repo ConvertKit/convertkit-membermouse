@@ -15,12 +15,24 @@
 class ConvertKit_MM_Actions {
 
 	/**
+	 * Holds the ConvertKit Settings class.
+	 *
+	 * @since   1.2.2
+	 *
+	 * @var     null|ConvertKit_MM_Settings
+	 */
+	public $settings;
+
+	/**
 	 * Constructor. Registers hooks when specific MemberMouse actions are performed,
 	 * such as adding a member, purchasing a product and being assigned to a bundle.
 	 *
 	 * @since   1.2.0
 	 */
 	public function __construct() {
+
+		// Initialize settings class.
+		$this->settings = new ConvertKit_MM_Settings();
 
 		// Tag on Membership Level.
 		add_action( 'mm_member_add', array( $this, 'add_member' ) );
@@ -60,8 +72,7 @@ class ConvertKit_MM_Actions {
 		// Fetch data from member array.
 		$user_email = $member_data['email'];
 		$first_name = rawurlencode( $member_data['first_name'] );
-		$mapping    = 'convertkit-mapping-' . $member_data['membership_level'];
-		$tag_id     = convertkit_mm_get_option( $mapping );
+		$tag_id     = $this->settings->get_membership_level_mapping( $member_data['membership_level'] );
 
 		// Bail if no tag mapping exists, as this means we don't need to tag the subscriber.
 		if ( empty( $tag_id ) ) {
@@ -99,8 +110,7 @@ class ConvertKit_MM_Actions {
 		// Fetch data from member array.
 		$user_email = $member_data['email'];
 		$first_name = rawurlencode( $member_data['first_name'] );
-		$mapping    = 'convertkit-mapping-' . $member_data['membership_level'] . '-cancel';
-		$tag_id     = convertkit_mm_get_option( $mapping );
+		$tag_id     = $this->settings->get_membership_level_cancellation_mapping( $member_data['membership_level'] );
 
 		// Bail if no tag mapping exists, as this means we don't need to tag the subscriber.
 		if ( empty( $tag_id ) ) {
@@ -130,8 +140,7 @@ class ConvertKit_MM_Actions {
 		// Fetch data from member array.
 		$user_email = $member_data['email'];
 		$first_name = rawurlencode( $member_data['first_name'] );
-		$mapping    = 'convertkit-mapping-' . $member_data['membership_level'] . '-cancel';
-		$tag_id     = convertkit_mm_get_option( $mapping );
+		$tag_id     = $this->settings->get_membership_level_cancellation_mapping( $member_data['membership_level'] );
 
 		// Bail if no tag mapping exists, as this means we don't need to tag the subscriber.
 		if ( empty( $tag_id ) ) {
@@ -157,8 +166,7 @@ class ConvertKit_MM_Actions {
 		// Fetch data from purchase array.
 		$user_email = $purchase_data['email'];
 		$first_name = rawurlencode( $purchase_data['first_name'] );
-		$mapping    = 'convertkit-mapping-product-' . $purchase_data['product_id'];
-		$tag_id     = convertkit_mm_get_option( $mapping );
+		$tag_id     = $this->settings->get_product_mapping( $purchase_data['product_id'] );
 
 		// If no tag assigned to this Product, bail.
 		if ( empty( $tag_id ) ) {
@@ -184,8 +192,7 @@ class ConvertKit_MM_Actions {
 		// Fetch data from purchase array.
 		$user_email = $purchase_data['email'];
 		$first_name = rawurlencode( $purchase_data['first_name'] );
-		$mapping    = 'convertkit-mapping-bundle-' . $purchase_data['bundle_id'];
-		$tag_id     = convertkit_mm_get_option( $mapping );
+		$tag_id     = $this->settings->get_bundle_mapping( $purchase_data['bundle_id'] );
 
 		// If no tag assigned to this Bundle, bail.
 		if ( empty( $tag_id ) ) {
@@ -210,10 +217,10 @@ class ConvertKit_MM_Actions {
 		// Determine the status change.
 		switch ( $member_data['bundle_status_name'] ) {
 			case 'Active':
-				$mapping = 'convertkit-mapping-bundle-' . $member_data['bundle_id'];
+				$tag_id = $this->settings->get_bundle_mapping( $purchase_data['bundle_id'] );
 				break;
 			case 'Canceled':
-				$mapping = 'convertkit-mapping-bundle-' . $member_data['bundle_id'] . '-cancel';
+				$tag_id = $this->settings->get_bundle_cancellation_mapping( $purchase_data['bundle_id'] );
 				break;
 
 			default:
@@ -224,7 +231,6 @@ class ConvertKit_MM_Actions {
 		// Fetch data from member array.
 		$user_email = $member_data['email'];
 		$first_name = rawurlencode( $member_data['first_name'] );
-		$tag_id     = convertkit_mm_get_option( $mapping );
 
 		// If no tag assigned to this Bundle, bail.
 		if ( empty( $tag_id ) ) {
@@ -250,8 +256,7 @@ class ConvertKit_MM_Actions {
 	private function add_tag_to_user( $email, $first_name, $tag_id ) {
 
 		// Initialize API.
-		$api_key = convertkit_mm_get_option( 'api-key' );
-		$api     = new ConvertKit_MM_API( $api_key );
+		$api = new ConvertKit_MM_API( $this->settings->get_api_key() );
 
 		// Send request.
 		$api->add_tag_to_user( $email, $first_name, absint( $tag_id ) );

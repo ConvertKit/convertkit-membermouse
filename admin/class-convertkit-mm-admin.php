@@ -134,7 +134,7 @@ class ConvertKit_MM_Admin {
 
 		// If the API hasn't been configured, don't display any further settings, as
 		// we cannot fetch tags from the API to populate dropdown fields.
-		$this->settings = new ConvertKit_MM_Settings;
+		$this->settings = new ConvertKit_MM_Settings();
 		if ( ! $this->settings->has_api_key() ) {
 			return;
 		}
@@ -433,7 +433,7 @@ class ConvertKit_MM_Admin {
 			$args['name'],
 			$this->settings::SETTINGS_NAME,
 			$args['name'],
-			convertkit_mm_get_option( $args['name'] )
+			$this->settings->get_by_key( $args['name'] )
 		);
 
 		// Output field with description appended to it.

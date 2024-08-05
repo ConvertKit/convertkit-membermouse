@@ -16,7 +16,7 @@ class ConvertKit_MM_Settings {
 	/**
 	 * Holds the Settings Key that stores site wide ConvertKit settings
 	 *
-	 * @since 	1.2.2
+	 * @since   1.2.2
 	 *
 	 * @var     string
 	 */
@@ -25,7 +25,7 @@ class ConvertKit_MM_Settings {
 	/**
 	 * Holds the Settings
 	 *
-	 * @since 	1.2.2
+	 * @since   1.2.2
 	 *
 	 * @var     array
 	 */
@@ -65,6 +65,24 @@ class ConvertKit_MM_Settings {
 	}
 
 	/**
+	 * Returns the setting for the given key.
+	 *
+	 * @since   1.2.2
+	 *
+	 * @param   string $key    Settings key.
+	 * @return  string
+	 */
+	public function get_by_key( $key ) {
+
+		if ( ! array_key_exists( $key, $this->settings ) ) {
+			return '';
+		}
+
+		return $this->settings[ $key ];
+
+	}
+
+	/**
 	 * Returns the API Key Plugin setting.
 	 *
 	 * @since   1.2.2
@@ -92,12 +110,25 @@ class ConvertKit_MM_Settings {
 	}
 
 	/**
+	 * Returns whether debugging is enabled in the Plugin settings.
+	 *
+	 * @since   1.2.2
+	 *
+	 * @return  bool
+	 */
+	public function debug_enabled() {
+
+		return ( $this->settings['debug'] === 'on' ? true : false );
+
+	}
+
+	/**
 	 * Returns the mapping setting for the given MemberMouse Membership Level ID.
-	 * 
-	 * @since 	1.2.2
-	 * 
-	 * @param 	int 	$id 	Membership Level ID.
-	 * @return 	string 			Setting
+	 *
+	 * @since   1.2.2
+	 *
+	 * @param   int $id     Membership Level ID.
+	 * @return  string          Setting
 	 */
 	public function get_membership_level_mapping( $id ) {
 
@@ -108,11 +139,11 @@ class ConvertKit_MM_Settings {
 	/**
 	 * Returns the mapping setting for the given MemberMouse Membership Level ID
 	 * when the Level is removed from the User.
-	 * 
-	 * @since 	1.2.2
-	 * 
-	 * @param 	int 	$id 	Membership Level ID.
-	 * @return 	string 			Setting
+	 *
+	 * @since   1.2.2
+	 *
+	 * @param   int $id     Membership Level ID.
+	 * @return  string          Setting
 	 */
 	public function get_membership_level_cancellation_mapping( $id ) {
 
@@ -122,11 +153,11 @@ class ConvertKit_MM_Settings {
 
 	/**
 	 * Returns the mapping setting for the given MemberMouse Product ID.
-	 * 
-	 * @since 	1.2.2
-	 * 
-	 * @param 	int 	$id 	Membership Level ID.
-	 * @return 	string 			Setting
+	 *
+	 * @since   1.2.2
+	 *
+	 * @param   int $id     Membership Level ID.
+	 * @return  string          Setting
 	 */
 	public function get_product_mapping( $id ) {
 
@@ -136,11 +167,11 @@ class ConvertKit_MM_Settings {
 
 	/**
 	 * Returns the mapping setting for the given MemberMouse Bundle ID.
-	 * 
-	 * @since 	1.2.2
-	 * 
-	 * @param 	int 	$id 	Membership Level ID.
-	 * @return 	string 			Setting
+	 *
+	 * @since   1.2.2
+	 *
+	 * @param   int $id     Membership Level ID.
+	 * @return  string          Setting
 	 */
 	public function get_bundle_mapping( $id ) {
 
@@ -151,11 +182,11 @@ class ConvertKit_MM_Settings {
 	/**
 	 * Returns the mapping setting for the given MemberMouse Bundle ID
 	 * when the Bundle is removed from the User.
-	 * 
-	 * @since 	1.2.2
-	 * 
-	 * @param 	int 	$id 	Bundle ID.
-	 * @return 	string 			Setting
+	 *
+	 * @since   1.2.2
+	 *
+	 * @param   int $id     Bundle ID.
+	 * @return  string          Setting
 	 */
 	public function get_bundle_cancellation_mapping( $id ) {
 
@@ -166,13 +197,13 @@ class ConvertKit_MM_Settings {
 	/**
 	 * Returns the mapping setting for the given MemberMouse resource ID, type
 	 * and whether the mapping is for the 'cancellation'.
-	 * 
-	 * @since 	1.2.2
-	 * 
-	 * @param 	int 	$id 						Level, Product or Bundle ID.
-	 * @param 	string  $type 						Mapping type (level,bundle,product).
-	 * @param 	bool 	$is_cancellation_mapping 	If the mapping setting is for the 'cancel' action.
-	 * @return 	string 								Setting
+	 *
+	 * @since   1.2.2
+	 *
+	 * @param   int    $id                         Level, Product or Bundle ID.
+	 * @param   string $type                       Mapping type (level,bundle,product).
+	 * @param   bool   $is_cancellation_mapping    If the mapping setting is for the 'cancel' action.
+	 * @return  string                              Setting
 	 */
 	private function get_mapping( $id, $type = 'level', $is_cancellation_mapping = false ) {
 
@@ -186,14 +217,7 @@ class ConvertKit_MM_Settings {
 			$key .= '-cancel';
 		}
 
-		// Return a blank string if the setting key doesn't exist i.e. settings were not saved
-		// or the level, product or bundle was added to MemberMouse but we don't yet have a setting
-		// mapped for it.
-		if ( ! array_key_exists( $key, $this->settings ) ) {
-			return '';
-		}
-
-		return $this->settings[ $key ];
+		return $this->get_by_key( $key );
 
 	}
 
@@ -208,7 +232,8 @@ class ConvertKit_MM_Settings {
 	public function get_defaults() {
 
 		$defaults = array(
-			'api-key'         => '', // string.
+			'api-key' => '', // string.
+			'debug'   => '', // string.
 		);
 
 		/**

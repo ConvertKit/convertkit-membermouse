@@ -39,6 +39,7 @@ define( 'CONVERTKIT_MM_VERSION', '1.2.1' );
 // Load plugin files that are always required.
 require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-actions.php';
 require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-api.php';
+require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-settings.php';
 require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm.php';
 require CONVERTKIT_MM_PATH . 'includes/convertkit-mm-functions.php';
 

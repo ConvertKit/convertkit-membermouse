@@ -134,12 +134,13 @@ class ConvertKit_MM_Admin {
 
 		// If the API hasn't been configured, don't display any further settings, as
 		// we cannot fetch tags from the API to populate dropdown fields.
-		if ( empty( convertkit_mm_get_option( 'api-key' ) ) ) {
+		$settings = new ConvertKit_MM_Settings;
+		if ( ! $settings->has_api_key() ) {
 			return;
 		}
 
 		// Initialize API.
-		$api = new ConvertKit_MM_API( convertkit_mm_get_option( 'api-key' ) );
+		$api = new ConvertKit_MM_API( $settings->get_api_key() );
 
 		// Get all tags from ConvertKit.
 		$this->tags = $api->get_tags();

@@ -74,7 +74,7 @@ class ConvertKit_MM_Settings {
 	public function get_api_key() {
 
 		// Return API Key from settings.
-		return $this->settings['api_key'];
+		return $this->settings['api-key'];
 
 	}
 
@@ -101,11 +101,22 @@ class ConvertKit_MM_Settings {
 	 */
 	public function get_membership_level_mapping( $id ) {
 
-		if ( ! array_key_exists( 'convertkit-mapping-' . $key, $this->settings ) ) {
-			return '';
-		}
+		return $this->get_mapping( $id, 'level' );
 
-		return $this->settings[ 'convertkit-mapping-' . $key ];
+	}
+
+	/**
+	 * Returns the mapping setting for the given MemberMouse Membership Level ID
+	 * when the Level is removed from the User.
+	 * 
+	 * @since 	1.2.2
+	 * 
+	 * @param 	int 	$id 	Membership Level ID.
+	 * @return 	string 			Setting
+	 */
+	public function get_membership_level_cancellation_mapping( $id ) {
+
+		return $this->get_mapping( $id, 'level', true );
 
 	}
 
@@ -119,11 +130,7 @@ class ConvertKit_MM_Settings {
 	 */
 	public function get_product_mapping( $id ) {
 
-		if ( ! array_key_exists( 'convertkit-mapping-product-' . $key, $this->settings ) ) {
-			return '';
-		}
-
-		return $this->settings[ 'convertkit-mapping-product-' . $key ];
+		return $this->get_mapping( $id, 'product' );
 
 	}
 
@@ -137,11 +144,56 @@ class ConvertKit_MM_Settings {
 	 */
 	public function get_bundle_mapping( $id ) {
 
-		if ( ! array_key_exists( 'convertkit-mapping-bundle-' . $key, $this->settings ) ) {
+		return $this->get_mapping( $id, 'bundle' );
+
+	}
+
+	/**
+	 * Returns the mapping setting for the given MemberMouse Bundle ID
+	 * when the Bundle is removed from the User.
+	 * 
+	 * @since 	1.2.2
+	 * 
+	 * @param 	int 	$id 	Bundle ID.
+	 * @return 	string 			Setting
+	 */
+	public function get_bundle_cancellation_mapping( $id ) {
+
+		return $this->get_mapping( $id, 'bundle', true );
+
+	}
+
+	/**
+	 * Returns the mapping setting for the given MemberMouse resource ID, type
+	 * and whether the mapping is for the 'cancellation'.
+	 * 
+	 * @since 	1.2.2
+	 * 
+	 * @param 	int 	$id 						Level, Product or Bundle ID.
+	 * @param 	string  $type 						Mapping type (level,bundle,product).
+	 * @param 	bool 	$is_cancellation_mapping 	If the mapping setting is for the 'cancel' action.
+	 * @return 	string 								Setting
+	 */
+	private function get_mapping( $id, $type = 'level', $is_cancellation_mapping = false ) {
+
+		// Build key we're looking for in the array of settings.
+		// Membership levels are stored as `convertkit-mapping-ID`, so don't append the type in this instance.
+		$key = 'convertkit-mapping-' . ( $type !== 'level' ? $type . '-' : '' ) . $id;
+
+		// If requesting a 'cancel' setting, append this to the key.
+		// Products don't support cancellation, so ignore this flag if it's for a product.
+		if ( $is_cancellation_mapping && $type !== 'product' ) {
+			$key .= '-cancel';
+		}
+
+		// Return a blank string if the setting key doesn't exist i.e. settings were not saved
+		// or the level, product or bundle was added to MemberMouse but we don't yet have a setting
+		// mapped for it.
+		if ( ! array_key_exists( $key, $this->settings ) ) {
 			return '';
 		}
 
-		return $this->settings[ 'convertkit-mapping-bundle-' . $key ];
+		return $this->settings[ $key ];
 
 	}
 
@@ -156,7 +208,7 @@ class ConvertKit_MM_Settings {
 	public function get_defaults() {
 
 		$defaults = array(
-			'api_key'         => '', // string.
+			'api-key'         => '', // string.
 		);
 
 		/**

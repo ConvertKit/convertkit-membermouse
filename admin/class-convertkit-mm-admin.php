@@ -17,25 +17,25 @@ class ConvertKit_MM_Admin {
 	/**
 	 * Holds the Settings Page Slug
 	 *
-	 * @since   1.3.0
+	 * @since   1.2.0
 	 *
 	 * @var     string
 	 */
 	const SETTINGS_PAGE_SLUG = 'convertkit-mm';
 
 	/**
-	 * Options table key
+	 * Holds the ConvertKit Settings class.
 	 *
-	 * @since   1.3.0
+	 * @since   1.2.2
 	 *
-	 * @var string
+	 * @var     null|ConvertKit_MM_Settings
 	 */
-	public $settings_key = CONVERTKIT_MM_NAME . '-options';
+	public $settings;
 
 	/**
 	 * Holds the ConvertKit Tags.
 	 *
-	 * @since   1.3.0
+	 * @since   1.2.0
 	 *
 	 * @var     null|array
 	 */
@@ -134,13 +134,13 @@ class ConvertKit_MM_Admin {
 
 		// If the API hasn't been configured, don't display any further settings, as
 		// we cannot fetch tags from the API to populate dropdown fields.
-		$settings = new ConvertKit_MM_Settings;
-		if ( ! $settings->has_api_key() ) {
+		$this->settings = new ConvertKit_MM_Settings;
+		if ( ! $this->settings->has_api_key() ) {
 			return;
 		}
 
 		// Initialize API.
-		$api = new ConvertKit_MM_API( $settings->get_api_key() );
+		$api = new ConvertKit_MM_API( $this->settings->get_api_key() );
 
 		// Get all tags from ConvertKit.
 		$this->tags = $api->get_tags();
@@ -208,10 +208,10 @@ class ConvertKit_MM_Admin {
 					'key'          => $key,
 
 					'name'         => 'convertkit-mapping-' . $key,
-					'value'        => convertkit_mm_get_option( 'convertkit-mapping-' . $key ),
+					'value'        => $this->settings->get_membership_level_mapping( $key ),
 
 					'name_cancel'  => 'convertkit-mapping-' . $key . '-cancel',
-					'value_cancel' => convertkit_mm_get_option( 'convertkit-mapping-' . $key . '-cancel' ),
+					'value_cancel' => $this->settings->get_membership_level_cancellation_mapping( $key ),
 
 					'options'      => $this->tags,
 				)
@@ -266,7 +266,7 @@ class ConvertKit_MM_Admin {
 					'key'     => $key,
 
 					'name'    => 'convertkit-mapping-product-' . $key,
-					'value'   => convertkit_mm_get_option( 'convertkit-mapping-product-' . $key ),
+					'value'   => $this->settings->get_product_mapping( $key ),
 
 					'options' => $this->tags,
 				)
@@ -322,10 +322,10 @@ class ConvertKit_MM_Admin {
 					'key'          => $key,
 
 					'name'         => 'convertkit-mapping-bundle-' . $key,
-					'value'        => convertkit_mm_get_option( 'convertkit-mapping-bundle-' . $key ),
+					'value'        => $this->settings->get_bundle_mapping( $key ),
 
 					'name_cancel'  => 'convertkit-mapping-bundle-' . $key . '-cancel',
-					'value_cancel' => convertkit_mm_get_option( 'convertkit-mapping-bundle-' . $key . '-cancel' ),
+					'value_cancel' => $this->settings->get_bundle_cancellation_mapping( $key ),
 
 					'options'      => $this->tags,
 				)
@@ -431,7 +431,7 @@ class ConvertKit_MM_Admin {
 			'<input type="text" class="%s" id="%s" name="%s[%s]" value="%s" />',
 			( is_array( $args['css_classes'] ) ? implode( ' ', $args['css_classes'] ) : 'regular-text' ),
 			$args['name'],
-			$this->settings_key,
+			$this->settings::SETTINGS_NAME,
 			$args['name'],
 			convertkit_mm_get_option( $args['name'] )
 		);
@@ -462,7 +462,7 @@ class ConvertKit_MM_Admin {
 		$html .= sprintf(
 			'<input type="checkbox" id="%s" name="%s[%s]" class="%s" value="%s" %s />',
 			$args['name'],
-			$this->settings_key,
+			$this->settings::SETTINGS_NAME,
 			$args['name'],
 			( array_key_exists( 'css_classes', $args ) && is_array( $args['css_classes'] ) ? implode( ' ', $args['css_classes'] ) : '' ),
 			$args['value'],
@@ -542,7 +542,7 @@ class ConvertKit_MM_Admin {
 		$html .= sprintf(
 			'<select id="%s" name="%s[%s]" size="1">',
 			$name,
-			$this->settings_key,
+			$this->settings::SETTINGS_NAME,
 			$name
 		);
 

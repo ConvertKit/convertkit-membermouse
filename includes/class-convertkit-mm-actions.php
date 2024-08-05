@@ -217,10 +217,10 @@ class ConvertKit_MM_Actions {
 		// Determine the status change.
 		switch ( $member_data['bundle_status_name'] ) {
 			case 'Active':
-				$tag_id = $this->settings->get_bundle_mapping( $purchase_data['bundle_id'] );
+				$tag_id = $this->settings->get_bundle_mapping( $member_data['bundle_id'] );
 				break;
 			case 'Canceled':
-				$tag_id = $this->settings->get_bundle_cancellation_mapping( $purchase_data['bundle_id'] );
+				$tag_id = $this->settings->get_bundle_cancellation_mapping( $member_data['bundle_id'] );
 				break;
 
 			default:

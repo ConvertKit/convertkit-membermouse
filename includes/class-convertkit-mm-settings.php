@@ -212,8 +212,7 @@ class ConvertKit_MM_Settings {
 		$key = 'convertkit-mapping-' . ( $type !== 'level' ? $type . '-' : '' ) . $id;
 
 		// If requesting a 'cancel' setting, append this to the key.
-		// Products don't support cancellation, so ignore this flag if it's for a product.
-		if ( $is_cancellation_mapping && $type !== 'product' ) {
+		if ( $is_cancellation_mapping ) {
 			$key .= '-cancel';
 		}
 

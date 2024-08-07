@@ -34,7 +34,7 @@ class SettingsCest
 		// Go to the Plugin's Settings Screen.
 		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
 
-		// Confirm no option is displayed to save changes, as the Plugin isn't authenticated.
+		// Confirm no option is displayed to save settings, as the Plugin isn't authenticated.
 		$I->dontSeeElementInDOM('input#submit');
 
 		// Confirm the Connect button displays.
@@ -104,17 +104,17 @@ class SettingsCest
 		// Go to the Plugin's Settings Screen.
 		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
 
-		// Confirm the Disconnect and Save Changes buttons display.
+		// Confirm the Disconnect and Save Settings buttons display.
 		$I->see('Disconnect');
 		$I->seeElementInDOM('input#submit');
 
-		// Save Changes to confirm credentials are not lost.
-		$I->click('Save Changes');
+		// Save Settings to confirm credentials are not lost.
+		$I->click('Save Settings');
 
 		// Check that no PHP warnings or notices were output.
 		$I->checkNoWarningsAndNoticesOnScreen($I);
 
-		// Confirm the Disconnect and Save Changes buttons display.
+		// Confirm the Disconnect and Save Settings buttons display.
 		$I->see('Disconnect');
 		$I->seeElementInDOM('input#submit');
 

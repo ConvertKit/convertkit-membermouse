@@ -32,6 +32,10 @@ class ConvertKit_MM_Admin {
 	 */
 	public $settings;
 
+	public $api;
+
+	public $account;
+
 	/**
 	 * Holds the ConvertKit Tags.
 	 *
@@ -54,7 +58,13 @@ class ConvertKit_MM_Admin {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_filter( 'plugin_action_links_convertkit-membermouse/convertkit-membermouse.php', array( $this, 'settings_link' ) );
 
-		//$this->maybe_get_and_store_access_token();
+		// Initialize settings class.
+		$this->settings = new ConvertKit_MM_Settings();
+
+		// Run OAuth related actions.
+		$this->maybe_get_and_store_access_token();
+		$this->check_credentials();
+		$this->maybe_disconnect();
 
 	}
 
@@ -66,7 +76,10 @@ class ConvertKit_MM_Admin {
 	private function maybe_get_and_store_access_token() {
 
 		// Bail if we're not on the settings screen.
-		if ( ! $this->on_settings_screen( 'general' ) ) {
+		if ( ! array_key_exists( 'page', $_REQUEST ) ) {  // phpcs:ignore WordPress.Security.NonceVerification
+			return;
+		}
+		if ( sanitize_text_field( $_REQUEST['page'] ) !== 'convertkit-mm' ) {  // phpcs:ignore WordPress.Security.NonceVerification
 			return;
 		}
 
@@ -87,7 +100,7 @@ class ConvertKit_MM_Admin {
 			wp_safe_redirect(
 				add_query_arg(
 					array(
-						'page'              => '_wp_convertkit_settings',
+						'page'              => 'convertkit-mm',
 						'error_description' => $result->get_error_message(),
 					),
 					'options-general.php'
@@ -105,13 +118,128 @@ class ConvertKit_MM_Admin {
 			)
 		);
 
-		// Redirect to General screen, which will now show the Plugin's settings, because the Plugin
+		// Redirect to settings screen, which will now show the Plugin's settings, because the Plugin
 		// is now authenticated.
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'    => '_wp_convertkit_settings',
-					'success' => 'oauth2_success',
+					'page'    => 'convertkit-mm',
+				),
+				'options-general.php'
+			)
+		);
+		exit();
+
+	}
+
+	/**
+	 * Test the access token, if it exists.
+	 * If the access token has been revoked or is invalid, remove it from the settings now.
+	 *
+	 * @since   1.3.0
+	 */
+	private function check_credentials() {
+
+		// Bail if we're not on the settings screen.
+		if ( ! array_key_exists( 'page', $_REQUEST ) ) {  // phpcs:ignore WordPress.Security.NonceVerification
+			return;
+		}
+		if ( sanitize_text_field( $_REQUEST['page'] ) !== 'convertkit-mm' ) {  // phpcs:ignore WordPress.Security.NonceVerification
+			return;
+		}
+
+		// Bail if no access and refresh token exist.
+		if ( ! $this->settings->has_access_and_refresh_token() ) {
+			return;
+		}
+
+		// Initialize the API.
+		$this->api = new ConvertKit_API_V4(
+			CONVERTKIT_MM_OAUTH_CLIENT_ID,
+			CONVERTKIT_MM_OAUTH_CLIENT_REDIRECT_URI,
+			$this->settings->get_access_token(),
+			$this->settings->get_refresh_token(),
+			$this->settings->debug_enabled(),
+			'settings'
+		);
+
+		// Get Account Details, which we'll use in account_name_callback(), but also lets us test
+		// whether the API credentials are valid.
+		$this->account = $this->api->get_account();
+
+		// If the request succeeded, no need to perform further actions.
+		if ( ! is_wp_error( $this->account ) ) {
+			// Remove any existing persistent notice.
+			// @TODO.
+			//WP_ConvertKit()->get_class( 'admin_notices' )->delete( 'authorization_failed' );
+
+			return;
+		}
+
+		// Depending on the error code, maybe persist a notice in the WordPress Administration until the user
+		// fixes the problem.
+		switch ( $this->account->get_error_data( $this->account->get_error_code() ) ) {
+			case 401:
+				// Access token either expired or was revoked in ConvertKit.
+				// Remove from settings.
+				$this->settings->delete_credentials();
+
+				// Display a site wide notice.
+				// @TODO.
+				//WP_ConvertKit()->get_class( 'admin_notices' )->add( 'authorization_failed' );
+
+				// Redirect to General screen, which will now show the ConvertKit_Settings_OAuth screen, because
+				// the Plugin has no access token.
+				wp_safe_redirect(
+					add_query_arg(
+						array(
+							'page' => 'convertkit-mm',
+						),
+						'options-general.php'
+					)
+				);
+				exit();
+		}
+
+		// Output a non-401 error now.
+		// @TODO.
+		$this->output_error( $this->account->get_error_message() );
+
+	}
+
+	/**
+	 * Deletes the OAuth Access Token, Refresh Token and Expiry from the Plugin's settings, if the user
+	 * clicked the Disconnect button.
+	 *
+	 * @since   1.3.0
+	 */
+	private function maybe_disconnect() {
+
+		// Bail if we're not on the settings screen.
+		if ( ! array_key_exists( 'page', $_REQUEST ) ) {  // phpcs:ignore WordPress.Security.NonceVerification
+			return;
+		}
+		if ( sanitize_text_field( $_REQUEST['page'] ) !== 'convertkit-mm' ) {  // phpcs:ignore WordPress.Security.NonceVerification
+			return;
+		}
+
+		// Bail if nonce verification fails.
+		if ( ! isset( $_REQUEST['_convertkit_mm_settings_oauth_disconnect'] ) ) {
+			return;
+		}
+		if ( ! wp_verify_nonce( sanitize_key( $_REQUEST['_convertkit_mm_settings_oauth_disconnect'] ), 'convertkit-mm-oauth-disconnect' ) ) {
+			return;
+		}
+
+		// Delete Access Token.
+		$this->settings->delete_credentials();
+
+		// Redirect to General screen, which will now show the OAuth connect screen, because
+		// the Plugin has no access token.
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page' => 'convertkit-mm',
 				),
 				'options-general.php'
 			)
@@ -155,7 +283,6 @@ class ConvertKit_MM_Admin {
 
 		// If no Access Token exists, register a settings section that shows a button
 		// to start the OAuth authentication flow.
-		$this->settings = new ConvertKit_MM_Settings();
 		if ( ! $this->settings->has_access_and_refresh_token() ) {
 			add_settings_section(
 				CONVERTKIT_MM_NAME . '-oauth',
@@ -174,25 +301,14 @@ class ConvertKit_MM_Admin {
 			CONVERTKIT_MM_NAME . '-display-options',
 			__( 'General', 'convertkit-mm' ),
 			array( $this, 'display_section_introduction' ),
-			CONVERTKIT_MM_NAME,
-			array(
-				'description' => esc_html__( 'Add your API key below, and then choose when to tag subscribers based on MemberMouse actions.', 'convertkit-mm' ),
-			)
+			CONVERTKIT_MM_NAME
 		);
 		add_settings_field(
-			'api-key',
-			__( 'API Key', 'convertkit-mm' ),
-			array( $this, 'text_field_callback' ),
+			'account_name',
+			__( 'Account Name', 'convertkit' ),
+			array( $this, 'account_name_callback' ),
 			CONVERTKIT_MM_NAME,
 			CONVERTKIT_MM_NAME . '-display-options',
-			array(
-				'name'        => 'api-key',
-				'label_for'   => 'api-key',
-				'css_classes' => array( 'widefat' ),
-				'description' => array(
-					'<a href="https://app.convertkit.com/account/edit" target="_blank">' . esc_html__( 'Get your ConvertKit API Key', 'convertkit-mm' ) . '</a>',
-				),
-			)
 		);
 		add_settings_field(
 			'debug',
@@ -499,8 +615,48 @@ class ConvertKit_MM_Admin {
 	 */
 	public function display_section_introduction( $args ) {
 
+		// If no description provided, don't output a blank paragraph tag.
+		if ( ! array_key_exists ( 'description', $args ) ) {
+			return;
+		}
+		if ( empty( $args['description'] ) ) {
+			return;
+		}
+
 		echo '<p>' . esc_html( $args['description'] ) . '</p>';
 
+	}
+
+	/**
+	 * Outputs the Account Name
+	 *
+	 * @since   1.3.0
+	 */
+	public function account_name_callback() {
+
+		// Output Account Name.
+		$html = sprintf(
+			'<code>%s</code>',
+			isset( $this->account['account']['name'] ) ? esc_attr( $this->account['account']['name'] ) : esc_html__( '(Not specified)', 'convertkit' )
+		);
+
+		// Display an option to disconnect.
+		$html .= sprintf(
+			'<p><a href="%1$s" class="button button-primary">%2$s</a></p>',
+			esc_url(
+				add_query_arg(
+					array(
+						'page' => 'convertkit-mm',
+						'_convertkit_mm_settings_oauth_disconnect' => wp_create_nonce( 'convertkit-mm-oauth-disconnect' ),
+					),
+					'options-general.php'
+				)
+			),
+			esc_html__( 'Disconnect', 'convertkit' )
+		);
+
+		// Output has already been run through escaping functions above.
+		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput
 	}
 
 	/**

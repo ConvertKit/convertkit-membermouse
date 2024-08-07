@@ -278,6 +278,23 @@ class ConvertKit_MM_Settings {
 	}
 
 	/**
+	 * Deletes any existing access token, refresh token and its expiry from the Plugin settings.
+	 *
+	 * @since   1.3.0
+	 */
+	public function delete_credentials() {
+
+		$this->save(
+			array(
+				'access_token'  => '',
+				'refresh_token' => '',
+				'token_expires' => '',
+			)
+		);
+
+	}
+
+	/**
 	 * Returns the mapping setting for the given MemberMouse resource ID, type
 	 * and whether the mapping is for the 'cancellation'.
 	 *

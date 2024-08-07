@@ -3,6 +3,9 @@
     "description": "ConvertKit WordPress Plugin",
     "type": "project",
     "license": "GPLv3",
+    "require": {
+        "convertkit/convertkit-wordpress-libraries": "2.0.1"
+    },
     "require-dev": {
         "lucatume/wp-browser": "<3.5",
         "codeception/module-asserts": "^1.3",                                      

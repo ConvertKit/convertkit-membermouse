@@ -35,6 +35,19 @@ define( 'CONVERTKIT_MM_FILE', plugin_basename( __FILE__ ) );
 define( 'CONVERTKIT_MM_URL', plugin_dir_url( __FILE__ ) );
 define( 'CONVERTKIT_MM_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CONVERTKIT_MM_VERSION', '1.2.1' );
+define( 'CONVERTKIT_MM_OAUTH_CLIENT_ID', 'HXZlOCj-K5r0ufuWCtyoyo3f688VmMAYSsKg1eGvw0Y' ); // @TODO Change.
+define( 'CONVERTKIT_MM_OAUTH_CLIENT_REDIRECT_URI', 'https://app.convertkit.com/wordpress/redirect' );
+
+// Load shared classes, if they have not been included by another ConvertKit Plugin.
+if ( ! trait_exists( 'ConvertKit_API_Traits' ) ) {
+	require_once CONVERTKIT_MM_PATH . '/vendor/convertkit/convertkit-wordpress-libraries/src/class-convertkit-api-traits.php';
+}
+if ( ! class_exists( 'ConvertKit_API_V4' ) ) {
+	require_once CONVERTKIT_MM_PATH . '/vendor/convertkit/convertkit-wordpress-libraries/src/class-convertkit-api-v4.php';
+}
+if ( ! class_exists( 'ConvertKit_Log' ) ) {
+	require_once CONVERTKIT_MM_PATH . '/vendor/convertkit/convertkit-wordpress-libraries/src/class-convertkit-log.php';
+}
 
 // Load plugin files that are always required.
 require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-actions.php';

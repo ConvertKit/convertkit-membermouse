@@ -54,6 +54,70 @@ class ConvertKit_MM_Admin {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_filter( 'plugin_action_links_convertkit-membermouse/convertkit-membermouse.php', array( $this, 'settings_link' ) );
 
+		//$this->maybe_get_and_store_access_token();
+
+	}
+
+	/**
+	 * Requests an access token via OAuth, if an authorization code and verifier are included in the request.
+	 *
+	 * @since   1.3.0
+	 */
+	private function maybe_get_and_store_access_token() {
+
+		// Bail if we're not on the settings screen.
+		if ( ! $this->on_settings_screen( 'general' ) ) {
+			return;
+		}
+
+		// Bail if no authorization code is included in the request.
+		if ( ! array_key_exists( 'code', $_REQUEST ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			return;
+		}
+
+		// Sanitize token.
+		$authorization_code = sanitize_text_field( $_REQUEST['code'] ); // phpcs:ignore WordPress.Security.NonceVerification
+
+		// Exchange the authorization code and verifier for an access token.
+		$api    = new ConvertKit_API_V4( CONVERTKIT_OAUTH_CLIENT_ID, CONVERTKIT_OAUTH_CLIENT_REDIRECT_URI );
+		$result = $api->get_access_token( $authorization_code );
+
+		// Redirect with an error if we could not fetch the access token.
+		if ( is_wp_error( $result ) ) {
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'page'              => '_wp_convertkit_settings',
+						'error_description' => $result->get_error_message(),
+					),
+					'options-general.php'
+				)
+			);
+			exit();
+		}
+
+		// Store Access Token, Refresh Token and expiry.
+		$this->settings->save(
+			array(
+				'access_token'  => $result['access_token'],
+				'refresh_token' => $result['refresh_token'],
+				'token_expires' => ( $result['created_at'] + $result['expires_in'] ),
+			)
+		);
+
+		// Redirect to General screen, which will now show the Plugin's settings, because the Plugin
+		// is now authenticated.
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'    => '_wp_convertkit_settings',
+					'success' => 'oauth2_success',
+				),
+				'options-general.php'
+			)
+		);
+		exit();
+
 	}
 
 	/**
@@ -88,6 +152,22 @@ class ConvertKit_MM_Admin {
 			CONVERTKIT_MM_NAME . '-options',
 			array( $this, 'validate_options' )
 		);
+
+		// If no Access Token exists, register a settings section that shows a button
+		// to start the OAuth authentication flow.
+		$this->settings = new ConvertKit_MM_Settings();
+		if ( ! $this->settings->has_access_and_refresh_token() ) {
+			add_settings_section(
+				CONVERTKIT_MM_NAME . '-oauth',
+				__( 'Connect to ConvertKit', 'convertkit-mm' ),
+				array( $this, 'display_section_introduction' ),
+				CONVERTKIT_MM_NAME,
+				array(
+					'description' => esc_html__( 'For the ConvertKit for MemberMouse Plugin to function, please connect your ConvertKit account using the button below.', 'convertkit-mm' ),
+				)
+			);
+			return;
+		}
 
 		// Register "General" settings section and fields.
 		add_settings_section(
@@ -131,13 +211,6 @@ class ConvertKit_MM_Admin {
 				),
 			)
 		);
-
-		// If the API hasn't been configured, don't display any further settings, as
-		// we cannot fetch tags from the API to populate dropdown fields.
-		$this->settings = new ConvertKit_MM_Settings();
-		if ( ! $this->settings->has_api_key() ) {
-			return;
-		}
 
 		// Initialize API.
 		$api = new ConvertKit_MM_API( $this->settings->get_api_key() );
@@ -382,7 +455,20 @@ class ConvertKit_MM_Admin {
 						<?php
 						do_settings_sections( CONVERTKIT_MM_NAME );
 						settings_fields( 'convertkit-mm-options' );
-						submit_button( __( 'Save Settings', 'convertkit-mm' ) );
+
+						// If no access token, show connect button.
+						if ( ! $this->settings->has_access_and_refresh_token() ) {
+							// Determine the OAuth URL to begin the authorization process.
+							$api       = new ConvertKit_API_V4( CONVERTKIT_MM_OAUTH_CLIENT_ID, CONVERTKIT_MM_OAUTH_CLIENT_REDIRECT_URI );
+							$oauth_url = $api->get_oauth_url( admin_url( 'options-general.php?page=convertkit-mm' ) );
+							?>
+							<p>
+								<a href="<?php echo esc_url( $oauth_url ); ?>" class="button button-primary"><?php esc_html_e( 'Connect', 'convertkit' ); ?></a>
+							</p>
+							<?php
+						} else {
+							submit_button( __( 'Save Settings', 'convertkit-mm' ) );
+						}
 						?>
 						</div>
 				</div>

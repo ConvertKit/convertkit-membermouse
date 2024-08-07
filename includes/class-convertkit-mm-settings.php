@@ -110,6 +110,89 @@ class ConvertKit_MM_Settings {
 	}
 
 	/**
+	 * Returns the Access Token Plugin setting.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @return  string
+	 */
+	public function get_access_token() {
+
+		// Return Access Token from settings.
+		return $this->settings['access_token'];
+
+	}
+
+	/**
+	 * Returns whether the Access Token has been set in the Plugin settings.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @return  bool
+	 */
+	public function has_access_token() {
+
+		return ( ! empty( $this->get_access_token() ) ? true : false );
+
+	}
+
+	/**
+	 * Returns the Refresh Token Plugin setting.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @return  string
+	 */
+	public function get_refresh_token() {
+
+		// Return Refresh Token from settings.
+		return $this->settings['refresh_token'];
+
+	}
+
+	/**
+	 * Returns whether the Refresh Token has been set in the Plugin settings.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @return  bool
+	 */
+	public function has_refresh_token() {
+
+		return ( ! empty( $this->get_refresh_token() ) ? true : false );
+
+	}
+
+	/**
+	 * Returns whether to use Access and Refresh Tokens for API requests,
+	 * based on whether an Access Token and Refresh Token have been saved
+	 * in the Plugin settings.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @return  bool
+	 */
+	public function has_access_and_refresh_token() {
+
+		return $this->has_access_token() && $this->has_refresh_token();
+
+	}
+
+	/**
+	 * Returns the Access Token expiry timestamp.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @return  int
+	 */
+	public function get_token_expiry() {
+
+		// Return Token Expiry from settings.
+		return $this->settings['token_expires'];
+
+	}
+
+	/**
 	 * Returns whether debugging is enabled in the Plugin settings.
 	 *
 	 * @since   1.2.2
@@ -231,8 +314,17 @@ class ConvertKit_MM_Settings {
 	public function get_defaults() {
 
 		$defaults = array(
-			'api-key' => '', // string.
-			'debug'   => '', // string.
+			// OAuth.
+			'access_token'    => '', // string.
+			'refresh_token'   => '', // string.
+			'token_expires'   => '', // integer.
+
+			// API Key. Retained if needed for backward compat.
+			// Hyphen is deliberate; this is how the setting has always been stored.
+			'api-key'         => '', // string.
+
+			// Settings.
+			'debug'           => '', // blank|on.
 		);
 
 		/**

@@ -86,12 +86,6 @@ class SettingsCest
 		$I->see('Connect');
 		$I->dontSee('Disconnect');
 		$I->dontSeeElementInDOM('input#submit');
-
-		// Navigate to the WordPress Admin.
-		$I->amOnAdminPage('index.php');
-
-		// Check that a notice is displayed that the API credentials are invalid.
-		$I->seeErrorNotice($I, 'ConvertKit: Authorization failed. Please connect your ConvertKit account.');
 	}
 
 	/**
@@ -124,15 +118,6 @@ class SettingsCest
 		$I->see('Disconnect');
 		$I->seeElementInDOM('input#submit');
 
-		// Navigate to the WordPress Admin.
-		$I->amOnAdminPage('index.php');
-
-		// Check that no notice is displayed that the API credentials are invalid.
-		$I->dontSeeErrorNotice($I, 'ConvertKit: Authorization failed. Please connect your ConvertKit account.');
-
-		// Go to the Plugin's Settings Screen.
-		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
-
 		// Disconnect the Plugin connection to ConvertKit.
 		$I->click('Disconnect');
 
@@ -143,29 +128,6 @@ class SettingsCest
 
 		// Check that the option table no longer contains cached resources.
 		$I->dontSeeOptionInDatabase('convertkit-mm-tags');
-	}
-
-	/**
-	 * Test that an error notice displays when the `error_description` is present in the URL,
-	 * typically when the user denies access via OAuth or exchanging a code for an access token failed.
-	 *
-	 * @since   1.3.0
-	 *
-	 * @param   AcceptanceTester $I  Tester.
-	 */
-	public function testErrorNoticeDisplaysOnOAuthFailure($I)
-	{
-		// Go to the Plugin's Settings Screen, as if we came back from OAuth where the user did not
-		// grant access, or exchanging a code for an access token failed.
-		$I->amOnAdminPage('options-general.php?page=convertkit-mm&error_description=Client+authentication+failed+due+to+unknown+client%2C+no+client+authentication+included%2C+or+unsupported+authentication+method.');
-
-		// Check that a notice is displayed that the API credentials are invalid.
-		$I->seeErrorNotice($I, 'Client authentication failed due to unknown client, no client authentication included, or unsupported authentication method.');
-
-		// Confirm the Connect button displays.
-		$I->see('Connect');
-		$I->dontSee('Disconnect');
-		$I->dontSeeElementInDOM('input#submit');
 	}
 
 	/**

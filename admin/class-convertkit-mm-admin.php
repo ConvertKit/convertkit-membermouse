@@ -237,7 +237,7 @@ class ConvertKit_MM_Admin {
 		$this->settings->delete_credentials();
 
 		// Delete cached resources.
-		$tags            = new ConvertKit_MM_Resource_Tags();
+		$tags = new ConvertKit_MM_Resource_Tags();
 		$tags->delete();
 
 		// Redirect to General screen, which will now show the OAuth connect screen, because

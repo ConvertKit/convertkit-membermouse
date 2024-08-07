@@ -45,6 +45,9 @@ if ( ! trait_exists( 'ConvertKit_API_Traits' ) ) {
 if ( ! class_exists( 'ConvertKit_API_V4' ) ) {
 	require_once CONVERTKIT_MM_PATH . '/vendor/convertkit/convertkit-wordpress-libraries/src/class-convertkit-api-v4.php';
 }
+if ( ! class_exists( 'ConvertKit_Resource_V4' ) ) {
+	require_once CONVERTKIT_MM_PATH . '/vendor/convertkit/convertkit-wordpress-libraries/src/class-convertkit-resource-v4.php';
+}
 if ( ! class_exists( 'ConvertKit_Log' ) ) {
 	require_once CONVERTKIT_MM_PATH . '/vendor/convertkit/convertkit-wordpress-libraries/src/class-convertkit-log.php';
 }
@@ -52,6 +55,8 @@ if ( ! class_exists( 'ConvertKit_Log' ) ) {
 // Load plugin files that are always required.
 require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-actions.php';
 require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-api.php';
+require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-resource.php';
+require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-resource-tags.php';
 require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm-settings.php';
 require CONVERTKIT_MM_PATH . 'includes/class-convertkit-mm.php';
 require CONVERTKIT_MM_PATH . 'includes/convertkit-mm-functions.php';

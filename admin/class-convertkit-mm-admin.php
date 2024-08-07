@@ -342,14 +342,14 @@ class ConvertKit_MM_Admin {
 			)
 		);
 
-		// Get all tags from ConvertKit.
-		// @TODO Use resource class.
-		
-
-		$this->tags = $this->api->get_tags();
+		// Fetch Tags.
+		// We use refresh() to ensure we get the latest data, as we're in the admin interface
+		// and need to populate the select dropdown.
+		$this->tags = new ConvertKit_MM_Actions_Resource_Tags( $this->api );
+		$this->tags->refresh();
 
 		// Bail if no tags, as there are no further configuration settings without having ConvertKit Tags.
-		if ( is_null( $this->tags ) ) {
+		if ( ! $this->tags->exist() ) {
 			return;
 		}
 
@@ -416,7 +416,7 @@ class ConvertKit_MM_Admin {
 					'name_cancel'  => 'convertkit-mapping-' . $key . '-cancel',
 					'value_cancel' => $this->settings->get_membership_level_cancellation_mapping( $key ),
 
-					'options'      => $this->tags,
+					'options'      => $this->tags->get(),
 				)
 			);
 		}
@@ -471,7 +471,7 @@ class ConvertKit_MM_Admin {
 					'name'    => 'convertkit-mapping-product-' . $key,
 					'value'   => $this->settings->get_product_mapping( $key ),
 
-					'options' => $this->tags,
+					'options' => $this->tags->get(),
 				)
 			);
 		}
@@ -530,7 +530,7 @@ class ConvertKit_MM_Admin {
 					'name_cancel'  => 'convertkit-mapping-bundle-' . $key . '-cancel',
 					'value_cancel' => $this->settings->get_bundle_cancellation_mapping( $key ),
 
-					'options'      => $this->tags,
+					'options'      => $this->tags->get(),
 				)
 			);
 		}
@@ -810,12 +810,12 @@ class ConvertKit_MM_Admin {
 		);
 
 		// Build <option> tags.
-		foreach ( $options as $option => $label ) {
+		foreach ( $options as $option ) {
 			$html .= sprintf(
 				'<option value="%s"%s>%s</option>',
-				$option,
-				selected( $value, $option, false ),
-				$label
+				$option['id'],
+				selected( $value, $option['id'], false ),
+				$option['name']
 			);
 		}
 

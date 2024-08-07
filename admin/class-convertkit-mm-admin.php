@@ -314,7 +314,7 @@ class ConvertKit_MM_Admin {
 			__( 'Account Name', 'convertkit-mm' ),
 			array( $this, 'account_name_callback' ),
 			CONVERTKIT_MM_NAME,
-			CONVERTKIT_MM_NAME . '-display-options',
+			CONVERTKIT_MM_NAME . '-display-options'
 		);
 		add_settings_field(
 			'debug',

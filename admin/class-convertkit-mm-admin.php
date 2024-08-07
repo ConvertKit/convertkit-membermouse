@@ -106,7 +106,7 @@ class ConvertKit_MM_Admin {
 		$authorization_code = sanitize_text_field( $_REQUEST['code'] ); // phpcs:ignore WordPress.Security.NonceVerification
 
 		// Exchange the authorization code and verifier for an access token.
-		$api    = new ConvertKit_MM_API( CONVERTKIT_OAUTH_CLIENT_ID, CONVERTKIT_OAUTH_CLIENT_REDIRECT_URI );
+		$api    = new ConvertKit_MM_API( CONVERTKIT_MM_OAUTH_CLIENT_ID, CONVERTKIT_MM_OAUTH_CLIENT_REDIRECT_URI );
 		$result = $api->get_access_token( $authorization_code );
 
 		// Redirect with an error if we could not fetch the access token.

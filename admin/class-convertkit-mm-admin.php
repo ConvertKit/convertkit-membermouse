@@ -183,10 +183,6 @@ class ConvertKit_MM_Admin {
 
 		// If the request succeeded, no need to perform further actions.
 		if ( ! is_wp_error( $this->account ) ) {
-			// Remove any existing persistent notice.
-			// @TODO.
-			// WP_ConvertKit()->get_class( 'admin_notices' )->delete( 'authorization_failed' );
-
 			return;
 		}
 
@@ -197,10 +193,6 @@ class ConvertKit_MM_Admin {
 				// Access token either expired or was revoked in ConvertKit.
 				// Remove from settings.
 				$this->settings->delete_credentials();
-
-				// Display a site wide notice.
-				// @TODO.
-				// WP_ConvertKit()->get_class( 'admin_notices' )->add( 'authorization_failed' );
 
 				// Redirect to General screen, which will now show the ConvertKit_Settings_OAuth screen, because
 				// the Plugin has no access token.
@@ -214,10 +206,6 @@ class ConvertKit_MM_Admin {
 				);
 				exit();
 		}
-
-		// Output a non-401 error now.
-		// @TODO.
-		$this->output_error( $this->account->get_error_message() );
 
 	}
 
@@ -345,7 +333,7 @@ class ConvertKit_MM_Admin {
 		// Fetch Tags.
 		// We use refresh() to ensure we get the latest data, as we're in the admin interface
 		// and need to populate the select dropdown.
-		$this->tags = new ConvertKit_MM_Actions_Resource_Tags( $this->api );
+		$this->tags = new ConvertKit_MM_Resource_Tags( $this->api );
 		$this->tags->refresh();
 
 		// Bail if no tags, as there are no further configuration settings without having ConvertKit Tags.
@@ -865,6 +853,22 @@ class ConvertKit_MM_Admin {
 	 * @return      array                 Validated plugin options
 	 */
 	public function validate_options( $input ) {
+
+		// If no Access Token, Refresh Token or Token Expiry keys were specified in the settings
+		// prior to save, don't overwrite them with the blank setting from get_defaults().
+		// This ensures we only blank these values if we explicitly do so via $settings,
+		// as they won't be included in the Settings screen for security.
+		if ( ! array_key_exists( 'disconnect', $_REQUEST ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			if ( ! array_key_exists( 'access_token', $input ) ) {
+				$input['access_token'] = $this->settings->get_access_token();
+			}
+			if ( ! array_key_exists( 'refresh_token', $input ) ) {
+				$input['refresh_token'] = $this->settings->get_refresh_token();
+			}
+			if ( ! array_key_exists( 'token_expires', $input ) ) {
+				$input['token_expires'] = $this->settings->get_token_expiry();
+			}
+		}
 
 		return $input;
 

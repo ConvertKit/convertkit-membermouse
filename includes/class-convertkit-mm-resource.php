@@ -12,7 +12,7 @@
  *
  * @since   1.3.0
  */
-class ConvertKit_MM_Actions_Resource extends ConvertKit_Resource_V4 {
+class ConvertKit_MM_Resource extends ConvertKit_Resource_V4 {
 
 	/**
 	 * Constructor.

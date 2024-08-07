@@ -16,8 +16,8 @@ class ConvertKit_MM_API extends ConvertKit_API_V4 {
 
 	/**
 	 * Holds the log class for writing to the log file
-	 * 
-	 * @since 	1.3.0
+	 *
+	 * @since   1.3.0
 	 *
 	 * @var bool|ConvertKit_Log
 	 */
@@ -26,8 +26,8 @@ class ConvertKit_MM_API extends ConvertKit_API_V4 {
 	/**
 	 * Holds an array of error messages, localized to the plugin
 	 * using this API class.
-	 * 
-	 * @since 	1.3.0
+	 *
+	 * @since   1.3.0
 	 *
 	 * @var bool|array
 	 */

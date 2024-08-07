@@ -12,7 +12,7 @@
  *
  * @since   1.3.0
  */
-class ConvertKit_MM_Actions_Resource_Tags extends ConvertKit_MM_Actions_Resource {
+class ConvertKit_MM_Resource_Tags extends ConvertKit_MM_Actions_Resource {
 
 	/**
 	 * Holds the Settings Key that stores site wide ConvertKit settings

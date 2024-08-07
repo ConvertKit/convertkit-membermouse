@@ -32,9 +32,23 @@ class ConvertKit_MM_Admin {
 	 */
 	public $settings;
 
-	public $api;
+	/**
+	 * Holds the API instance.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @var     ConvertKit_API_V4
+	 */
+	private $api;
 
-	public $account;
+	/**
+	 * Holds the ConvertKit Account Name.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @var     bool|WP_Error|array
+	 */
+	private $account = false;
 
 	/**
 	 * Holds the ConvertKit Tags.
@@ -123,7 +137,7 @@ class ConvertKit_MM_Admin {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'    => 'convertkit-mm',
+					'page' => 'convertkit-mm',
 				),
 				'options-general.php'
 			)
@@ -171,7 +185,7 @@ class ConvertKit_MM_Admin {
 		if ( ! is_wp_error( $this->account ) ) {
 			// Remove any existing persistent notice.
 			// @TODO.
-			//WP_ConvertKit()->get_class( 'admin_notices' )->delete( 'authorization_failed' );
+			// WP_ConvertKit()->get_class( 'admin_notices' )->delete( 'authorization_failed' );
 
 			return;
 		}
@@ -186,7 +200,7 @@ class ConvertKit_MM_Admin {
 
 				// Display a site wide notice.
 				// @TODO.
-				//WP_ConvertKit()->get_class( 'admin_notices' )->add( 'authorization_failed' );
+				// WP_ConvertKit()->get_class( 'admin_notices' )->add( 'authorization_failed' );
 
 				// Redirect to General screen, which will now show the ConvertKit_Settings_OAuth screen, because
 				// the Plugin has no access token.
@@ -305,7 +319,7 @@ class ConvertKit_MM_Admin {
 		);
 		add_settings_field(
 			'account_name',
-			__( 'Account Name', 'convertkit' ),
+			__( 'Account Name', 'convertkit-mm' ),
 			array( $this, 'account_name_callback' ),
 			CONVERTKIT_MM_NAME,
 			CONVERTKIT_MM_NAME . '-display-options',
@@ -328,11 +342,11 @@ class ConvertKit_MM_Admin {
 			)
 		);
 
-		// Initialize API.
-		$api = new ConvertKit_MM_API( $this->settings->get_api_key() );
-
 		// Get all tags from ConvertKit.
-		$this->tags = $api->get_tags();
+		// @TODO Use resource class.
+		
+
+		$this->tags = $this->api->get_tags();
 
 		// Bail if no tags, as there are no further configuration settings without having ConvertKit Tags.
 		if ( is_null( $this->tags ) ) {
@@ -579,7 +593,7 @@ class ConvertKit_MM_Admin {
 							$oauth_url = $api->get_oauth_url( admin_url( 'options-general.php?page=convertkit-mm' ) );
 							?>
 							<p>
-								<a href="<?php echo esc_url( $oauth_url ); ?>" class="button button-primary"><?php esc_html_e( 'Connect', 'convertkit' ); ?></a>
+								<a href="<?php echo esc_url( $oauth_url ); ?>" class="button button-primary"><?php esc_html_e( 'Connect', 'convertkit-mm' ); ?></a>
 							</p>
 							<?php
 						} else {
@@ -616,7 +630,7 @@ class ConvertKit_MM_Admin {
 	public function display_section_introduction( $args ) {
 
 		// If no description provided, don't output a blank paragraph tag.
-		if ( ! array_key_exists ( 'description', $args ) ) {
+		if ( ! array_key_exists( 'description', $args ) ) {
 			return;
 		}
 		if ( empty( $args['description'] ) ) {
@@ -637,7 +651,7 @@ class ConvertKit_MM_Admin {
 		// Output Account Name.
 		$html = sprintf(
 			'<code>%s</code>',
-			isset( $this->account['account']['name'] ) ? esc_attr( $this->account['account']['name'] ) : esc_html__( '(Not specified)', 'convertkit' )
+			isset( $this->account['account']['name'] ) ? esc_attr( $this->account['account']['name'] ) : esc_html__( '(Not specified)', 'convertkit-mm' )
 		);
 
 		// Display an option to disconnect.
@@ -652,7 +666,7 @@ class ConvertKit_MM_Admin {
 					'options-general.php'
 				)
 			),
-			esc_html__( 'Disconnect', 'convertkit' )
+			esc_html__( 'Disconnect', 'convertkit-mm' )
 		);
 
 		// Output has already been run through escaping functions above.

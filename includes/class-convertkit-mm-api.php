@@ -1,223 +1,119 @@
 <?php
 /**
- * ConvertKit API class
+ * ConvertKit API class for WPForms.
  *
- * @package ConvertKit_MM
+ * @package ConvertKit_WPForms
  * @author ConvertKit
  */
 
 /**
- * Class to make ConvertKit v3 API calls.
+ * ConvertKit API class for WPForms.
  *
- * @package ConvertKit_MM
+ * @package ConvertKit_WPForms
  * @author ConvertKit
  */
-class ConvertKit_MM_API {
+class ConvertKit_MM_API extends ConvertKit_API_V4 {
 
 	/**
-	 * API version
+	 * Holds the log class for writing to the log file
+	 * 
+	 * @since 	1.3.0
 	 *
-	 * @since   1.0.0
-	 *
-	 * @var     string
+	 * @var bool|ConvertKit_Log
 	 */
-	protected $api_version = 'v3';
+	public $log = false;
 
 	/**
-	 * API URL
+	 * Holds an array of error messages, localized to the plugin
+	 * using this API class.
+	 * 
+	 * @since 	1.3.0
 	 *
-	 * @since   1.0.0
-	 *
-	 * @var     string
+	 * @var bool|array
 	 */
-	protected $api_url = 'https://api.convertkit.com';
+	public $error_messages = false;
 
 	/**
-	 * API Key
+	 * Sets up the API with the required credentials.
 	 *
-	 * @since   1.0.0
+	 * @since   1.3.0
 	 *
-	 * @var     string
+	 * @param   string      $client_id         OAuth Client ID.
+	 * @param   string      $redirect_uri      OAuth Redirect URI.
+	 * @param   bool|string $access_token      ConvertKit OAuth Access Token.
+	 * @param   bool|string $refresh_token     ConvertKit OAuth Refresh Token.
+	 * @param   bool|object $debug             Save data to log.
+	 * @param   bool|string $context           Context of originating request.
 	 */
-	protected $api_key;
+	public function __construct( $client_id, $redirect_uri, $access_token = false, $refresh_token = false, $debug = false, $context = false ) {
 
-	/**
-	 * ConvertKit Forms
-	 *
-	 * @since   1.0.0
-	 *
-	 * @var     array
-	 */
-	protected $forms;
+		// Set API credentials, debugging and logging class.
+		$this->client_id      = $client_id;
+		$this->redirect_uri   = $redirect_uri;
+		$this->access_token   = $access_token;
+		$this->refresh_token  = $refresh_token;
+		$this->debug          = $debug;
+		$this->context        = $context;
+		$this->plugin_name    = ( defined( 'CONVERTKIT_MM_NAME' ) ? CONVERTKIT_MM_NAME : false );
+		$this->plugin_path    = ( defined( 'CONVERTKIT_MM_PATH' ) ? CONVERTKIT_MM_PATH : false );
+		$this->plugin_url     = ( defined( 'CONVERTKIT_MM_URL' ) ? CONVERTKIT_MM_URL : false );
+		$this->plugin_version = ( defined( 'CONVERTKIT_MM_VERSION' ) ? CONVERTKIT_MM_VERSION : false );
 
-	/**
-	 * ConvertKit Tags
-	 *
-	 * @since   1.0.0
-	 *
-	 * @var     array
-	 */
-	protected $tags;
-
-	/**
-	 * Initialize the class.
-	 *
-	 * @since    1.0.0
-	 *
-	 * @param    string $api_key    API Key.
-	 */
-	public function __construct( $api_key ) {
-
-		$this->api_key = $api_key;
-
-	}
-
-	/**
-	 * Get an array of forms and IDs from the API
-	 *
-	 * @since   1.0.0
-	 *
-	 * @return mixed
-	 */
-	public function get_forms() {
-
-		$forms = get_transient( 'convertkit_mm_form_data' );
-
-		if ( false === $forms ) {
-			$data = $this->do_api_call( 'forms' );
-
-			if ( ! is_wp_error( $data ) ) {
-
-				$forms = $data;
-				set_transient( 'convertkit_mm_form_data', $forms, 24 * 24 );
-			}
+		// Setup logging class if the required parameters exist.
+		if ( $this->debug && $this->plugin_path !== false ) {
+			$this->log = new ConvertKit_Log( $this->plugin_path );
 		}
 
-		if ( ! empty( $forms ) && isset( $forms['forms'] ) && ! empty( $forms['forms'] ) ) {
+		// Define translatable / localized error strings.
+		// WordPress requires that the text domain be a string (e.g. 'convertkit-mm') and not a variable,
+		// otherwise localization won't work.
+		$this->error_messages = array(
+			'form_subscribe_form_id_empty'                 => __( 'form_subscribe(): the form_id parameter is empty.', 'convertkit-mm' ),
+			'form_subscribe_email_empty'                   => __( 'form_subscribe(): the email parameter is empty.', 'convertkit-mm' ),
 
-			foreach ( $forms['forms'] as $key => $form ) {
-				$this->forms[ $form['id'] ] = $form['name'];
-			}
-		}
+			'sequence_subscribe_sequence_id_empty'         => __( 'sequence_subscribe(): the sequence_id parameter is empty.', 'convertkit-mm' ),
+			'sequence_subscribe_email_empty'               => __( 'sequence_subscribe(): the email parameter is empty.', 'convertkit-mm' ),
 
-		return $this->forms;
+			'tag_subscribe_tag_id_empty'                   => __( 'tag_subscribe(): the tag_id parameter is empty.', 'convertkit-mm' ),
+			'tag_subscribe_email_empty'                    => __( 'tag_subscribe(): the email parameter is empty.', 'convertkit-mm' ),
 
-	}
+			'get_subscriber_by_email_email_empty'          => __( 'get_subscriber_by_email(): the email parameter is empty.', 'convertkit-mm' ),
+			/* translators: Email Address */
+			'get_subscriber_by_email_none'                 => __( 'get_subscriber_by_email(): No subscriber(s) exist in ConvertKit matching the email address %s.', 'convertkit-mm' ),
 
+			'get_subscriber_by_id_subscriber_id_empty'     => __( 'get_subscriber_by_id(): the subscriber_id parameter is empty.', 'convertkit-mm' ),
 
-	/**
-	 * Get an array of tags and IDs from the API
-	 *
-	 * @since   1.0.0
-	 *
-	 * @return mixed
-	 */
-	public function get_tags() {
+			'get_subscriber_tags_subscriber_id_empty'      => __( 'get_subscriber_tags(): the subscriber_id parameter is empty.', 'convertkit-mm' ),
 
-		$tags = get_transient( 'convertkit_mm_tag_data' );
+			'unsubscribe_email_empty'                      => __( 'unsubscribe(): the email parameter is empty.', 'convertkit-mm' ),
 
-		if ( false === $tags || empty( $tags ) ) {
-			$data = $this->do_api_call( 'tags' );
+			'broadcast_delete_broadcast_id_empty'          => __( 'broadcast_delete(): the broadcast_id parameter is empty.', 'convertkit-mm' ),
 
-			if ( ! is_wp_error( $data ) ) {
+			'get_all_posts_posts_per_request_bound_too_low' => __( 'get_all_posts(): the posts_per_request parameter must be equal to or greater than 1.', 'convertkit-mm' ),
+			'get_all_posts_posts_per_request_bound_too_high' => __( 'get_all_posts(): the posts_per_request parameter must be equal to or less than 50.', 'convertkit-mm' ),
 
-				$tags = $data;
-				set_transient( 'convertkit_mm_tag_data', $tags, 24 * 24 );
-			}
-		}
+			'get_posts_page_parameter_bound_too_low'       => __( 'get_posts(): the page parameter must be equal to or greater than 1.', 'convertkit-mm' ),
+			'get_posts_per_page_parameter_bound_too_low'   => __( 'get_posts(): the per_page parameter must be equal to or greater than 1.', 'convertkit-mm' ),
+			'get_posts_per_page_parameter_bound_too_high'  => __( 'get_posts(): the per_page parameter must be equal to or less than 50.', 'convertkit-mm' ),
 
-		if ( ! empty( $tags ) && isset( $tags['tags'] ) && ! empty( $tags['tags'] ) ) {
+			'subscriber_authentication_send_code_email_empty' => __( 'subscriber_authentication_send_code(): the email parameter is empty.', 'convertkit-mm' ),
+			'subscriber_authentication_send_code_redirect_url_empty' => __( 'subscriber_authentication_send_code(): the redirect_url parameter is empty.', 'convertkit-mm' ),
+			'subscriber_authentication_send_code_redirect_url_invalid' => __( 'subscriber_authentication_send_code(): the redirect_url parameter is not a valid URL.', 'convertkit-mm' ),
+			'subscriber_authentication_send_code_response_token_missing' => __( 'subscriber_authentication_send_code(): the token parameter is missing from the API response.', 'convertkit-mm' ),
 
-			foreach ( $tags['tags'] as $key => $tag ) {
-				$this->tags[ $tag['id'] ] = $tag['name'];
-			}
-		}
+			'subscriber_authentication_verify_token_empty' => __( 'subscriber_authentication_verify(): the token parameter is empty.', 'convertkit-mm' ),
+			'subscriber_authentication_verify_subscriber_code_empty' => __( 'subscriber_authentication_verify(): the subscriber_code parameter is empty.', 'convertkit-mm' ),
+			'subscriber_authentication_verify_response_error' => __( 'The entered code is invalid. Please try again, or click the link sent in the email.', 'convertkit-mm' ),
 
-		return $this->tags;
+			'profiles_signed_subscriber_id_empty'          => __( 'profiles(): the signed_subscriber_id parameter is empty.', 'convertkit-mm' ),
 
-	}
-
-	/**
-	 * Add a tag to the subscriber.
-	 *
-	 * @since   1.0.0
-	 *
-	 * @param string $user_email    Email Address.
-	 * @param string $first_name    First name.
-	 * @param int    $tag_id        ConvertKit Tag ID.
-	 */
-	public function add_tag_to_user( $user_email, $first_name, $tag_id ) {
-
-		$args = array(
-			'first_name' => $first_name,
-			'email'      => $user_email,
+			/* translators: HTTP method */
+			'request_method_unsupported'                   => __( 'API request method %s is not supported in ConvertKit_API class.', 'convertkit-mm' ),
+			'request_rate_limit_exceeded'                  => __( 'ConvertKit API Error: Rate limit hit.', 'convertkit-mm' ),
+			'request_internal_server_error'                => __( 'ConvertKit API Error: Internal server error.', 'convertkit-mm' ),
+			'request_bad_gateway'                          => __( 'ConvertKit API Error: Bad gateway.', 'convertkit-mm' ),
+			'response_type_unexpected'                     => __( 'ConvertKit API Error: The response is not of the expected type array.', 'convertkit-mm' ),
 		);
-
-		$this->do_api_call( 'tags/' . $tag_id . '/subscribe', $args, 'POST' );
-
-	}
-
-	/**
-	 * Make a remote call to ConvertKit's API.
-	 *
-	 * @since   1.0.0
-	 * @param   string $path           API endpoint.
-	 * @param   array  $query_args     Query arguments.
-	 * @param   string $method         Request method.
-	 * @param   null   $body           Body.
-	 * @param   array  $request_args   Request arguments.
-	 *
-	 * @return array|mixed|object|WP_Error
-	 */
-	public function do_api_call( $path, $query_args = array(), $method = 'GET', $body = null, $request_args = array() ) {
-
-		$api_key = $this->api_key;
-
-		if ( '' === $api_key ) {
-			return array();
-		}
-
-		// Setup the URL endpoint.
-		$request_url           = $this->api_url . '/' . $this->api_version . '/' . $path;
-		$query_args['api_key'] = $api_key;
-		$request_url           = add_query_arg( $query_args, $request_url );
-
-		// Setup the request args.
-		$request_args = array_merge(
-			array(
-				'body'    => $body,
-				'headers' => array(
-					'Accept' => 'application/json',
-				),
-				'method'  => $method,
-				'timeout' => 30,
-
-			),
-			$request_args
-		);
-
-		convertkit_mm_log( 'api', 'Request url: ' . $request_url );
-		convertkit_mm_log( 'api', 'Request args: ' . print_r( $request_args, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
-
-		// Do the request.
-		$response = wp_remote_request( $request_url, $request_args );
-
-		// Handle the response.
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		} else {
-			$response_body = wp_remote_retrieve_body( $response );
-			$response_data = json_decode( $response_body, true );
-
-			if ( is_null( $response_data ) ) {
-				convertkit_mm_log( 'api', 'Response data not null. ' . print_r( $response, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
-				return new WP_Error( 'parse_failed', __( 'Could not parse response from ConvertKit', 'convertkit-mm' ) );
-			} elseif ( isset( $response_data['error'] ) && isset( $response_data['message'] ) ) {
-				return new WP_Error( $response_data['error'], $response_data['message'] );
-			} else {
-				return $response_data;
-			}
-		}
 
 	}
 

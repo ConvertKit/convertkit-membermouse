@@ -43,7 +43,7 @@
 	<!-- Define minimum supported WordPress version for sniffs. -->
 	<config name="minimum_supported_wp_version" value="5.0"/>
 
-	<!-- Text domain should always be 'convertkit'. -->
+	<!-- Text domain should always be 'convertkit-mm'. -->
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">

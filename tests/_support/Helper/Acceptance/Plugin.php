@@ -45,6 +45,8 @@ class Plugin extends \Codeception\Module
 	 *           Optional. An array of settings.
 	 *
 	 *     @type string $api_key            API Key (if specified, used instead of CONVERTKIT_API_KEY).
+	 *     @type string $access_token       Access Token (if specified, used instead of CONVERTKIT_OAUTH_ACCESS_TOKEN).
+	 *     @type string $refresh_token      Refresh Token (if specified, used instead of CONVERTKIT_OAUTH_REFRESH_TOKEN).
 	 *     @type string $debug              Enable debugging (default: on).
 	 * }
 	 */
@@ -52,8 +54,11 @@ class Plugin extends \Codeception\Module
 	{
 		// Define default options.
 		$defaults = [
-			'api-key' => $_ENV['CONVERTKIT_API_KEY'],
-			'debug'   => 'on',
+			// API Key retained for testing Legacy Forms and Landing Pages.
+			'api-key'       => $_ENV['CONVERTKIT_API_KEY'],
+			'access_token'  => $_ENV['CONVERTKIT_OAUTH_ACCESS_TOKEN'],
+			'refresh_token' => $_ENV['CONVERTKIT_OAUTH_REFRESH_TOKEN'],
+			'debug'         => 'on',
 		];
 
 		// If supplied options are an array, merge them with the defaults.

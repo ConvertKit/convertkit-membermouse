@@ -23,6 +23,7 @@ modules:
         - \Helper\Acceptance\MemberMouse
         - \Helper\Acceptance\Plugin
         - \Helper\Acceptance\ThirdPartyPlugin
+        - \Helper\Acceptance\WPNotices
         - \Helper\Acceptance\Xdebug
     config:
         WPDb:

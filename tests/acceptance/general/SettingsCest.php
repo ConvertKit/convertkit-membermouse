@@ -22,6 +22,153 @@ class SettingsCest
 	}
 
 	/**
+	 * Test that no PHP errors or notices are displayed on the Plugin's Setting screen
+	 * and a Connect button is displayed when no credentials exist.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @param   AcceptanceTester $I  Tester.
+	 */
+	public function testNoCredentials(AcceptanceTester $I)
+	{
+		// Go to the Plugin's Settings Screen.
+		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
+
+		// Confirm no option is displayed to save changes, as the Plugin isn't authenticated.
+		$I->dontSeeElementInDOM('input#submit');
+
+		// Confirm the Connect button displays.
+		$I->see('Connect');
+		$I->dontSee('Disconnect');
+
+		// Check that a link to the OAuth auth screen exists and includes the state parameter.
+		$I->seeInSource('<a href="https://app.convertkit.com/oauth/authorize?client_id=' . $_ENV['CONVERTKIT_OAUTH_CLIENT_ID'] . '&amp;response_type=code&amp;redirect_uri=' . urlencode( $_ENV['CONVERTKIT_OAUTH_REDIRECT_URI'] ) );
+		$I->seeInSource(
+			'&amp;state=' . $I->apiEncodeState(
+				$_ENV['TEST_SITE_WP_URL'] . '/wp-admin/options-general.php?page=_wp_convertkit_settings',
+				$_ENV['CONVERTKIT_OAUTH_CLIENT_ID']
+			)
+		);
+
+		// Click the connect button.
+		$I->click('Connect');
+
+		// Confirm the ConvertKit hosted OAuth login screen is displayed.
+		$I->waitForElementVisible('body.sessions');
+		$I->seeInSource('oauth/authorize?client_id=' . $_ENV['CONVERTKIT_OAUTH_CLIENT_ID']);
+	}
+
+
+	/**
+	 * Test that no PHP errors or notices are displayed on the Plugin's Setting screen,
+	 * and a warning is displayed that the supplied credentials are invalid, when
+	 * e.g. the access token has been revoked.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @param   AcceptanceTester $I  Tester.
+	 */
+	public function testInvalidCredentials(AcceptanceTester $I)
+	{
+		// Setup Plugin.
+		$I->setupConvertKitPlugin(
+			$I,
+			[
+				'access_token'  => 'fakeAccessToken',
+				'refresh_token' => 'fakeRefreshToken',
+			]
+		);
+
+		// Go to the Plugin's Settings Screen.
+		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
+
+		// Confirm the Connect button displays.
+		$I->see('Connect');
+		$I->dontSee('Disconnect');
+		$I->dontSeeElementInDOM('input#submit');
+
+		// Navigate to the WordPress Admin.
+		$I->amOnAdminPage('index.php');
+
+		// Check that a notice is displayed that the API credentials are invalid.
+		$I->seeErrorNotice($I, 'ConvertKit: Authorization failed. Please connect your ConvertKit account.');
+	}
+
+	/**
+	 * Test that no PHP errors or notices are displayed on the Plugin's Setting screen,
+	 * when valid credentials exist.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @param   AcceptanceTester $I  Tester.
+	 */
+	public function testValidCredentials(AcceptanceTester $I)
+	{
+		// Setup Plugin.
+		$I->setupConvertKitPlugin($I);
+
+		// Go to the Plugin's Settings Screen.
+		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
+
+		// Confirm the Disconnect and Save Changes buttons display.
+		$I->see('Disconnect');
+		$I->seeElementInDOM('input#submit');
+
+		// Save Changes to confirm credentials are not lost.
+		$I->click('Save Changes');
+
+		// Check that no PHP warnings or notices were output.
+		$I->checkNoWarningsAndNoticesOnScreen($I);
+
+		// Confirm the Disconnect and Save Changes buttons display.
+		$I->see('Disconnect');
+		$I->seeElementInDOM('input#submit');
+
+		// Navigate to the WordPress Admin.
+		$I->amOnAdminPage('index.php');
+
+		// Check that no notice is displayed that the API credentials are invalid.
+		$I->dontSeeErrorNotice($I, 'ConvertKit: Authorization failed. Please connect your ConvertKit account.');
+
+		// Go to the Plugin's Settings Screen.
+		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
+
+		// Disconnect the Plugin connection to ConvertKit.
+		$I->click('Disconnect');
+
+		// Confirm the Connect button displays.
+		$I->see('Connect');
+		$I->dontSee('Disconnect');
+		$I->dontSeeElementInDOM('input#submit');
+
+		// Check that the option table no longer contains cached resources.
+		$I->dontSeeOptionInDatabase('convertkit-mm-tags');
+	}
+
+	/**
+	 * Test that an error notice displays when the `error_description` is present in the URL,
+	 * typically when the user denies access via OAuth or exchanging a code for an access token failed.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @param   AcceptanceTester $I  Tester.
+	 */
+	public function testErrorNoticeDisplaysOnOAuthFailure($I)
+	{
+		// Go to the Plugin's Settings Screen, as if we came back from OAuth where the user did not
+		// grant access, or exchanging a code for an access token failed.
+		$I->amOnAdminPage('options-general.php?page=convertkit-mm&error_description=Client+authentication+failed+due+to+unknown+client%2C+no+client+authentication+included%2C+or+unsupported+authentication+method.');
+
+		// Check that a notice is displayed that the API credentials are invalid.
+		$I->seeErrorNotice($I, 'Client authentication failed due to unknown client, no client authentication included, or unsupported authentication method.');
+
+		// Confirm the Connect button displays.
+		$I->see('Connect');
+		$I->dontSee('Disconnect');
+		$I->dontSeeElementInDOM('input#submit');
+	}
+
+	/**
 	 * Test that saving settings on the settings screen with no changes
 	 * works with no errors.
 	 *
@@ -31,7 +178,10 @@ class SettingsCest
 	 */
 	public function testSaveSettingsWithNoChanges(AcceptanceTester $I)
 	{
-		// Go to the Plugin's Settings > General Screen.
+		// Setup Plugin.
+		$I->setupConvertKitPlugin($I);
+
+		// Go to the Plugin's Settings Screen.
 		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
 
 		// Click save settings.
@@ -39,60 +189,6 @@ class SettingsCest
 
 		// Check that no PHP warnings or notices were output.
 		$I->checkNoWarningsAndNoticesOnScreen($I);
-	}
-
-	/**
-	 * Test that saving a valid API Key on the settings screen
-	 * works with no errors.
-	 *
-	 * @since   1.2.0
-	 *
-	 * @param   AcceptanceTester $I  Tester.
-	 */
-	public function testSaveValidAPIKey(AcceptanceTester $I)
-	{
-		// Go to the Plugin's Settings > General Screen.
-		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
-
-		// Complete API Field.
-		$I->fillField('convertkit-mm-options[api-key]', $_ENV['CONVERTKIT_API_KEY']);
-
-		// Click save settings.
-		$I->click('Save Settings');
-
-		// Check that no PHP warnings or notices were output.
-		$I->checkNoWarningsAndNoticesOnScreen($I);
-
-		// Confirm settings saved.
-		$I->see('Settings saved.');
-	}
-
-	/**
-	 * Test that saving an invalid API Key on the settings screen
-	 * works with no errors.
-	 *
-	 * @since   1.2.0
-	 *
-	 * @param   AcceptanceTester $I  Tester.
-	 */
-	public function testSaveInvalidAPIKey(AcceptanceTester $I)
-	{
-		// Go to the Plugin's Settings > General Screen.
-		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
-
-		// Complete API Field.
-		$I->fillField('convertkit-mm-options[api-key]', 'fakeApiKey');
-
-		// Click save settings.
-		$I->click('Save Settings');
-
-		// Check that no PHP warnings or notices were output.
-		$I->checkNoWarningsAndNoticesOnScreen($I);
-
-		// Confirm settings saved.
-		// The Plugin doesn't show an error if an invalid API Key is present; in the future
-		// we'll want to add a notice in the Plugin and then test for it here.
-		$I->see('Settings saved.');
 	}
 
 	/**
@@ -108,7 +204,7 @@ class SettingsCest
 		// Setup Plugin.
 		$I->setupConvertKitPlugin($I);
 
-		// Go to the Plugin's Settings > General Screen.
+		// Go to the Plugin's Settings Screen.
 		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
 
 		// Assign tags.
@@ -158,7 +254,7 @@ class SettingsCest
 		// Setup Plugin.
 		$I->setupConvertKitPlugin($I);
 
-		// Go to the Plugin's Settings > General Screen.
+		// Go to the Plugin's Settings Screen.
 		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
 
 		// Assign tags.
@@ -207,7 +303,7 @@ class SettingsCest
 		// Setup Plugin.
 		$I->setupConvertKitPlugin($I);
 
-		// Go to the Plugin's Settings > General Screen.
+		// Go to the Plugin's Settings Screen.
 		$I->amOnAdminPage('options-general.php?page=convertkit-mm');
 
 		// Assign tags.

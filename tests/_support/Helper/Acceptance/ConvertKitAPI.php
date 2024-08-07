@@ -41,8 +41,8 @@ class ConvertKitAPI extends \Codeception\Module
 
 	/**
 	 * Check the given email address exists as a subscriber.
-	 * 
-	 * @since 	1.2.0
+	 *
+	 * @since   1.2.0
 	 *
 	 * @param   AcceptanceTester $I             AcceptanceTester.
 	 * @param   string           $emailAddress   Email Address.
@@ -69,8 +69,8 @@ class ConvertKitAPI extends \Codeception\Module
 
 	/**
 	 * Check the given subscriber ID has been assigned to the given tag ID.
-	 * 
-	 * @since 	1.2.0
+	 *
+	 * @since   1.2.0
 	 *
 	 * @param   AcceptanceTester $I             AcceptanceTester.
 	 * @param   int              $subscriberID  Subscriber ID.
@@ -132,8 +132,8 @@ class ConvertKitAPI extends \Codeception\Module
 
 	/**
 	 * Check the given email address does not exists as a subscriber.
-	 * 
-	 * @since 	1.2.0
+	 *
+	 * @since   1.2.0
 	 *
 	 * @param   AcceptanceTester $I             AcceptanceTester.
 	 * @param   string           $emailAddress   Email Address.
@@ -157,8 +157,8 @@ class ConvertKitAPI extends \Codeception\Module
 	/**
 	 * Sends a request to the ConvertKit API, typically used to read an endpoint to confirm
 	 * that data in an Acceptance Test was added/edited/deleted successfully.
-	 * 
-	 * @since 	1.2.0
+	 *
+	 * @since   1.2.0
 	 *
 	 * @param   string $endpoint   Endpoint.
 	 * @param   string $method     Method (GET|POST|PUT).

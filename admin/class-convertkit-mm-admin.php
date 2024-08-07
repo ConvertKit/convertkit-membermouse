@@ -37,7 +37,7 @@ class ConvertKit_MM_Admin {
 	 *
 	 * @since   1.3.0
 	 *
-	 * @var     ConvertKit_API_V4
+	 * @var     ConvertKit_MM_API
 	 */
 	private $api;
 
@@ -106,7 +106,7 @@ class ConvertKit_MM_Admin {
 		$authorization_code = sanitize_text_field( $_REQUEST['code'] ); // phpcs:ignore WordPress.Security.NonceVerification
 
 		// Exchange the authorization code and verifier for an access token.
-		$api    = new ConvertKit_API_V4( CONVERTKIT_OAUTH_CLIENT_ID, CONVERTKIT_OAUTH_CLIENT_REDIRECT_URI );
+		$api    = new ConvertKit_MM_API( CONVERTKIT_OAUTH_CLIENT_ID, CONVERTKIT_OAUTH_CLIENT_REDIRECT_URI );
 		$result = $api->get_access_token( $authorization_code );
 
 		// Redirect with an error if we could not fetch the access token.
@@ -168,7 +168,7 @@ class ConvertKit_MM_Admin {
 		}
 
 		// Initialize the API.
-		$this->api = new ConvertKit_API_V4(
+		$this->api = new ConvertKit_MM_API(
 			CONVERTKIT_MM_OAUTH_CLIENT_ID,
 			CONVERTKIT_MM_OAUTH_CLIENT_REDIRECT_URI,
 			$this->settings->get_access_token(),
@@ -577,7 +577,7 @@ class ConvertKit_MM_Admin {
 						// If no access token, show connect button.
 						if ( ! $this->settings->has_access_and_refresh_token() ) {
 							// Determine the OAuth URL to begin the authorization process.
-							$api       = new ConvertKit_API_V4( CONVERTKIT_MM_OAUTH_CLIENT_ID, CONVERTKIT_MM_OAUTH_CLIENT_REDIRECT_URI );
+							$api       = new ConvertKit_MM_API( CONVERTKIT_MM_OAUTH_CLIENT_ID, CONVERTKIT_MM_OAUTH_CLIENT_REDIRECT_URI );
 							$oauth_url = $api->get_oauth_url( admin_url( 'options-general.php?page=convertkit-mm' ) );
 							?>
 							<p>

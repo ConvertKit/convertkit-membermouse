@@ -34,6 +34,11 @@ class ConvertKit_MM_Actions {
 		// Initialize settings class.
 		$this->settings = new ConvertKit_MM_Settings();
 
+		// Bail if no access and refresh token exist.
+		if ( ! $this->settings->has_access_and_refresh_token() ) {
+			return;
+		}
+
 		// Tag on Membership Level.
 		add_action( 'mm_member_add', array( $this, 'add_member' ) );
 		add_action( 'mm_member_membership_change', array( $this, 'add_member' ) );
@@ -255,11 +260,25 @@ class ConvertKit_MM_Actions {
 	 */
 	private function add_tag_to_user( $email, $first_name, $tag_id ) {
 
-		// Initialize API.
-		$api = new ConvertKit_MM_API( $this->settings->get_api_key() );
+		// Initialize the API.
+		$api = new ConvertKit_MM_API(
+			CONVERTKIT_MM_OAUTH_CLIENT_ID,
+			CONVERTKIT_MM_OAUTH_CLIENT_REDIRECT_URI,
+			$this->settings->get_access_token(),
+			$this->settings->get_refresh_token(),
+			$this->settings->debug_enabled(),
+			'settings'
+		);
 
-		// Send request.
-		$api->add_tag_to_user( $email, $first_name, absint( $tag_id ) );
+		// Subscribe email.
+		// Subscribe the email address.
+		$subscriber = $api->create_subscriber( $email, $first_name );
+		if ( is_wp_error( $subscriber ) ) {
+			return;
+		}
+
+		// Tag subscriber.
+		$api->tag_subscriber( absint( $tag_id ), $subscriber['subscriber']['id'] );
 
 	}
 

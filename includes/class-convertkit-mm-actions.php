@@ -328,8 +328,17 @@ class ConvertKit_MM_Actions {
 			'settings'
 		);
 
+		// Get subscriber ID using the last email address.
+		$subscriber_id = $api->get_subscriber_id( $last_email );
+
+		// If no subscriber could be found, bail.
+		if ( ! $subscriber_id ) {
+			return;
+		}
+
 		// Update subscriber.
-		// @TODO.
+		$api->update_subscriber( $subscriber_id, $first_name, $email );
+
 	}
 
 }

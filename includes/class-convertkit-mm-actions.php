@@ -52,6 +52,9 @@ class ConvertKit_MM_Actions {
 		add_action( 'mm_bundles_add', array( $this, 'add_bundle' ) );
 		add_action( 'mm_bundles_status_change', array( $this, 'status_change_bundle' ) );
 
+		// Membership Account changed.
+		add_action( 'mm_member_account_update', array( $this, 'update_member' ) );
+
 	}
 
 	/**
@@ -87,6 +90,28 @@ class ConvertKit_MM_Actions {
 		// Subscribe and tag.
 		$this->add_tag_to_user( $user_email, $first_name, $tag_id );
 		convertkit_mm_log( 'tag', 'Add tag ' . $tag_id . ' to user ' . $user_email . ' (' . $first_name . ')' );
+
+	}
+
+	/**
+	 * Called when a member's account is updated in MemberMouse.
+	 *
+	 * @since   1.2.2
+	 *
+	 * @param   array $member_data    Member data.
+	 */
+	public function update_member( $member_data ) {
+
+		// Bail if no change of email address occured.
+		if ( ! array_key_exists( 'last_email', $member_data ) ) {
+			return;
+		}
+		if ( $member_data['last_email'] === $member_data['email'] ) {
+			return;
+		}
+
+		// Update the subscriber.
+		$this->update_subscriber( $member_data['email'], $member_data['first_name'], $member_data['last_email'] );
 
 	}
 
@@ -280,6 +305,31 @@ class ConvertKit_MM_Actions {
 		// Tag subscriber.
 		$api->tag_subscriber( absint( $tag_id ), $subscriber['subscriber']['id'] );
 
+	}
+
+	/**
+	 * Updates the subscriber in ConvertKit with their new email address.
+	 *
+	 * @since   1.2.2
+	 *
+	 * @param   string $email          Email Address.
+	 * @param   string $first_name     First Name.
+	 * @param   string $last_email     Old (last) email address.
+	 */
+	private function update_subscriber( $email, $first_name, $last_email ) {
+
+		// Initialize the API.
+		$api = new ConvertKit_MM_API(
+			CONVERTKIT_MM_OAUTH_CLIENT_ID,
+			CONVERTKIT_MM_OAUTH_CLIENT_REDIRECT_URI,
+			$this->settings->get_access_token(),
+			$this->settings->get_refresh_token(),
+			$this->settings->debug_enabled(),
+			'settings'
+		);
+
+		// Update subscriber.
+		// @TODO.
 	}
 
 }

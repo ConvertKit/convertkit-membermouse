@@ -102,15 +102,12 @@ class ConvertKit_MM_Actions {
 	 */
 	public function update_member( $member_data ) {
 
-		// Bail if no change of email address occured.
-		if ( ! array_key_exists( 'last_email', $member_data ) ) {
-			return;
-		}
-		if ( $member_data['last_email'] === $member_data['email'] ) {
+		// Bail if no change of first name or email address occured.
+		if ( ! array_key_exists( 'last_email', $member_data ) && ! array_key_exists( 'last_first_name', $member_data ) ) {
 			return;
 		}
 
-		// Update the subscriber.
+		// Update the subscriber with their new first name and/or email address.
 		$this->update_subscriber( $member_data['email'], $member_data['first_name'], $member_data['last_email'] );
 
 	}

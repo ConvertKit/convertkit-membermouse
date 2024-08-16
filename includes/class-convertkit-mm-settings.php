@@ -159,7 +159,7 @@ class ConvertKit_MM_Settings {
 	 */
 	public function has_refresh_token() {
 
-		return ( ! empty( $this->get_refresh_token() );
+		return ( ! empty( $this->get_refresh_token() ) );
 
 	}
 

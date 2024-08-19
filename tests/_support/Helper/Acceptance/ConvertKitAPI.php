@@ -131,6 +131,23 @@ class ConvertKitAPI extends \Codeception\Module
 	}
 
 	/**
+	 * Removes the given tag ID from the given subscriber ID.
+	 *
+	 * @since   1.2.1
+	 *
+	 * @param   AcceptanceTester $I             AcceptanceTester.
+	 * @param   int              $subscriberID  Subscriber ID.
+	 * @param   int              $tagID         Tag ID.
+	 */
+	public function apiSubscriberRemoveTag($I, $subscriberID, $tagID)
+	{
+		$this->apiRequest(
+			'tags/' . $tagID . '/subscribers/' . $subscriberID,
+			'DELETE'
+		);
+	}
+
+	/**
 	 * Check the given email address does not exists as a subscriber.
 	 *
 	 * @since   1.2.0

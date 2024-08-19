@@ -97,10 +97,11 @@ class MemberMouse extends \Codeception\Module
 	 *
 	 * @since   1.2.0
 	 *
-	 * @param   AcceptanceTester $I             AcceptanceTester.
-	 * @param   string           $emailAddress  Email Address.
+	 * @param   AcceptanceTester $I                     AcceptanceTester.
+	 * @param   string           $emailAddress          Email Address.
+	 * @param   string           $membershipLevelName   Membership Level Name to assign to member.
 	 */
-	public function memberMouseCreateMember($I, $emailAddress)
+	public function memberMouseCreateMember($I, $emailAddress, $membershipLevelName = 'Free Membership')
 	{
 		// Navigate to MemberMouse > Manage Members.
 		$I->amOnAdminPage('admin.php?page=manage_members');
@@ -108,10 +109,12 @@ class MemberMouse extends \Codeception\Module
 		// Create Member.
 		$I->click('Create Member');
 		$I->waitForElementVisible('#mm-new-member-form-container');
+		$I->selectOption('#mm-new-membership-selector', $membershipLevelName);
 		$I->fillField('#mm-new-first-name', 'First');
 		$I->fillField('#mm-new-last-name', 'Last');
 		$I->fillField('#mm-new-email', $emailAddress);
 		$I->fillField('#mm-new-password', '12345678');
+
 		$I->click('Create Member', '.mm-dialog-button-container');
 		$I->waitForElementNotVisible('#mm-new-member-form-container');
 

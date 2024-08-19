@@ -210,6 +210,87 @@ class MemberTagCest
 	}
 
 	/**
+	 * Test that the member is tagged with the configured "apply tag" when:
+	 * - a first level is added, applying a tag,
+	 * - a first level is cancelled, applying a cancel tag,
+	 * - a second level is added, applying a tag.
+	 *
+	 * @since   1.2.1
+	 *
+	 * @param   AcceptanceTester $I  Tester.
+	 */
+	public function testMemberTaggedWhenMembershipLevelAddedCancelledAndReAdded(AcceptanceTester $I)
+	{
+		// Create an additional membership level.
+		$levelID = $I->memberMouseCreateMembershipLevel($I, 'Premium');
+
+		// Setup Plugin to tag users added to the Free Membership level to the
+		// ConvertKit Tag ID, and assign them a different tag when their membership
+		// is cancelled.
+		$I->setupConvertKitPlugin(
+			$I,
+			[
+				'convertkit-mapping-1'           => $_ENV['CONVERTKIT_API_TAG_ID'],
+				'convertkit-mapping-1-cancel'    => $_ENV['CONVERTKIT_API_TAG_CANCEL_ID'],
+				'convertkit-mapping-' . $levelID => $_ENV['CONVERTKIT_API_TAG_ID'],
+			]
+		);
+
+		// Generate email address for test.
+		$emailAddress = $I->generateEmailAddress();
+
+		// Create member.
+		$I->memberMouseCreateMember($I, $emailAddress);
+
+		// Check subscriber exists.
+		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
+
+		// Check that the subscriber has been assigned to the tag.
+		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);
+
+		// Cancel the user's membership level.
+		$I->amOnAdminPage('admin.php?page=manage_members');
+		$I->click($emailAddress);
+		$I->click('Access Rights');
+		$I->click('Cancel Membership');
+
+		// Accept popups
+		// We have to wait as there's no specific event MemberMouse fires to tell
+		// us it completed changing the membership level.
+		$I->wait(3);
+		$I->acceptPopup();
+		$I->wait(3);
+		$I->acceptPopup();
+		$I->wait(3);
+
+		// Check that the subscriber has been assigned to the cancelled tag.
+		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_CANCEL_ID']);
+
+		// Remove tags added to subscriber.
+		$I->apiSubscriberRemoveTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);
+		$I->apiSubscriberRemoveTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_CANCEL_ID']);
+
+		// Confirm tag removal worked.
+		$I->apiCheckSubscriberHasNoTags($I, $subscriberID);
+
+		// Assign second, new membership level.
+		$I->selectOption('#mm-new-membership-selection', 'Premium');
+		$I->click('Change Membership');
+
+		// Accept popups
+		// We have to wait as there's no specific event MemberMouse fires to tell
+		// us it completed changing the membership level.
+		$I->wait(3);
+		$I->acceptPopup();
+		$I->wait(3);
+		$I->acceptPopup();
+		$I->wait(3);
+
+		// Check that the subscriber has been assigned to the tag for the second membership level.
+		$I->apiCheckSubscriberHasTag($I, $subscriberID, $_ENV['CONVERTKIT_API_TAG_ID']);
+	}
+
+	/**
 	 * Test that the member is not subscribed or tagged when the configured "apply tag on add"
 	 * setting is set to 'None', and the member is added to a Membership Level.
 	 *

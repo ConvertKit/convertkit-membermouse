@@ -142,7 +142,7 @@ class ConvertKitAPI extends \Codeception\Module
 	public function apiSubscriberRemoveTag($I, $subscriberID, $tagID)
 	{
 		$this->apiRequest(
-			'subscribers/' . $subscriberID . '/tags/' . $tagID,
+			'tags/' . $tagID . '/subscribers/' . $subscriberID,
 			'DELETE'
 		);
 	}

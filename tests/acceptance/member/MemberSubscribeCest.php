@@ -51,11 +51,12 @@ class MemberSubscribeCest
 		$subscriberID = $I->apiCheckSubscriberExists($I, $emailAddress);
 
 		// Change the member's email address.
+		$newFirstName    = 'New First Name';
 		$newEmailAddress = $I->generateEmailAddress();
-		$I->memberMouseChangeEmailAddress($I, $emailAddress, $newEmailAddress);
+		$I->memberMouseUpdateMember($I, $emailAddress, $newEmailAddress, $newFirstName);
 
 		// Check the subscriber's email address was updated in ConvertKit.
-		$subscriberIDAfterNewEmailAddress = $I->apiCheckSubscriberExists($I, $newEmailAddress);
+		$subscriberIDAfterNewEmailAddress = $I->apiCheckSubscriberExists($I, $newEmailAddress, $newFirstName);
 
 		// Confirm the subscriber ID is the same.
 		$I->assertEquals($subscriberID, $subscriberIDAfterNewEmailAddress);

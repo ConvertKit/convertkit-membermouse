@@ -134,8 +134,9 @@ class MemberMouse extends \Codeception\Module
 	 * @param   AcceptanceTester $I                     AcceptanceTester.
 	 * @param   string           $emailAddress          Email Address.
 	 * @param   string           $newEmailAddress       New Email Address.
+	 * @param   bool|string      $newFirstName          New First Name.
 	 */
-	public function memberMouseChangeEmailAddress($I, $emailAddress, $newEmailAddress)
+	public function memberMouseUpdateMember($I, $emailAddress, $newEmailAddress, $newFirstName = false)
 	{
 		// Navigate to MemberMouse > Manage Members.
 		$I->amOnAdminPage('admin.php?page=manage_members');
@@ -143,8 +144,11 @@ class MemberMouse extends \Codeception\Module
 		// Click account with current email address.
 		$I->click($emailAddress);
 
-		// Change email address.
+		// Change email address and first name.
 		$I->fillField('#mm-email', $newEmailAddress);
+		if ($newFirstName) {
+			$I->fillField('#mm-first-name', $newFirstName);
+		}
 		$I->click('Update Member');
 
 		// Accept popup once user updated.

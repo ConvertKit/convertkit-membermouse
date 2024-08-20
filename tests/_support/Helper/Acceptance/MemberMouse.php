@@ -143,7 +143,7 @@ class MemberMouse extends \Codeception\Module
 
 		// Click account with current email address.
 		$I->click($emailAddress);
-
+		$I->wait(5);
 		$I->see('xxxxxxxx');
 
 		// Change email address and first name.

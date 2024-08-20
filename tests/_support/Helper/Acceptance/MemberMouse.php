@@ -127,6 +127,34 @@ class MemberMouse extends \Codeception\Module
 	}
 
 	/**
+	 * Helper method to update a member's email address in MemberMouse.
+	 *
+	 * @since   1.2.2
+	 *
+	 * @param   AcceptanceTester $I                     AcceptanceTester.
+	 * @param   string           $emailAddress          Email Address.
+	 * @param   string           $newEmailAddress       New Email Address.
+	 */
+	public function memberMouseChangeEmailAddress($I, $emailAddress, $newEmailAddress)
+	{
+		// Navigate to MemberMouse > Manage Members.
+		$I->amOnAdminPage('admin.php?page=manage_members');
+
+		// Click account with current email address.
+		$I->click($emailAddress);
+
+		// Change email address.
+		$I->fillField('#mm-email', $newEmailAddress);
+		$I->click('Update Member');
+
+		// Accept popup once user updated.
+		// We have to wait as there's no specific event MemberMouse fires to tell
+		// us it completed updating the member.
+		$I->wait(3);
+		$I->acceptPopup();
+	}
+
+	/**
 	 * Helper method to assign a bundle to the given email address.
 	 *
 	 * @since   1.2.0

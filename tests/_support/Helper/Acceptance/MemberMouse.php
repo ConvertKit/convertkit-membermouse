@@ -124,6 +124,8 @@ class MemberMouse extends \Codeception\Module
 		$I->wait(5);
 		$I->acceptPopup();
 		$I->wait(5);
+
+		$I->see('XXXXXXX');
 	}
 
 	/**
@@ -143,16 +145,14 @@ class MemberMouse extends \Codeception\Module
 
 		// Click account with current email address.
 		$I->click($emailAddress);
-		$I->wait(5);
-		$I->see('xxxxxxxx');
+
+		$I->see('XXXXXX');
 
 		// Change email address and first name.
 		$I->fillField('#mm-email', $newEmailAddress);
 		if ($newFirstName) {
 			$I->fillField('#mm-first-name', $newFirstName);
 		}
-
-		
 
 		$I->click('Update Member');
 

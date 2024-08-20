@@ -142,13 +142,19 @@ class MemberMouse extends \Codeception\Module
 		$I->amOnAdminPage('admin.php?page=manage_members');
 
 		// Click account with current email address.
+		$I->see($emailAddress);
 		$I->click($emailAddress);
+
+		$I->see('xxxxxxxx');
 
 		// Change email address and first name.
 		$I->fillField('#mm-email', $newEmailAddress);
 		if ($newFirstName) {
 			$I->fillField('#mm-first-name', $newFirstName);
 		}
+
+		
+
 		$I->click('Update Member');
 
 		// Accept popup once user updated.

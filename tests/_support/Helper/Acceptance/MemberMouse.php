@@ -142,7 +142,6 @@ class MemberMouse extends \Codeception\Module
 		$I->amOnAdminPage('admin.php?page=manage_members');
 
 		// Click account with current email address.
-		$I->see($emailAddress);
 		$I->click($emailAddress);
 
 		$I->see('xxxxxxxx');

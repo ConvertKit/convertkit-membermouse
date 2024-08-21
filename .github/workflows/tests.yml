@@ -119,9 +119,7 @@ jobs:
         working-directory: ${{ env.ROOT_DIR }}
         run: |
           wp-cli config set WP_DEBUG true --raw
-          wp-cli config set WP_DEBUG_LOG true --raw
-          wp-cli config set WP_DEBUG_DISPLAY false --raw
-          
+
       # FS_METHOD = direct is required for WP_Filesystem to operate without suppressed PHP fopen() errors that trip up tests.
       - name: Enable FS_METHOD
         working-directory: ${{ env.ROOT_DIR }}
@@ -220,10 +218,3 @@ jobs:
         with:
           name: log-${{ steps.test-group.outputs.value }}-${{ matrix.php-versions }}.txt
           path: ${{ env.PLUGIN_DIR }}/log/log.txt
-
-      - name: Upload debug.log File to Artifact
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: log-${{ steps.test-group.outputs.value }}-${{ matrix.php-versions }}.log
-          path: ${{ env.ROOT_DIR }}/wp-content/debug.log

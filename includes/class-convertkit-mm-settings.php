@@ -49,6 +49,9 @@ class ConvertKit_MM_Settings {
 			$this->settings = array_merge( $this->get_defaults(), $settings );
 		}
 
+		// Update Access Token when refreshed by the API class.
+		add_action( 'convertkit_api_refresh_token', array( $this, 'update_credentials' ), 10, 2 );
+
 	}
 
 	/**
@@ -274,6 +277,33 @@ class ConvertKit_MM_Settings {
 	public function get_bundle_cancellation_mapping( $id ) {
 
 		return $this->get_mapping( $id, 'bundle', true );
+
+	}
+
+	/**
+	 * Saves the new access token, refresh token and its expiry when the API
+	 * class automatically refreshes an outdated access token.
+	 *
+	 * @since   1.3.0
+	 *
+	 * @param   array  $result      New Access Token, Refresh Token and Expiry.
+	 * @param   string $client_id   OAuth Client ID used for the Access and Refresh Tokens.
+	 */
+	public function update_credentials( $result, $client_id ) {
+
+		// Don't save these credentials if they're not for this Client ID.
+		// They're for another ConvertKit Plugin that uses OAuth.
+		if ( $client_id !== CONVERTKIT_MM_OAUTH_CLIENT_ID ) {
+			return;
+		}
+
+		$this->save(
+			array(
+				'access_token'  => $result['access_token'],
+				'refresh_token' => $result['refresh_token'],
+				'token_expires' => ( $result['created_at'] + $result['expires_in'] ),
+			)
+		);
 
 	}
 

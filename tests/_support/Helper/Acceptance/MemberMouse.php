@@ -121,9 +121,39 @@ class MemberMouse extends \Codeception\Module
 		// Accept popup once user created.
 		// We have to wait as there's no specific event MemberMouse fires to tell
 		// us it completed adding the member.
-		$I->wait(3);
+		$I->wait(5);
 		$I->acceptPopup();
-		$I->wait(3);
+		$I->wait(5);
+	}
+
+	/**
+	 * Helper method to update a member's email address in MemberMouse.
+	 *
+	 * @since   1.2.2
+	 *
+	 * @param   AcceptanceTester $I                     AcceptanceTester.
+	 * @param   string           $emailAddress          Email Address.
+	 * @param   string           $newEmailAddress       New Email Address.
+	 * @param   bool|string      $newFirstName          New First Name.
+	 */
+	public function memberMouseUpdateMember($I, $emailAddress, $newEmailAddress, $newFirstName = false)
+	{
+		// Click account with current email address.
+		$I->click($emailAddress);
+
+		// Change email address and first name.
+		$I->fillField('#mm-email', $newEmailAddress);
+		if ($newFirstName) {
+			$I->fillField('#mm-first-name', $newFirstName);
+		}
+
+		$I->click('Update Member');
+
+		// Accept popup once user updated.
+		// We have to wait as there's no specific event MemberMouse fires to tell
+		// us it completed updating the member.
+		$I->wait(5);
+		$I->acceptPopup();
 	}
 
 	/**
@@ -151,11 +181,11 @@ class MemberMouse extends \Codeception\Module
 
 		// Comp product for free.
 		$I->click('Comp ' . $bundleName);
-		$I->wait(3);
+		$I->wait(5);
 		$I->acceptPopup();
 
 		// Accept popups.
-		$I->wait(3);
+		$I->wait(5);
 		$I->acceptPopup();
 	}
 
@@ -179,9 +209,9 @@ class MemberMouse extends \Codeception\Module
 		// Accept popups
 		// We have to wait as there's no specific event MemberMouse fires to tell
 		// us it completed changing the membership level.
-		$I->wait(3);
+		$I->wait(5);
 		$I->acceptPopup();
-		$I->wait(3);
+		$I->wait(5);
 		$I->acceptPopup();
 	}
 
@@ -206,11 +236,11 @@ class MemberMouse extends \Codeception\Module
 		$I->waitForElementVisible('#mm-payment-options-dialog');
 
 		$I->click('Comp ' . $bundleName);
-		$I->wait(3);
+		$I->wait(5);
 		$I->acceptPopup();
 
 		// Accept popups.
-		$I->wait(3);
+		$I->wait(5);
 		$I->acceptPopup();
 	}
 

@@ -44,10 +44,11 @@ class ConvertKitAPI extends \Codeception\Module
 	 *
 	 * @since   1.2.0
 	 *
-	 * @param   AcceptanceTester $I             AcceptanceTester.
+	 * @param   AcceptanceTester $I              AcceptanceTester.
 	 * @param   string           $emailAddress   Email Address.
+	 * @param   bool|string      $firstName      First Name.
 	 */
-	public function apiCheckSubscriberExists($I, $emailAddress)
+	public function apiCheckSubscriberExists($I, $emailAddress, $firstName = false)
 	{
 		// Run request.
 		$results = $this->apiRequest(
@@ -62,6 +63,11 @@ class ConvertKitAPI extends \Codeception\Module
 		// Check at least one subscriber was returned and it matches the email address.
 		$I->assertGreaterThan(0, $results['pagination']['total_count']);
 		$I->assertEquals($emailAddress, $results['subscribers'][0]['email_address']);
+
+		// If a name is supplied, confirm it matches.
+		if ($firstName) {
+			$I->assertEquals($firstName, $results['subscribers'][0]['first_name']);
+		}
 
 		// Return subscriber ID.
 		return $results['subscribers'][0]['id'];

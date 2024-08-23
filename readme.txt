@@ -5,7 +5,7 @@ Tags: convertkit, email, marketing, membermouse
 Requires at least: 5.0
 Tested up to: 6.6
 Requires PHP: 5.6.20
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,6 +40,11 @@ This plugin integrates ConvertKit with Member Mouse.
 No. You must first have an account on [convertkit.com](https://convertkit.com?utm_source=wordpress&utm_term=en_US&utm_content=readme), but you do not have to use a paid plan!
 
 == Changelog ==
+
+### 1.2.2 2024-08-23
+* Added: Use ConvertKit v4 API and OAuth. You'll need to authorize one time at `Settings > ConvertKit MemberMouse > Connect`
+* Fix: Update subscriber's email address in ConvertKit when their email address is changed in MemberMouse
+* Updated: ConvertKit WordPress Libraries to 2.0.1
 
 ### 1.2.1 2024-07-16
 * Fix: Settings: Improved UI

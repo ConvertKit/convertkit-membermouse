@@ -1,4 +1,4 @@
-=== ConvertKit MemberMouse Integration ===
+=== Kit (formerly ConvertKit) MemberMouse Integration ===
 Contributors: nathanbarry, growdev, travisnorthcutt
 Donate link: http://kit.com/
 Tags: convertkit, email, marketing, membermouse
@@ -9,29 +9,28 @@ Stable tag: 1.2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin integrates ConvertKit with Member Mouse.
+This plugin integrates Kit with Member Mouse.
 
 == Description ==
 
-[ConvertKit](https://kit.com) makes it easy to capture more leads and sell more products. This plugin makes it a little bit easier for those of us using Member Mouse to subscribe and tag customers that signup for memberships, products or bundles.
+[Kit](https://kit.com) makes it easy to capture more leads and sell more products. This plugin makes it a little bit easier for those of us using Member Mouse to subscribe and tag customers that signup for memberships, products or bundles.
 
-**New to ConvertKit? [Creating an account](https://app.kit.com/users/signup?plan=newsletter-free&utm_source=wordpress&utm_term=en_US&utm_content=readme) is 100% free for your first 10,000 subscribers, making ConvertKit an email marketing solution for everyone - whether you're new to email marketing or a seasoned professional email marketer.**
+**New to Kit? [Creating an account](https://app.kit.com/users/signup?plan=newsletter-free&utm_source=wordpress&utm_term=en_US&utm_content=readme) is 100% free for your first 10,000 subscribers, making Kit an email marketing solution for everyone - whether you're new to email marketing or a seasoned professional email marketer.**
 
 == Installation ==
 
 1. Upload the `convertkit-membermouse` folder to the `/wp-content/plugins/` directory
-2. Active the ConvertKit MemberMouse Integration plugin through the 'Plugins' menu in WordPress
+2. Active the Kit MemberMouse Integration plugin through the 'Plugins' menu in WordPress
 
 == Configuration ==
 
-1. Visit the settings page by clicking on the link under the plugin's name
-2. Enter your ConvertKit API key, which you can find [here](https://app.kit.com/account/edit), and save the settings
-3. Select a tag to add to customers who signup for each Membership Level
-4. Save your settings
+1. Configure the plugin by navigating to `Settings > Kit Membermouse` in the WordPress Administration Menu, and clicking the `Connect` button
+2. Select a tag to add to customers who signup for each Membership Level
+3. Save your settings
 
 == Screenshots ==
 
-1. ConvertKit MemberMouse settings page
+1. Kit MemberMouse settings page
 
 == Frequently asked questions ==
 

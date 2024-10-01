@@ -296,7 +296,7 @@ class ConvertKit_MM_Admin {
 				array( $this, 'display_section_introduction' ),
 				CONVERTKIT_MM_NAME,
 				array(
-					'description' => esc_html__( 'For the ConvertKit for MemberMouse Plugin to function, please connect your ConvertKit account using the button below.', 'convertkit-mm' ),
+					'description' => esc_html__( 'For the Kit for MemberMouse Plugin to function, please connect your Kit account using the button below.', 'convertkit-mm' ),
 				)
 			);
 			return;
@@ -538,8 +538,8 @@ class ConvertKit_MM_Admin {
 	public function add_settings_page() {
 
 		add_options_page(
-			apply_filters( CONVERTKIT_MM_NAME . '_settings_page_title', esc_html__( 'ConvertKit MemberMouse Settings', 'convertkit-mm' ) ),
-			apply_filters( CONVERTKIT_MM_NAME . '_settings_menu_title', esc_html__( 'ConvertKit MemberMouse', 'convertkit-mm' ) ),
+			apply_filters( CONVERTKIT_MM_NAME . '_settings_page_title', esc_html__( 'Kit MemberMouse Settings', 'convertkit-mm' ) ),
+			apply_filters( CONVERTKIT_MM_NAME . '_settings_menu_title', esc_html__( 'Kit MemberMouse', 'convertkit-mm' ) ),
 			'manage_options',
 			CONVERTKIT_MM_NAME,
 			array( $this, 'display_settings_page' )
@@ -557,7 +557,7 @@ class ConvertKit_MM_Admin {
 
 		?>
 		<header>
-			<h1><?php esc_html_e( 'ConvertKit for MemberMouse', 'convertkit-mm' ); ?></h1>
+			<h1><?php esc_html_e( 'Kit for MemberMouse', 'convertkit-mm' ); ?></h1>
 
 			<?php
 			// Output Help link.

@@ -292,7 +292,7 @@ class ConvertKit_MM_Admin {
 		if ( ! $this->settings->has_access_and_refresh_token() ) {
 			add_settings_section(
 				CONVERTKIT_MM_NAME . '-oauth',
-				__( 'Connect to ConvertKit', 'convertkit-mm' ),
+				__( 'Connect to Kit', 'convertkit-mm' ),
 				array( $this, 'display_section_introduction' ),
 				CONVERTKIT_MM_NAME,
 				array(

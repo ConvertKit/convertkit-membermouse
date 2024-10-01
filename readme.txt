@@ -3,9 +3,9 @@ Contributors: nathanbarry, growdev, travisnorthcutt
 Donate link: http://kit.com/
 Tags: convertkit, email, marketing, membermouse
 Requires at least: 5.0
-Tested up to: 6.6
+Tested up to: 6.6.2
 Requires PHP: 5.6.20
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,6 +40,10 @@ This plugin integrates ConvertKit with Member Mouse.
 No. You must first have an account on [kit.com](https://kit.com?utm_source=wordpress&utm_term=en_US&utm_content=readme), but you do not have to use a paid plan!
 
 == Changelog ==
+
+### 1.2.4 2024-09-13
+* Updated: ConvertKit WordPress Libraries to 2.0.2
+* Fix: Don't automatically refresh tokens on non-production sites
 
 ### 1.2.3 2024-08-24
 * Fix: Include WordPress Libraries 2.0.1 with release

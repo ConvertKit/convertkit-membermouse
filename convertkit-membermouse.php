@@ -7,17 +7,17 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              http://www.convertkit.com
+ * @link              http://www.kit.com
  * @since             1.0.0
  * @package           ConvertKit_MM
  *
  * @wordpress-plugin
  * Plugin Name:       ConvertKit MemberMouse Integration
- * Plugin URI:        http://www.convertkit.com
+ * Plugin URI:        http://www.kit.com
  * Description:       This plugin integrates ConvertKit with MemberMouse.
  * Version:           1.2.4
  * Author:            ConvertKit
- * Author URI:        https://convertkit.com
+ * Author URI:        https://kit.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       convertkit-mm
@@ -36,7 +36,7 @@ define( 'CONVERTKIT_MM_URL', plugin_dir_url( __FILE__ ) );
 define( 'CONVERTKIT_MM_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CONVERTKIT_MM_VERSION', '1.2.4' );
 define( 'CONVERTKIT_MM_OAUTH_CLIENT_ID', 'U4aHnnj_QgRrZOdtWUJ6vtpulZSloLKn-7e551T-Exw' );
-define( 'CONVERTKIT_MM_OAUTH_CLIENT_REDIRECT_URI', 'https://app.convertkit.com/wordpress/redirect' );
+define( 'CONVERTKIT_MM_OAUTH_CLIENT_REDIRECT_URI', 'https://app.kit.com/wordpress/redirect' );
 
 // Load shared classes, if they have not been included by another ConvertKit Plugin.
 if ( ! trait_exists( 'ConvertKit_API_Traits' ) ) {

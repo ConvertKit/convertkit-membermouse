@@ -1,6 +1,6 @@
 === ConvertKit MemberMouse Integration ===
 Contributors: nathanbarry, growdev, travisnorthcutt
-Donate link: http://convertkit.com/
+Donate link: http://kit.com/
 Tags: convertkit, email, marketing, membermouse
 Requires at least: 5.0
 Tested up to: 6.6.2
@@ -13,9 +13,9 @@ This plugin integrates ConvertKit with Member Mouse.
 
 == Description ==
 
-[ConvertKit](https://convertkit.com) makes it easy to capture more leads and sell more products. This plugin makes it a little bit easier for those of us using Member Mouse to subscribe and tag customers that signup for memberships, products or bundles.
+[ConvertKit](https://kit.com) makes it easy to capture more leads and sell more products. This plugin makes it a little bit easier for those of us using Member Mouse to subscribe and tag customers that signup for memberships, products or bundles.
 
-**New to ConvertKit? [Creating an account](https://app.convertkit.com/users/signup?plan=newsletter-free&utm_source=wordpress&utm_term=en_US&utm_content=readme) is 100% free for your first 10,000 subscribers, making ConvertKit an email marketing solution for everyone - whether you're new to email marketing or a seasoned professional email marketer.**
+**New to ConvertKit? [Creating an account](https://app.kit.com/users/signup?plan=newsletter-free&utm_source=wordpress&utm_term=en_US&utm_content=readme) is 100% free for your first 10,000 subscribers, making ConvertKit an email marketing solution for everyone - whether you're new to email marketing or a seasoned professional email marketer.**
 
 == Installation ==
 
@@ -25,7 +25,7 @@ This plugin integrates ConvertKit with Member Mouse.
 == Configuration ==
 
 1. Visit the settings page by clicking on the link under the plugin's name
-2. Enter your ConvertKit API key, which you can find [here](https://app.convertkit.com/account/edit), and save the settings
+2. Enter your ConvertKit API key, which you can find [here](https://app.kit.com/account/edit), and save the settings
 3. Select a tag to add to customers who signup for each Membership Level
 4. Save your settings
 
@@ -37,7 +37,7 @@ This plugin integrates ConvertKit with Member Mouse.
 
 = Does this plugin require a paid service? =
 
-No. You must first have an account on [convertkit.com](https://convertkit.com?utm_source=wordpress&utm_term=en_US&utm_content=readme), but you do not have to use a paid plan!
+No. You must first have an account on [kit.com](https://kit.com?utm_source=wordpress&utm_term=en_US&utm_content=readme), but you do not have to use a paid plan!
 
 == Changelog ==
 

@@ -368,7 +368,7 @@ class ConvertKit_MM_Admin {
 
 		// Define description for the settings section, depending on whether any bundles exist.
 		if ( count( $levels ) ) {
-			$description = esc_html__( 'For each MemberMouse membership level, assign a ConvertKit Tag that you wish to be assigned to members of that level.', 'convertkit-mm' );
+			$description = esc_html__( 'For each MemberMouse membership level, assign a Kit Tag that you wish to be assigned to members of that level.', 'convertkit-mm' );
 		} else {
 			$description = esc_html__( 'No membership levels exist in MemberMouse. Add a membership level first, and then reload this settings screen to assign tags to members by membership level.', 'convertkit-mm' );
 		}
@@ -427,7 +427,7 @@ class ConvertKit_MM_Admin {
 
 		// Define description for the settings section, depending on whether any products exist.
 		if ( count( $products ) ) {
-			$description = esc_html__( 'For each MemberMouse product, assign a ConvertKit Tag that you wish to be assigned to members of that product.', 'convertkit-mm' );
+			$description = esc_html__( 'For each MemberMouse product, assign a Kit Tag that you wish to be assigned to members of that product.', 'convertkit-mm' );
 		} else {
 			$description = esc_html__( 'No products exist in MemberMouse. Add a product first, and then reload this settings screen to assign tags to members of products.', 'convertkit-mm' );
 		}
@@ -482,7 +482,7 @@ class ConvertKit_MM_Admin {
 
 		// Define description for the settings section, depending on whether any bundles exist.
 		if ( count( $bundles ) ) {
-			$description = esc_html__( 'For each MemberMouse bundle, assign a ConvertKit Tag that you wish to be assigned to members of that bundle.', 'convertkit-mm' );
+			$description = esc_html__( 'For each MemberMouse bundle, assign a Kit Tag that you wish to be assigned to members of that bundle.', 'convertkit-mm' );
 		} else {
 			$description = esc_html__( 'No bundles exist in MemberMouse. Add a bundle first, and then reload this settings screen to assign tags to members of bundles.', 'convertkit-mm' );
 		}

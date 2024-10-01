@@ -35,9 +35,6 @@ body.settings_page_convertkit-mm header a.convertkit-docs {
 	background: url(../images/help.svg) 0 0% no-repeat;
 	background-size: 20px 20px;
 }
-body.settings_page_convertkit-mm header a.convertkit-docs:hover {
-	color: #fff;
-}
 body.settings_page_convertkit-mm .wrap {
 	margin-left: 20px;
 }

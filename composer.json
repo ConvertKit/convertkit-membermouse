@@ -1,10 +1,10 @@
 {
     "name": "convertkit/convertkit-wordpress",
-    "description": "ConvertKit WordPress Plugin",
+    "description": "Kit for MemberMouse Plugin",
     "type": "project",
     "license": "GPLv3",
     "require": {
-        "convertkit/convertkit-wordpress-libraries": "dev-use-kit-domain"
+        "convertkit/convertkit-wordpress-libraries": "2.0.4"
     },
     "require-dev": {
         "lucatume/wp-browser": "<3.5",

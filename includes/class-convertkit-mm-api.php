@@ -79,7 +79,7 @@ class ConvertKit_MM_API extends ConvertKit_API_V4 {
 
 			'get_subscriber_by_email_email_empty'          => __( 'get_subscriber_by_email(): the email parameter is empty.', 'convertkit-mm' ),
 			/* translators: Email Address */
-			'get_subscriber_by_email_none'                 => __( 'get_subscriber_by_email(): No subscriber(s) exist in ConvertKit matching the email address %s.', 'convertkit-mm' ),
+			'get_subscriber_by_email_none'                 => __( 'get_subscriber_by_email(): No subscriber(s) exist in Kit matching the email address %s.', 'convertkit-mm' ),
 
 			'get_subscriber_by_id_subscriber_id_empty'     => __( 'get_subscriber_by_id(): the subscriber_id parameter is empty.', 'convertkit-mm' ),
 
@@ -109,10 +109,10 @@ class ConvertKit_MM_API extends ConvertKit_API_V4 {
 
 			/* translators: HTTP method */
 			'request_method_unsupported'                   => __( 'API request method %s is not supported in ConvertKit_API class.', 'convertkit-mm' ),
-			'request_rate_limit_exceeded'                  => __( 'ConvertKit API Error: Rate limit hit.', 'convertkit-mm' ),
-			'request_internal_server_error'                => __( 'ConvertKit API Error: Internal server error.', 'convertkit-mm' ),
-			'request_bad_gateway'                          => __( 'ConvertKit API Error: Bad gateway.', 'convertkit-mm' ),
-			'response_type_unexpected'                     => __( 'ConvertKit API Error: The response is not of the expected type array.', 'convertkit-mm' ),
+			'request_rate_limit_exceeded'                  => __( 'Kit API Error: Rate limit hit.', 'convertkit-mm' ),
+			'request_internal_server_error'                => __( 'Kit API Error: Internal server error.', 'convertkit-mm' ),
+			'request_bad_gateway'                          => __( 'Kit API Error: Bad gateway.', 'convertkit-mm' ),
+			'response_type_unexpected'                     => __( 'Kit API Error: The response is not of the expected type array.', 'convertkit-mm' ),
 		);
 
 	}

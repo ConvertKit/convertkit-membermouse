@@ -292,11 +292,11 @@ class ConvertKit_MM_Admin {
 		if ( ! $this->settings->has_access_and_refresh_token() ) {
 			add_settings_section(
 				CONVERTKIT_MM_NAME . '-oauth',
-				__( 'Connect to ConvertKit', 'convertkit-mm' ),
+				__( 'Connect to Kit', 'convertkit-mm' ),
 				array( $this, 'display_section_introduction' ),
 				CONVERTKIT_MM_NAME,
 				array(
-					'description' => esc_html__( 'For the ConvertKit for MemberMouse Plugin to function, please connect your ConvertKit account using the button below.', 'convertkit-mm' ),
+					'description' => esc_html__( 'For the Kit for MemberMouse Plugin to function, please connect your Kit account using the button below.', 'convertkit-mm' ),
 				)
 			);
 			return;
@@ -368,7 +368,7 @@ class ConvertKit_MM_Admin {
 
 		// Define description for the settings section, depending on whether any bundles exist.
 		if ( count( $levels ) ) {
-			$description = esc_html__( 'For each MemberMouse membership level, assign a ConvertKit Tag that you wish to be assigned to members of that level.', 'convertkit-mm' );
+			$description = esc_html__( 'For each MemberMouse membership level, assign a Kit Tag that you wish to be assigned to members of that level.', 'convertkit-mm' );
 		} else {
 			$description = esc_html__( 'No membership levels exist in MemberMouse. Add a membership level first, and then reload this settings screen to assign tags to members by membership level.', 'convertkit-mm' );
 		}
@@ -427,7 +427,7 @@ class ConvertKit_MM_Admin {
 
 		// Define description for the settings section, depending on whether any products exist.
 		if ( count( $products ) ) {
-			$description = esc_html__( 'For each MemberMouse product, assign a ConvertKit Tag that you wish to be assigned to members of that product.', 'convertkit-mm' );
+			$description = esc_html__( 'For each MemberMouse product, assign a Kit Tag that you wish to be assigned to members of that product.', 'convertkit-mm' );
 		} else {
 			$description = esc_html__( 'No products exist in MemberMouse. Add a product first, and then reload this settings screen to assign tags to members of products.', 'convertkit-mm' );
 		}
@@ -482,7 +482,7 @@ class ConvertKit_MM_Admin {
 
 		// Define description for the settings section, depending on whether any bundles exist.
 		if ( count( $bundles ) ) {
-			$description = esc_html__( 'For each MemberMouse bundle, assign a ConvertKit Tag that you wish to be assigned to members of that bundle.', 'convertkit-mm' );
+			$description = esc_html__( 'For each MemberMouse bundle, assign a Kit Tag that you wish to be assigned to members of that bundle.', 'convertkit-mm' );
 		} else {
 			$description = esc_html__( 'No bundles exist in MemberMouse. Add a bundle first, and then reload this settings screen to assign tags to members of bundles.', 'convertkit-mm' );
 		}
@@ -538,8 +538,8 @@ class ConvertKit_MM_Admin {
 	public function add_settings_page() {
 
 		add_options_page(
-			apply_filters( CONVERTKIT_MM_NAME . '_settings_page_title', esc_html__( 'ConvertKit MemberMouse Settings', 'convertkit-mm' ) ),
-			apply_filters( CONVERTKIT_MM_NAME . '_settings_menu_title', esc_html__( 'ConvertKit MemberMouse', 'convertkit-mm' ) ),
+			apply_filters( CONVERTKIT_MM_NAME . '_settings_page_title', esc_html__( 'Kit MemberMouse Settings', 'convertkit-mm' ) ),
+			apply_filters( CONVERTKIT_MM_NAME . '_settings_menu_title', esc_html__( 'Kit MemberMouse', 'convertkit-mm' ) ),
 			'manage_options',
 			CONVERTKIT_MM_NAME,
 			array( $this, 'display_settings_page' )
@@ -557,7 +557,7 @@ class ConvertKit_MM_Admin {
 
 		?>
 		<header>
-			<h1><?php esc_html_e( 'ConvertKit for MemberMouse', 'convertkit-mm' ); ?></h1>
+			<h1><?php esc_html_e( 'Kit for MemberMouse', 'convertkit-mm' ); ?></h1>
 
 			<?php
 			// Output Help link.

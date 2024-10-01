@@ -12,9 +12,9 @@
  * @package           ConvertKit_MM
  *
  * @wordpress-plugin
- * Plugin Name:       ConvertKit MemberMouse Integration
+ * Plugin Name:       Kit (formerly ConvertKit) MemberMouse Integration
  * Plugin URI:        http://www.kit.com
- * Description:       This plugin integrates ConvertKit with MemberMouse.
+ * Description:       This plugin integrates Kit with MemberMouse.
  * Version:           1.2.5
  * Author:            ConvertKit
  * Author URI:        https://kit.com

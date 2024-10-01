@@ -171,7 +171,7 @@ class ConvertKit_MM {
 				'convertkit_membermouse_get_class',
 				sprintf(
 					/* translators: %1$s: PHP class name */
-					__( 'ConvertKit for MemberMouse Error: Could not load Plugin class <strong>%1$s</strong>', 'convertkit-mm' ),
+					__( 'Kit for MemberMouse Error: Could not load Plugin class <strong>%1$s</strong>', 'convertkit-mm' ),
 					$name
 				)
 			);
@@ -181,7 +181,7 @@ class ConvertKit_MM {
 			if ( is_admin() ) {
 				wp_die(
 					esc_attr( $error->get_error_message() ),
-					esc_html__( 'ConvertKit for MemberMouse Error', 'convertkit-mm' ),
+					esc_html__( 'Kit for MemberMouse Error', 'convertkit-mm' ),
 					array(
 						'back_link' => true,
 					)

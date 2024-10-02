@@ -1,4 +1,4 @@
-=== Kit (formerly ConvertKit) MemberMouse Integration ===
+=== Kit (formerly ConvertKit) for MemberMouse ===
 Contributors: nathanbarry, growdev, travisnorthcutt
 Donate link: http://kit.com/
 Tags: convertkit, email, marketing, membermouse
@@ -20,7 +20,7 @@ This plugin integrates Kit with Member Mouse.
 == Installation ==
 
 1. Upload the `convertkit-membermouse` folder to the `/wp-content/plugins/` directory
-2. Active the Kit MemberMouse Integration plugin through the 'Plugins' menu in WordPress
+2. Active the Kit for MemberMouse plugin through the 'Plugins' menu in WordPress
 
 == Configuration ==
 

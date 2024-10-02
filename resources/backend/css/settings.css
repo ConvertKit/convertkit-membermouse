@@ -2,7 +2,7 @@
  * Settings > ConvertKit
  */
 body.settings_page_convertkit-mm {
-	background: #f6f8fa;
+	background: #f9f7f4;
 }
 body.settings_page_convertkit-mm #wpcontent {
 	padding-left: 0;
@@ -51,12 +51,12 @@ body.settings_page_convertkit-mm .notice {
  */
 body.settings_page_convertkit-mm .wrap .postbox {
 	background: #fff;
-	box-shadow: 0 2px 5px #0000000d;
-	color: #373f45;
+	color: #6e6e6e;
 	margin: 0 0 30px 0;
 	padding: 40px 30px 30px 30px;
 	font-size: 14px;
-	border: 1px solid #EDF2F4;
+	border-radius: 8px;
+	border: none;
 }
 body.settings_page_convertkit-mm .wrap .postbox .section {
 	margin-top: 40px;
@@ -66,7 +66,8 @@ body.settings_page_convertkit-mm .wrap .postbox h2 {
 	padding: 0 0 30px 0;
 	font-size: 24px;
 	font-weight: 600;
-	border-bottom: 1px solid #EDF2F4;
+	border-bottom: 1px solid #e3e3e3;
+	color: #3d3d3d;
 }
 body.settings_page_convertkit-mm .wrap .postbox p {
 	font-size: 14px;
@@ -82,9 +83,10 @@ body.settings_page_convertkit-mm .wrap .postbox table.form-table tbody td div la
 	display: block;
 }
 body.settings_page_convertkit-mm .wrap .postbox .button {
-	margin:  0 5px 0 0;
+	margin: 0 5px 0 0;
 	padding: 4px 12px;
 	font-size: 14px;
+	border-radius: 10px;
 
 	/* Required for WordPress 5.x styling */
 	height: auto;
@@ -97,8 +99,8 @@ body.settings_page_convertkit-mm .wrap .postbox .button-primary {
 	color: #fff;
 }
 body.settings_page_convertkit-mm .wrap .postbox .button-primary:hover {
-	background: #1e1e1e;
-	border-color: #1e1e1e;
+	background: #3d3d3d;
+	border-color: #3d3d3d;
 }
 body.settings_page_convertkit-mm .wrap .postbox textarea.convertkit-monospace {
 	font-family: monospace;

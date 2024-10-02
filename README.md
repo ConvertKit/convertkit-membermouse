@@ -1,6 +1,6 @@
 # Kit for MemberMouse
 
-Welcome to the Kit (formerly ConvertKit) MemberMouse Addon for WordPress repository on GitHub. Here you can view the plugin source code, review open issues, and see releases of the plugin.
+Welcome to the Kit MemberMouse Addon for WordPress repository on GitHub. Here you can view the plugin source code, review open issues, and see releases of the plugin.
 
 **If you're not a developer, please download the plugin from [WordPress.org](https://wordpress.org/plugins/convertkit-membermouse/). Downloading and installing directly from GitHub will not work.**
 

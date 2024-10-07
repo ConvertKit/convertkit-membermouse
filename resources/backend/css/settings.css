@@ -102,6 +102,15 @@ body.settings_page_convertkit-mm .wrap .postbox .button-primary:hover {
 	background: #3d3d3d;
 	border-color: #3d3d3d;
 }
+body.settings_page_convertkit-mm .wrap .postbox .button-secondary {
+	background: #f0f0f0;
+	border-color: #f0f0f0;
+	color: #3d3d3d;
+}
+body.settings_page_convertkit-mm .wrap .postbox .button-secondary:hover {
+	background: #ddd;
+	border-color: #ddd;
+}
 body.settings_page_convertkit-mm .wrap .postbox textarea.convertkit-monospace {
 	font-family: monospace;
 	padding: 20px;

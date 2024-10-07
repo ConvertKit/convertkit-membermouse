@@ -642,7 +642,7 @@ class ConvertKit_MM_Admin {
 
 		// Output Account Name.
 		$html = sprintf(
-			'<code>%s</code>',
+			'<p>%s</p>',
 			isset( $this->account['account']['name'] ) ? esc_attr( $this->account['account']['name'] ) : esc_html__( '(Not specified)', 'convertkit-mm' )
 		);
 

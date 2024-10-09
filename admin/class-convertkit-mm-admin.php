@@ -642,13 +642,13 @@ class ConvertKit_MM_Admin {
 
 		// Output Account Name.
 		$html = sprintf(
-			'<code>%s</code>',
+			'<p>%s</p>',
 			isset( $this->account['account']['name'] ) ? esc_attr( $this->account['account']['name'] ) : esc_html__( '(Not specified)', 'convertkit-mm' )
 		);
 
 		// Display an option to disconnect.
 		$html .= sprintf(
-			'<p><a href="%1$s" class="button button-primary">%2$s</a></p>',
+			'<p><a href="%1$s" class="button button-secondary">%2$s</a></p>',
 			esc_url(
 				add_query_arg(
 					array(

@@ -582,7 +582,7 @@ class ConvertKit_MM_Admin {
 						if ( ! $this->settings->has_access_and_refresh_token() ) {
 							// Determine the OAuth URL to begin the authorization process.
 							$api       = new ConvertKit_MM_API( CONVERTKIT_MM_OAUTH_CLIENT_ID, CONVERTKIT_MM_OAUTH_CLIENT_REDIRECT_URI );
-							$oauth_url = $api->get_oauth_url( admin_url( 'options-general.php?page=convertkit-mm' ) );
+							$oauth_url = $api->get_oauth_url( admin_url( 'options-general.php?page=convertkit-mm' ), get_site_url() );
 							?>
 							<p>
 								<a href="<?php echo esc_url( $oauth_url ); ?>" class="button button-primary"><?php esc_html_e( 'Connect', 'convertkit-mm' ); ?></a>
